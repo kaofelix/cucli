@@ -1,0 +1,21 @@
+[project]
+name = "cucli"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Kao Félix", email = "me@kaofelix.dev" }
+]
+requires-python = ">=3.12.1"
+dependencies = [
+    "click>=8.3.1",
+    "httpx>=0.28.1",
+    "pydantic>=2.12.5",
+]
+
+[project.scripts]
+cucli = "cucli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.24,<0.10.0"]
+build-backend = "uv_build"
