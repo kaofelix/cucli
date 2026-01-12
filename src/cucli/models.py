@@ -63,5 +63,28 @@ class TeamsResponse(BaseModel):
     teams: list[Team] = Field(default_factory=list)
 
 
+class Task(BaseModel):
+    """A ClickUp task."""
+
+    id: str
+    name: str
+    description: str | None = None
+    markdown_description: str | None = None
+    status: dict[str, Any] | None = None
+    priority: dict[str, Any] | None = None
+    assignees: list[str] = Field(default_factory=list)
+    tags: list[dict[str, Any]] = Field(default_factory=list)
+    due_date: str | None = None
+    start_date: str | None = None
+    time_estimate: str | None = None
+    time_spent: int | None = None
+
+
+class TaskResponse(BaseModel):
+    """Response from the /task/{task_id} endpoint."""
+
+    task: Task | None = None
+
+
 # For raw output when models don't match
 RawResponse = dict[str, Any]

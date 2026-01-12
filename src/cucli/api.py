@@ -36,6 +36,22 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def get_task(self, task_id: str) -> dict[str, Any]:
+        """Get a task by ID.
+
+        Args:
+            task_id: The task ID.
+
+        Returns:
+            The response from the /task/{task_id} endpoint.
+        """
+        response = self._client.get(
+            f"{self.base_url}/task/{task_id}",
+            params={"include_markdown_description": "true"},
+        )
+        response.raise_for_status()
+        return response.json()
+
     def close(self) -> None:
         """Close the HTTP client."""
         self._client.close()

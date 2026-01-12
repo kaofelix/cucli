@@ -60,6 +60,34 @@ Output raw JSON (useful for debugging or when models don't match):
 cucli workspaces --raw
 ```
 
+### Get task details
+
+```bash
+cucli task <task_id>
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli task 86abc123
+
+# Table format
+cucli task 86abc123 --format table
+
+# Markdown format (description only)
+cucli task 86abc123 --format markdown
+
+# Markdown description only (useful for piping to other tools)
+cucli task 86abc123 --md-only
+```
+
+Get raw JSON response:
+
+```bash
+cucli task 86abc123 --raw
+```
+
 ### Get help
 
 ```bash
