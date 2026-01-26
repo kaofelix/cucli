@@ -1,0 +1,79 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.clickup.com/api/v2/team/99999999/task
+  response:
+    body:
+      string: '{"err":"Workspace not found","ECODE":"SHARD_031"}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - x-datadog-trace-id,server
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Cache-control:
+      - no-cache
+      - no-store
+      Connection:
+      - keep-alive
+      Content-Language:
+      - en-US
+      Content-Length:
+      - '49'
+      Content-Security-Policy:
+      - frame-ancestors 'self'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 26 Jan 2026 13:37:21 GMT
+      Expect-CT:
+      - max-age=0
+      Expires:
+      - '0'
+      Pragma:
+      - no-cache
+      Server:
+      - nginx
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Timing-Allow-Origin:
+      - '*'
+      Via:
+      - 1.1 ca72fb79824404d2ea5e2f5721ad1998.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - spODw8UlmEhQXMDqfYNYkq4dAfWXainLIlIRo6G5bcxuEeikTKhkRQ==
+      X-Amz-Cf-Pop:
+      - MRS53-P1
+      X-Cache:
+      - Error from cloudfront
+      X-Content-Type-Options:
+      - nosniff
+      X-DNS-Prefetch-Control:
+      - 'off'
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-XSS-Protection:
+      - '0'
+      x-datadog-trace-id:
+      - '4870609112471869723'
+    status:
+      code: 404
+      message: Not Found
+version: 1

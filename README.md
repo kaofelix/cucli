@@ -88,6 +88,54 @@ Get raw JSON response:
 cucli task 86abc123 --raw
 ```
 
+### List tasks
+
+```bash
+cucli tasks <team_id>
+```
+
+List tasks with filters:
+
+```bash
+# Filter by status
+cucli tasks <team_id> --status "to do" --status "in progress"
+
+# Filter by space
+cucli tasks <team_id> --space-id <space_id>
+
+# Filter by list
+cucli tasks <team_id> --list-id <list_id>
+
+# Filter by assignee
+cucli tasks <team_id> --assignee <assignee_id>
+
+# Filter by tag
+cucli tasks <team_id> --tag <tag_name>
+
+# Include closed tasks
+cucli tasks <team_id> --include-closed
+```
+
+Pagination:
+
+```bash
+# Get second page
+cucli tasks <team_id> --page 1
+```
+
+Output formats:
+
+```bash
+# JSON (default)
+cucli tasks <team_id>
+
+# Table format
+cucli tasks <team_id> --format table
+
+# Raw JSON (useful for debugging or when models don't match)
+cucli tasks <team_id> --raw
+```
+
 ### Get help
 
 ```bash

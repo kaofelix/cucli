@@ -1,4 +1,5 @@
 """Pydantic models for ClickUp API responses."""
+
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -72,7 +73,7 @@ class Task(BaseModel):
     markdown_description: str | None = None
     status: dict[str, Any] | None = None
     priority: dict[str, Any] | None = None
-    assignees: list[str] = Field(default_factory=list)
+    assignees: list[dict[str, Any]] = Field(default_factory=list)
     tags: list[dict[str, Any]] = Field(default_factory=list)
     due_date: str | None = None
     start_date: str | None = None

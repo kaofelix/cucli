@@ -1,5 +1,4 @@
 """Tests for the ClickUp API client."""
-import json
 
 import pytest
 from cucli.api import ClickUpClient
@@ -13,6 +12,7 @@ class TestClickUpClient:
         """Test that client raises ValueError when no API key is provided."""
         # Temporarily unset env var if it exists
         import os
+
         original_key = os.environ.get("CLICKUP_API_KEY")
         if "CLICKUP_API_KEY" in os.environ:
             del os.environ["CLICKUP_API_KEY"]
@@ -106,6 +106,45 @@ class TestClickUpClient:
 
         with pytest.raises(httpx.HTTPStatusError) as exc_info:
             clickup_client.get_task(task_id)
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_get_team_tasks(self, clickup_client):
+        """Test getting tasks from a team."""
+        # Using a real team ID from the test workspace
+        team_id = "90152245421"
+
+        response = clickup_client.get_team_tasks(team_id)
+
+        # Verify response structure
+        assert "tasks" in response
+        assert isinstance(response["tasks"], list)
+
+    @pytest.mark.vcr
+    def test_get_team_tasks_with_filters(self, clickup_client):
+        """Test getting team tasks with filters."""
+        team_id = "90152245421"
+
+        response = clickup_client.get_team_tasks(
+            team_id,
+            page=0,
+            include_markdown_description=True,
+        )
+
+        assert "tasks" in response
+        assert isinstance(response["tasks"], list)
+
+    @pytest.mark.vcr
+    def test_get_team_tasks_not_found(self, clickup_client):
+        """Test that get_team_tasks raises HTTPStatusError for non-existent team."""
+        import httpx
+
+        team_id = "99999999"  # Non-existent team ID
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.get_team_tasks(team_id)
 
         # Should get a 404 or similar error
         assert exc_info.value.response.status_code >= 400

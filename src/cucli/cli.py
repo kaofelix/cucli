@@ -1,4 +1,5 @@
 """Click CLI for ClickUp."""
+
 import json
 
 import click
@@ -102,8 +103,10 @@ def task(task_id: str, format: str, raw: bool, md_only: bool) -> None:
                     "description": task.description,
                     "markdown_description": task.markdown_description,
                     "status": task.status.get("status") if task.status else None,
-                    "priority": task.priority.get("priority") if task.priority else None,
-                    "assignees": task.assignees,
+                    "priority": task.priority.get("priority")
+                    if task.priority
+                    else None,
+                    "assignees": [a.get("username") for a in task.assignees],
                     "tags": [t.get("name") for t in task.tags],
                     "due_date": task.due_date,
                     "start_date": task.start_date,
@@ -117,15 +120,19 @@ def task(task_id: str, format: str, raw: bool, md_only: bool) -> None:
                 if task.priority:
                     click.echo(f"Priority: {task.priority.get('priority')}")
                 if task.assignees:
-                    click.echo(f"Assignees: {', '.join(task.assignees)}")
+                    click.echo(
+                        f"Assignees: {', '.join(a.get('username', '') for a in task.assignees)}"
+                    )
                 if task.tags:
-                    click.echo(f"Tags:     {', '.join(t.get('name', '') for t in task.tags)}")
+                    click.echo(
+                        f"Tags:     {', '.join(t.get('name', '') for t in task.tags)}"
+                    )
                 if task.due_date:
                     click.echo(f"Due Date: {task.due_date}")
                 # Use markdown_description if available, otherwise fall back to description
                 desc = task.markdown_description or task.description
                 if desc:
-                    click.echo(f"\nDescription:")
+                    click.echo("\nDescription:")
                     click.echo(desc)
             elif format == "markdown":
                 # Use markdown_description if available, otherwise fall back to description
@@ -134,6 +141,123 @@ def task(task_id: str, format: str, raw: bool, md_only: bool) -> None:
                     click.echo(desc)
                 else:
                     click.echo("(No description)")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="tasks")
+@click.argument("team_id")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@click.option("--page", type=int, help="Page to fetch (starts at 0).")
+@click.option("--status", multiple=True, help="Filter by status (can use multiple).")
+@click.option(
+    "--include-closed",
+    is_flag=True,
+    help="Include closed tasks.",
+)
+@click.option(
+    "--space-id", multiple=True, help="Filter by space ID (can use multiple)."
+)
+@click.option("--list-id", multiple=True, help="Filter by list ID (can use multiple).")
+@click.option(
+    "--assignee", multiple=True, help="Filter by assignee ID (can use multiple)."
+)
+@click.option("--tag", multiple=True, help="Filter by tag (can use multiple).")
+def tasks(
+    team_id: str,
+    format: str,
+    raw: bool,
+    page: int | None,
+    status: tuple[str, ...],
+    include_closed: bool,
+    space_id: tuple[str, ...],
+    list_id: tuple[str, ...],
+    assignee: tuple[str, ...],
+    tag: tuple[str, ...],
+) -> None:
+    """List tasks in a team/workspace.
+
+    TEAM_ID: The ID of the team/workspace.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.get_team_tasks(
+                team_id,
+                page=page,
+                include_markdown_description=True,
+                statuses=list(status) if status else None,
+                include_closed=include_closed,
+                space_ids=list(space_id) if space_id else None,
+                list_ids=list(list_id) if list_id else None,
+                assignees=list(assignee) if assignee else None,
+                tags=list(tag) if tag else None,
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            tasks_list = data.get("tasks", [])
+
+            if format == "json":
+                output = []
+                for task_data in tasks_list:
+                    task = Task(**task_data)
+                    output.append(
+                        {
+                            "id": task.id,
+                            "name": task.name,
+                            "status": task.status.get("status")
+                            if task.status
+                            else None,
+                            "priority": task.priority.get("priority")
+                            if task.priority
+                            else None,
+                            "assignees": [a.get("username") for a in task.assignees],
+                            "tags": [t.get("name") for t in task.tags],
+                            "due_date": task.due_date,
+                            "url": task_data.get("url"),
+                        }
+                    )
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                if not tasks_list:
+                    click.echo("No tasks found.")
+                    return
+
+                # Calculate column widths
+                max_id = max(len(t.get("id", "")) for t in tasks_list)
+                max_name = max(len(t.get("name", "")) for t in tasks_list)
+                max_status = max(
+                    len(str(t.get("status", {}).get("status", ""))) for t in tasks_list
+                )
+
+                # Print header
+                click.echo(
+                    f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'STATUS'}"
+                )
+                click.echo("-" * (max_id + max_name + max_status + 6))
+
+                # Print rows
+                for task_data in tasks_list:
+                    task = Task(**task_data)
+                    status_val = task.status.get("status") if task.status else ""
+                    click.echo(
+                        f"{task.id.ljust(max_id)}  {task.name.ljust(max_name)}  {status_val}"
+                    )
     except httpx.HTTPStatusError as e:
         click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
         raise click.Abort()

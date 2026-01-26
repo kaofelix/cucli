@@ -1,5 +1,4 @@
 """Tests for Pydantic models."""
-import pytest
 
 from cucli.models import (
     InvitedBy,
@@ -149,7 +148,10 @@ class TestTask:
             "markdown_description": "## Markdown Description",
             "status": {"status": "In Progress", "color": "#ffff00"},
             "priority": {"priority": "urgent", "color": "#ff0000"},
-            "assignees": ["user1", "user2"],
+            "assignees": [
+                {"id": 123, "username": "user1"},
+                {"id": 456, "username": "user2"},
+            ],
             "tags": [{"name": "frontend", "color": "#00ff00"}],
             "due_date": "1634567890000",
             "start_date": "1634567890000",
@@ -163,7 +165,8 @@ class TestTask:
         assert task.markdown_description == "## Markdown Description"
         assert task.status["status"] == "In Progress"
         assert task.priority["priority"] == "urgent"
-        assert task.assignees == ["user1", "user2"]
+        assert len(task.assignees) == 2
+        assert task.assignees[0]["username"] == "user1"
         assert len(task.tags) == 1
         assert task.tags[0]["name"] == "frontend"
         assert task.due_date == "1634567890000"

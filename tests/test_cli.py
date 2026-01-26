@@ -1,4 +1,5 @@
 """Tests for the CLI commands."""
+
 import json
 
 import pytest
@@ -52,8 +53,6 @@ class TestWorkspacesCommand:
         # Raw output should include all fields from API
         assert "teams" in output
         assert isinstance(output["teams"], list)
-
-
 
     def test_workspaces_missing_api_key(self, runner, monkeypatch):
         """Test workspaces command fails gracefully without API key."""
@@ -136,6 +135,77 @@ class TestTaskCommand:
         """Test task command fails gracefully without API key."""
         task_id = "86abc123def456"
         result = runner.invoke(cli, ["task", task_id])
+
+        assert result.exit_code != 0
+        assert "Error:" in result.output or "CLICKUP_API_KEY" in result.output
+
+
+class TestTasksCommand:
+    """Test cases for the tasks command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_tasks_json_output(self, runner, mock_api_key_env):
+        """Test tasks command with JSON output (default)."""
+        team_id = "90152245421"
+        result = runner.invoke(cli, ["tasks", team_id])
+
+        if result.exit_code != 0:
+            print(f"Output: {result.output}")
+            print(f"Exception: {result.exception}")
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert isinstance(output, list)
+        # Validate structure if there are tasks
+        if output:
+            task = output[0]
+            assert "id" in task
+            assert "name" in task
+            assert "status" in task
+
+    @pytest.mark.vcr
+    def test_tasks_with_filters(self, runner, mock_api_key_env):
+        """Test tasks command with filters."""
+        team_id = "90152245421"
+        result = runner.invoke(cli, ["tasks", team_id, "--status", "todo"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert isinstance(output, list)
+
+    @pytest.mark.vcr
+    def test_tasks_raw_output(self, runner, mock_api_key_env):
+        """Test tasks command with raw JSON output."""
+        team_id = "90152245421"
+        result = runner.invoke(cli, ["tasks", team_id, "--raw"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        # Raw output should include all fields from API
+        assert "tasks" in output
+        assert isinstance(output["tasks"], list)
+
+    @pytest.mark.vcr
+    def test_tasks_not_found(self, runner, mock_api_key_env):
+        """Test tasks command with non-existent team ID."""
+        team_id = "99999999"
+        result = runner.invoke(cli, ["tasks", team_id])
+
+        assert result.exit_code != 0
+        assert "Error" in result.output or "HTTP Error" in result.output
+
+    def test_tasks_missing_api_key(self, runner, monkeypatch):
+        """Test tasks command fails gracefully without API key."""
+        monkeypatch.delenv("CLICKUP_API_KEY", raising=False)
+        team_id = "90152245421"
+        result = runner.invoke(cli, ["tasks", team_id])
 
         assert result.exit_code != 0
         assert "Error:" in result.output or "CLICKUP_API_KEY" in result.output
