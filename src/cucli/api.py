@@ -81,6 +81,24 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def create_folder(self, space_id: str, *, name: str) -> dict[str, Any]:
+        """Create a new folder in a space.
+
+        Args:
+            space_id: The space ID to create the folder in.
+            name: The folder name.
+
+        Returns:
+            The response from the /space/{space_id}/folder endpoint.
+        """
+        data: dict[str, Any] = {"name": name}
+
+        response = self._client.post(
+            f"{self.base_url}/space/{space_id}/folder", json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
     def get_lists(
         self, folder_id: str, *, archived: bool | None = None
     ) -> dict[str, Any]:

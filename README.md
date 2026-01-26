@@ -189,6 +189,25 @@ Output raw JSON:
 cucli lists <folder_id> --raw
 ```
 
+### Create folder
+
+```bash
+cucli create-folder <space_id> --name "Folder Name"
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli create-folder <space_id> --name "New Folder"
+
+# Table format
+cucli create-folder <space_id> --name "New Folder" --format table
+
+# Raw JSON (useful for debugging or when models don't match)
+cucli create-folder <space_id> --name "New Folder" --raw
+```
+
 ### Get task details
 
 ```bash

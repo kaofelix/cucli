@@ -1,0 +1,97 @@
+interactions:
+- request:
+    body: '{"name":"Test Folder Table"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - pk_272627274_QZU8LEFFQ2CDW3ASOXATNG51Q2I45PRY
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '28'
+      Content-Type:
+      - application/json
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.clickup.com/api/v2/space/90159451300/folder
+  response:
+    body:
+      string: '{"id":"901513799682","name":"Test Folder Table","orderindex":3,"override_statuses":false,"hidden":false,"space":{"id":"90159451300","name":"Team
+        Space","access":true},"task_count":"0","archived":false,"statuses":[],"deleted":false,"lists":[],"permission_level":"create"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '270'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 26 Jan 2026 18:53:44 GMT
+      Server:
+      - nginx
+      Server-Timing:
+      - cdn-upstream-layer;desc="EDGE",cdn-upstream-dns;dur=0,cdn-upstream-connect;dur=0,cdn-upstream-fbl;dur=868,cdn-cache-miss,cdn-pop;desc="MRS53-P1",cdn-rid;desc="EOMzp1dhhkXd_MncvUBrhuWIKAwtTCrcCxKZX3ckyifgdNaCrffJsg==",cdn-downstream-fbl;dur=871
+      Timing-Allow-Origin:
+      - '*'
+      Via:
+      - 1.1 3c56e229198dedda70b5e40530bd2d04.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - EOMzp1dhhkXd_MncvUBrhuWIKAwtTCrcCxKZX3ckyifgdNaCrffJsg==
+      X-Amz-Cf-Pop:
+      - MRS53-P1
+      X-Cache:
+      - Miss from cloudfront
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - x-datadog-trace-id,server
+      cache-control:
+      - no-cache, no-store
+      content-language:
+      - en-US
+      content-security-policy:
+      - frame-ancestors 'self'
+      expect-ct:
+      - max-age=0
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Origin
+      x-content-type-options:
+      - nosniff
+      x-datadog-trace-id:
+      - '4833823424777480131'
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-permitted-cross-domain-policies:
+      - none
+      x-ratelimit-limit:
+      - '100'
+      x-ratelimit-remaining:
+      - '99'
+      x-ratelimit-reset:
+      - '1769453684'
+      x-received-from:
+      - shard-prod-eu-west-1-3
+      x-xss-protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

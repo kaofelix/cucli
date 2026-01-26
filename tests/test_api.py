@@ -5,6 +5,7 @@ from cucli.api import ClickUpClient
 from cucli.models import (
     Comment,
     CommentsResponse,
+    Folder,
     FoldersResponse,
     ListsResponse,
     SpacesResponse,
@@ -502,6 +503,38 @@ class TestClickUpClient:
 
         with pytest.raises(httpx.HTTPStatusError) as exc_info:
             clickup_client.create_task_comment(task_id, comment_text="Test")
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_create_folder(self, clickup_client):
+        """Test creating a folder in a space."""
+        space_id = "90159451300"
+
+        response = clickup_client.create_folder(space_id, name="Test Folder from API")
+
+        # Verify response structure
+        assert "id" in response
+        assert "name" in response
+        assert response["name"] == "Test Folder from API"
+        assert "space" in response
+        assert response["space"]["id"] == space_id
+
+        # Parse with Pydantic model
+        folder = Folder(**response)
+        assert folder.name == "Test Folder from API"
+        assert folder.space.id == space_id
+
+    @pytest.mark.vcr
+    def test_create_folder_not_found(self, clickup_client):
+        """Test creating a folder in a non-existent space."""
+        import httpx
+
+        space_id = "99999999"
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.create_folder(space_id, name="Test Folder")
 
         # Should get a 404 or similar error
         assert exc_info.value.response.status_code >= 400

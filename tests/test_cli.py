@@ -483,6 +483,7 @@ class TestCLI:
         assert "folders" in result.output
         assert "lists" in result.output
         assert "create-task" in result.output
+        assert "create-folder" in result.output
         assert "update-task" in result.output
         assert "delete-task" in result.output
 
@@ -951,3 +952,84 @@ class TestAddCommentCommand:
         """Test add-comment command help."""
         result = runner.invoke(cli, ["add-comment", "--help"])
         assert result.exit_code == 0
+
+
+class TestCreateFolderCommand:
+    """Test cases for the create-folder command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_create_folder_basic(self, runner, mock_api_key_env):
+        """Test create-folder command with minimal options."""
+        space_id = "90159451300"
+        result = runner.invoke(
+            cli, ["create-folder", space_id, "--name", "Test Folder from CLI"]
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "id" in output
+        assert output["name"] == "Test Folder from CLI"
+
+    @pytest.mark.vcr
+    def test_create_folder_table_output(self, runner, mock_api_key_env):
+        """Test create-folder command with table output."""
+        space_id = "90159451300"
+        result = runner.invoke(
+            cli,
+            [
+                "create-folder",
+                space_id,
+                "--name",
+                "Test Folder Table",
+                "--format",
+                "table",
+            ],
+        )
+
+        assert result.exit_code == 0
+        assert "ID:" in result.output
+        assert "Name:" in result.output
+
+    @pytest.mark.vcr
+    def test_create_folder_raw_output(self, runner, mock_api_key_env):
+        """Test create-folder command with raw output."""
+        space_id = "90159451300"
+        result = runner.invoke(
+            cli, ["create-folder", space_id, "--name", "Test Folder Raw", "--raw"]
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        # Raw output includes all fields from API
+        assert "id" in output
+        assert "name" in output
+
+    @pytest.mark.vcr
+    def test_create_folder_invalid_space(self, runner, mock_api_key_env):
+        """Test create-folder command with invalid space ID."""
+        space_id = "99999999"
+        result = runner.invoke(
+            cli, ["create-folder", space_id, "--name", "Test Folder"]
+        )
+
+        assert result.exit_code != 0
+        assert "Error" in result.output or "HTTP Error" in result.output
+
+    def test_create_folder_missing_name(self, runner, mock_api_key_env):
+        """Test create-folder command fails without required name."""
+        space_id = "90159451300"
+        result = runner.invoke(cli, ["create-folder", space_id])
+
+        assert result.exit_code != 0
+        assert "name" in result.output.lower() or "missing" in result.output.lower()
+
+    def test_create_folder_help(self, runner):
+        """Test create-folder command help."""
+        result = runner.invoke(cli, ["create-folder", "--help"])
+        assert result.exit_code == 0
+        assert "--name" in result.output

@@ -199,6 +199,53 @@ def folders(space_id: str, format: str, raw: bool, archived: bool) -> None:
             )
 
 
+@cli.command(name="create-folder")
+@click.argument("space_id")
+@click.option("--name", required=True, help="Folder name (required).")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def create_folder(space_id: str, name: str, format: str, raw: bool) -> None:
+    """Create a new folder in a space.
+
+    SPACE_ID: The ID of the space to create the folder in.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.create_folder(space_id, name=name)
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            if format == "json":
+                output = {
+                    "id": data.get("id"),
+                    "name": data.get("name"),
+                    "space_id": data.get("space", {}).get("id"),
+                    "task_count": data.get("task_count"),
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:        {data.get('id')}")
+                click.echo(f"Name:      {data.get('name')}")
+                click.echo(f"Space ID:  {data.get('space', {}).get('id')}")
+                click.echo(f"Task Count: {data.get('task_count')}")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
 @cli.command(name="lists")
 @click.argument("folder_id")
 @click.option(
