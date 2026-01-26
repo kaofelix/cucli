@@ -3,6 +3,8 @@
 import pytest
 from cucli.api import ClickUpClient
 from cucli.models import (
+    Comment,
+    CommentsResponse,
     FoldersResponse,
     ListsResponse,
     SpacesResponse,
@@ -422,6 +424,84 @@ class TestClickUpClient:
 
         with pytest.raises(httpx.HTTPStatusError) as exc_info:
             clickup_client.delete_task(task_id)
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_get_task_comments(self, clickup_client):
+        """Test getting comments from a task."""
+        # Using a real task ID from the test workspace
+        task_id = "86c7mc19h"
+
+        response = clickup_client.get_task_comments(task_id)
+
+        # Verify response structure
+        assert "comments" in response
+        assert isinstance(response["comments"], list)
+
+        # Parse with Pydantic model
+        comments_response = CommentsResponse(**response)
+        assert len(comments_response.comments) >= 0
+
+        # If there are comments, validate first comment structure
+        if comments_response.comments:
+            comment = comments_response.comments[0]
+            assert isinstance(comment.id, str)
+            assert isinstance(comment.comment_text, str)
+            assert isinstance(comment.user, Comment)
+            assert isinstance(comment.resolved, bool)
+
+    @pytest.mark.vcr
+    def test_get_task_comments_not_found(self, clickup_client):
+        """Test that get_task_comments raises HTTPStatusError for non-existent task."""
+        import httpx
+
+        task_id = "00000000"  # Non-existent task ID
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.get_task_comments(task_id)
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_create_task_comment(self, clickup_client):
+        """Test creating a comment on a task."""
+        # Using a real task ID from the test workspace
+        task_id = "86c7mc19h"
+
+        response = clickup_client.create_task_comment(
+            task_id, comment_text="Test comment from API"
+        )
+
+        # Verify response structure
+        assert "id" in response
+        assert "date" in response
+
+    @pytest.mark.vcr
+    def test_create_task_comment_with_assignee(self, clickup_client):
+        """Test creating a comment on a task with an assignee."""
+        task_id = "86c7mc19h"
+
+        response = clickup_client.create_task_comment(
+            task_id,
+            comment_text="Test comment with assignee",
+            assignee=183,
+        )
+
+        # Verify response structure
+        assert "id" in response
+
+    @pytest.mark.vcr
+    def test_create_task_comment_not_found(self, clickup_client):
+        """Test creating a comment on a non-existent task."""
+        import httpx
+
+        task_id = "00000000"  # Non-existent task ID
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.create_task_comment(task_id, comment_text="Test")
 
         # Should get a 404 or similar error
         assert exc_info.value.response.status_code >= 400

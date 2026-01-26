@@ -373,6 +373,69 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def get_task_comments(
+        self,
+        task_id: str,
+        *,
+        start: int | None = None,
+        start_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Get comments from a task.
+
+        Args:
+            task_id: The task ID.
+            start: The Unix timestamp (in milliseconds) of the reference comment for pagination.
+            start_id: The unique ID of the reference comment for pagination.
+
+        Returns:
+            The response from the /task/{task_id}/comment endpoint.
+        """
+        params: dict[str, Any] = {}
+
+        if start is not None:
+            params["start"] = start
+        if start_id is not None:
+            params["start_id"] = start_id
+
+        response = self._client.get(
+            f"{self.base_url}/task/{task_id}/comment", params=params
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def create_task_comment(
+        self,
+        task_id: str,
+        comment_text: str,
+        *,
+        assignee: int | None = None,
+        notify_all: bool = True,
+    ) -> dict[str, Any]:
+        """Create a comment on a task.
+
+        Args:
+            task_id: The task ID.
+            comment_text: The comment text (required).
+            assignee: Assignee user ID to assign the comment to.
+            notify_all: Whether to notify everyone including the creator.
+
+        Returns:
+            The response from the /task/{task_id}/comment endpoint.
+        """
+        data: dict[str, Any] = {
+            "comment_text": comment_text,
+            "notify_all": notify_all,
+        }
+
+        if assignee is not None:
+            data["assignee"] = assignee
+
+        response = self._client.post(
+            f"{self.base_url}/task/{task_id}/comment", json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
     def close(self) -> None:
         """Close the HTTP client."""
         self._client.close()

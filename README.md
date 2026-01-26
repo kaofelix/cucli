@@ -398,6 +398,73 @@ cucli delete-task <task_id> --yes
 cucli delete-task <task_id> -y
 ```
 
+### Get task comments
+
+```bash
+cucli task-comments <task_id>
+```
+
+Output in JSON format (default):
+
+```json
+[
+  {
+    "id": "90150188973520",
+    "text": "This is a comment",
+    "user": "john.doe",
+    "resolved": false,
+    "date": "1234567890123"
+  }
+]
+```
+
+Output in table format:
+
+```bash
+cucli task-comments <task_id> --format table
+```
+
+```
+ID              USER        TEXT                           RESOLVED
+------------------------------------------------------------------------
+90150188973520  john.doe    This is a comment              No
+```
+
+Output raw JSON:
+
+```bash
+cucli task-comments <task_id> --raw
+```
+
+### Add comment to task
+
+```bash
+cucli add-comment <task_id> --text "Comment text"
+```
+
+Add comment with additional options:
+
+```bash
+# With assignee
+cucli add-comment <task_id> --text "Comment text" --assignee 123
+
+# Don't notify everyone
+cucli add-comment <task_id> --text "Comment text" --no-notify
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli add-comment <task_id> --text "Comment text"
+
+# Table format
+cucli add-comment <task_id> --text "Comment text" --format table
+
+# Raw JSON (useful for debugging or when models don't match)
+cucli add-comment <task_id> --text "Comment text" --raw
+```
+
 ### Get help
 
 ```bash

@@ -190,5 +190,37 @@ class ListsResponse(BaseModel):
     lists: list[ClickUpList] = Field(default_factory=list)
 
 
+class CommentUser(BaseModel):
+    """A user associated with a comment."""
+
+    id: int
+    username: str
+    email: str
+    color: str
+    initials: str
+    profilePicture: str | None = None
+
+
+class Comment(BaseModel):
+    """A ClickUp comment."""
+
+    id: str
+    comment: list[dict[str, str]] = Field(default_factory=list)
+    comment_text: str
+    user: CommentUser
+    resolved: bool = False
+    assignee: CommentUser | None = None
+    assigned_by: CommentUser | None = None
+    reactions: list[str] = Field(default_factory=list)
+    date: str
+    reply_count: str | int | None = None
+
+
+class CommentsResponse(BaseModel):
+    """Response from comment endpoints."""
+
+    comments: list[Comment] = Field(default_factory=list)
+
+
 # For raw output when models don't match
 RawResponse = dict[str, Any]

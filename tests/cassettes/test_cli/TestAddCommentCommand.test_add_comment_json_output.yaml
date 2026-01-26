@@ -1,0 +1,96 @@
+interactions:
+- request:
+    body: '{"comment_text":"Test comment","notify_all":true}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - pk_272627274_QZU8LEFFQ2CDW3ASOXATNG51Q2I45PRY
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '49'
+      Content-Type:
+      - application/json
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.clickup.com/api/v2/task/86c7mc19h/comment
+  response:
+    body:
+      string: '{"id":90150188976129,"hist_id":"4926525936520483272","date":1769439968040,"version":{"object_type":"comment","object_id":"90150188976129","workspace_id":90152245421,"operation":"c","data":{"context":{"root_parent_type":1,"is_chat":false,"audit_context":{"userid":272627274,"current_time":1769439967837,"route":"*"},"originating_service":"publicapi"},"relationships":[{"type":"comment-author","object_type":"user","object_id":"272627274","workspace_id":90152245421},{"type":"comment-parent","object_type":"task","object_id":"86c7mc19h","workspace_id":90152245421}],"changes":[{"field":"date_created","after":1769439968040}]},"master_id":31,"version":1769439968066000,"deleted":false,"traceparent":"2891787393987733630","date_created":1769439968066,"date_updated":1769439968066,"event_publish_time":1769439968074}}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '812'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 26 Jan 2026 15:06:08 GMT
+      Server:
+      - nginx
+      Server-Timing:
+      - cdn-upstream-layer;desc="EDGE",cdn-upstream-dns;dur=0,cdn-upstream-connect;dur=0,cdn-upstream-fbl;dur=327,cdn-cache-miss,cdn-pop;desc="MRS53-P1",cdn-rid;desc="HZ-XobFzfH3_KIUO4iOJ2YFRFB0441R7LHhCACLdAco5RdmHnV9bng==",cdn-downstream-fbl;dur=330
+      Timing-Allow-Origin:
+      - '*'
+      Via:
+      - 1.1 bef918445c49bf6d036d07d855e42cd8.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - HZ-XobFzfH3_KIUO4iOJ2YFRFB0441R7LHhCACLdAco5RdmHnV9bng==
+      X-Amz-Cf-Pop:
+      - MRS53-P1
+      X-Cache:
+      - Miss from cloudfront
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - x-datadog-trace-id,server
+      cache-control:
+      - no-cache, no-store
+      content-language:
+      - en-US
+      content-security-policy:
+      - frame-ancestors 'self'
+      expect-ct:
+      - max-age=0
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Origin
+      x-content-type-options:
+      - nosniff
+      x-datadog-trace-id:
+      - '2891787393987733630'
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-permitted-cross-domain-policies:
+      - none
+      x-ratelimit-limit:
+      - '100'
+      x-ratelimit-remaining:
+      - '99'
+      x-ratelimit-reset:
+      - '1769440028'
+      x-received-from:
+      - shard-prod-eu-west-1-3
+      x-xss-protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

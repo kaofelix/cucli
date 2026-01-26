@@ -821,3 +821,133 @@ class TestDeleteTaskCommand:
         """Test delete-task command help."""
         result = runner.invoke(cli, ["delete-task", "--help"])
         assert result.exit_code == 0
+
+
+class TestTaskCommentsCommand:
+    """Test cases for the task-comments command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_task_comments_json_output(self, runner, mock_api_key_env):
+        """Test task-comments command with JSON output (default)."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(cli, ["task-comments", task_id])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert isinstance(output, list)
+        # Validate structure if there are comments
+        if output:
+            comment = output[0]
+            assert "id" in comment
+            assert "text" in comment
+            assert "user" in comment
+            assert "resolved" in comment
+            assert "date" in comment
+
+    @pytest.mark.vcr
+    def test_task_comments_table_output(self, runner, mock_api_key_env):
+        """Test task-comments command with table output."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(cli, ["task-comments", task_id, "--format", "table"])
+
+        assert result.exit_code == 0
+        # Table format should have headers
+        assert "ID" in result.output
+        assert "USER" in result.output
+        assert "TEXT" in result.output
+
+    @pytest.mark.vcr
+    def test_task_comments_raw_output(self, runner, mock_api_key_env):
+        """Test task-comments command with raw JSON output."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(cli, ["task-comments", task_id, "--raw"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "comments" in output
+
+    @pytest.mark.vcr
+    def test_task_comments_not_found(self, runner, mock_api_key_env):
+        """Test task-comments command with invalid task ID."""
+        task_id = "00000000"
+        result = runner.invoke(cli, ["task-comments", task_id])
+
+        assert result.exit_code != 0
+        assert "Error" in result.output or "HTTP Error" in result.output
+
+    def test_task_comments_help(self, runner):
+        """Test task-comments command help."""
+        result = runner.invoke(cli, ["task-comments", "--help"])
+        assert result.exit_code == 0
+
+
+class TestAddCommentCommand:
+    """Test cases for the add-comment command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_add_comment_json_output(self, runner, mock_api_key_env):
+        """Test add-comment command with JSON output (default)."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(cli, ["add-comment", task_id, "--text", "Test comment"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert "id" in output
+        assert "date" in output
+
+    @pytest.mark.vcr
+    def test_add_comment_table_output(self, runner, mock_api_key_env):
+        """Test add-comment command with table output."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(
+            cli, ["add-comment", task_id, "--text", "Test comment", "--format", "table"]
+        )
+
+        assert result.exit_code == 0
+        assert "ID:" in result.output
+
+    @pytest.mark.vcr
+    def test_add_comment_with_assignee(self, runner, mock_api_key_env):
+        """Test add-comment command with assignee."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(
+            cli, ["add-comment", task_id, "--text", "Test comment", "--assignee", "183"]
+        )
+
+        assert result.exit_code == 0
+
+    @pytest.mark.vcr
+    def test_add_comment_no_notify(self, runner, mock_api_key_env):
+        """Test add-comment command with no-notify flag."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(
+            cli, ["add-comment", task_id, "--text", "Test comment", "--no-notify"]
+        )
+
+        assert result.exit_code == 0
+
+    @pytest.mark.vcr
+    def test_add_comment_not_found(self, runner, mock_api_key_env):
+        """Test add-comment command with invalid task ID."""
+        task_id = "00000000"
+        result = runner.invoke(cli, ["add-comment", task_id, "--text", "Test"])
+
+        assert result.exit_code != 0
+        assert "Error" in result.output or "HTTP Error" in result.output
+
+    def test_add_comment_help(self, runner):
+        """Test add-comment command help."""
+        result = runner.invoke(cli, ["add-comment", "--help"])
+        assert result.exit_code == 0

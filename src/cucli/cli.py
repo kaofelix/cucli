@@ -5,7 +5,7 @@ import json
 import click
 import httpx
 from cucli.api import ClickUpClient
-from cucli.models import ClickUpList, Folder, Space, Team, Task
+from cucli.models import ClickUpList, Comment, Folder, Space, Team, Task
 
 
 @click.group()
@@ -741,6 +741,133 @@ def delete_task(task_id: str, yes: bool) -> None:
         with ClickUpClient() as client:
             client.delete_task(task_id)
             click.echo(f"Task {task_id} deleted successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="task-comments")
+@click.argument("task_id")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def task_comments(task_id: str, format: str, raw: bool) -> None:
+    """List comments on a task.
+
+    TASK_ID: The ID of the task to get comments from.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.get_task_comments(task_id)
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            comments = [Comment(**comment) for comment in data["comments"]]
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+
+    if not comments:
+        click.echo("No comments found.")
+        return
+
+    if format == "json":
+        output = [
+            {
+                "id": c.id,
+                "text": c.comment_text,
+                "user": c.user.username,
+                "resolved": c.resolved,
+                "date": c.date,
+            }
+            for c in comments
+        ]
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        # Calculate column widths
+        max_id = max(len(c.id) for c in comments)
+        max_user = max(len(c.user.username) for c in comments)
+
+        # Print header
+        click.echo(
+            f"{'ID'.ljust(max_id)}  {'USER'.ljust(max_user)}  {'TEXT'}  {'RESOLVED'}"
+        )
+        click.echo("-" * (max_id + max_user + 40))
+
+        # Print rows
+        for comment in comments:
+            resolved_str = "Yes" if comment.resolved else "No"
+            # Truncate comment text to 30 chars for display
+            text = (
+                comment.comment_text[:30] + "..."
+                if len(comment.comment_text) > 30
+                else comment.comment_text
+            )
+            click.echo(
+                f"{comment.id.ljust(max_id)}  {comment.user.username.ljust(max_user)}  {text.ljust(33)}  {resolved_str}"
+            )
+
+
+@cli.command(name="add-comment")
+@click.argument("task_id")
+@click.option("--text", required=True, help="Comment text (required).")
+@click.option("--assignee", type=int, help="Assignee user ID to assign the comment to.")
+@click.option(
+    "--no-notify", is_flag=True, help="Don't notify everyone (default: notify all)."
+)
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def add_comment(
+    task_id: str,
+    text: str,
+    assignee: int | None,
+    no_notify: bool,
+    format: str,
+    raw: bool,
+) -> None:
+    """Add a comment to a task.
+
+    TASK_ID: The ID of the task to add a comment to.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.create_task_comment(
+                task_id, comment_text=text, assignee=assignee, notify_all=not no_notify
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            if format == "json":
+                output = {
+                    "id": str(data.get("id")),
+                    "date": data.get("date"),
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:   {data.get('id')}")
+                click.echo(f"Date: {data.get('date')}")
     except httpx.HTTPStatusError as e:
         click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
         raise click.Abort()

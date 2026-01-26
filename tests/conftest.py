@@ -6,12 +6,6 @@ import pytest
 from cucli.api import ClickUpClient
 
 
-@pytest.fixture(scope="module")
-def vcr_config():
-    """Configure VCR to filter sensitive headers."""
-    return {"filter_headers": ["authorization"]}
-
-
 @pytest.fixture
 def api_key():
     """Provide a test API key (actual value not used with VCR recordings)."""

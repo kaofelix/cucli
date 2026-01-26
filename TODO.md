@@ -12,9 +12,9 @@
 - [x] Update task status
 - [x] Update task priority
 - [x] Delete task
+- [x] Get task comments
+- [x] Add task comment
 
 ## In Progress
 
 ## Planned
-- [ ] Get task comments
-- [ ] Add task comment
