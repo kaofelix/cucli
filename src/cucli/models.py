@@ -315,5 +315,19 @@ class ListMembersResponse(BaseModel):
     members: list[ListMember] = Field(default_factory=list)
 
 
+class Tag(BaseModel):
+    """A ClickUp tag."""
+
+    name: str
+    tag_fg: str
+    tag_bg: str
+
+
+class TagsResponse(BaseModel):
+    """Response from tag endpoints."""
+
+    tags: list[Tag] = Field(default_factory=list)
+
+
 # For raw output when models don't match
 RawResponse = dict[str, Any]

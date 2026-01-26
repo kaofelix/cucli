@@ -1,0 +1,84 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - pk_272627274_QZU8LEFFQ2CDW3ASOXATNG51Q2I45PRY
+      Connection:
+      - keep-alive
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.clickup.com/api/v2/list/00000000/member
+  response:
+    body:
+      string: '{"err":"validateListIDEx List ID invalid","ECODE":"INPUT_003"}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '62'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 26 Jan 2026 20:34:54 GMT
+      Server:
+      - nginx
+      Timing-Allow-Origin:
+      - '*'
+      Via:
+      - 1.1 1254b3ae737b92244d9e4a69fee984b6.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - EduGoFyxo6qSG4vJzo83whGGM5G1Zywbrlf4DJjRxyAeE4bR_r0oqg==
+      X-Amz-Cf-Pop:
+      - MRS53-P1
+      X-Cache:
+      - Error from cloudfront
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - x-datadog-trace-id,server
+      cache-control:
+      - no-cache, no-store
+      content-language:
+      - en-US
+      content-security-policy:
+      - frame-ancestors 'self'
+      expect-ct:
+      - max-age=0
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Origin
+      x-content-type-options:
+      - nosniff
+      x-datadog-trace-id:
+      - '8598958890631503307'
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-permitted-cross-domain-policies:
+      - none
+      x-received-from:
+      - shard-prod-eu-west-1-3
+      x-xss-protection:
+      - '0'
+    status:
+      code: 400
+      message: Bad Request
+version: 1

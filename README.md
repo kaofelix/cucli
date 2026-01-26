@@ -767,6 +767,103 @@ Output raw JSON:
 cucli list-members <list_id> --raw
 ```
 
+### List tags in a space
+
+```bash
+cucli tags <space_id>
+```
+
+Output in JSON format (default):
+
+```json
+[
+  {
+    "name": "test-tag",
+    "foreground_color": "#622aea",
+    "background_color": "#622aea"
+  }
+]
+```
+
+Output in table format:
+
+```bash
+cucli tags <space_id> --format table
+```
+
+```
+NAME        FG COLOR    BG COLOR
+----------------------------------------
+test-tag    #622aea    #622aea
+```
+
+Output raw JSON:
+
+```bash
+cucli tags <space_id> --raw
+```
+
+### Create tag
+
+```bash
+cucli create-tag <space_id> --name "Tag Name" --fg-color "#000000" --bg-color "#FFFFFF"
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli create-tag <space_id> --name "New Tag" --fg-color "#000000" --bg-color "#FFFFFF"
+
+# Table format
+cucli create-tag <space_id> --name "New Tag" --fg-color "#000000" --bg-color "#FFFFFF" --format table
+
+# Raw JSON (useful for debugging or when models don't match)
+cucli create-tag <space_id> --name "New Tag" --fg-color "#000000" --bg-color "#FFFFFF" --raw
+```
+
+### Add tag to task
+
+```bash
+cucli add-tag <task_id> <tag_name>
+```
+
+Add a tag to a task.
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli add-tag <task_id> "urgent"
+
+# Table format
+cucli add-tag <task_id> "urgent" --format table
+
+# Raw JSON
+cucli add-tag <task_id> "urgent" --raw
+```
+
+### Remove tag from task
+
+```bash
+cucli remove-tag <task_id> <tag_name>
+```
+
+Remove a tag from a task.
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli remove-tag <task_id> "urgent"
+
+# Table format
+cucli remove-tag <task_id> "urgent" --format table
+
+# Raw JSON
+cucli remove-tag <task_id> "urgent" --raw
+```
+
 ## Development
 
 Add a dependency:

@@ -814,3 +814,56 @@ class TestClickUpClient:
 
         # Should get a 404 or similar error
         assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_get_space_tags(self, clickup_client):
+        """Test getting tags in a space."""
+        # Using a real space ID from test workspace
+        space_id = "90159451300"
+
+        response = clickup_client.get_space_tags(space_id)
+
+        # Verify response structure
+        assert "tags" in response
+        assert isinstance(response["tags"], list)
+
+        # If there are tags, validate tag structure
+        if response["tags"]:
+            tag = response["tags"][0]
+            assert "name" in tag
+            assert "tag_fg" in tag
+            assert "tag_bg" in tag
+
+    @pytest.mark.vcr
+    def test_create_space_tag(self, clickup_client):
+        """Test creating a tag in a space."""
+        space_id = "90159451300"
+
+        response = clickup_client.create_space_tag(
+            space_id, name="Test Tag", tag_fg="#000000", tag_bg="#FFFFFF"
+        )
+
+        # Response should be an empty dict or similar
+        assert isinstance(response, dict)
+
+    @pytest.mark.vcr
+    def test_add_tag_to_task(self, clickup_client):
+        """Test adding a tag to a task."""
+        task_id = "86c7mc19h"
+        tag_name = "test-tag"
+
+        response = clickup_client.add_tag_to_task(task_id, tag_name)
+
+        # Response should be an empty dict or similar
+        assert isinstance(response, dict)
+
+    @pytest.mark.vcr
+    def test_remove_tag_from_task(self, clickup_client):
+        """Test removing a tag from a task."""
+        task_id = "86c7mc19h"
+        tag_name = "test-tag"
+
+        response = clickup_client.remove_tag_from_task(task_id, tag_name)
+
+        # Response should be an empty dict or similar
+        assert isinstance(response, dict)

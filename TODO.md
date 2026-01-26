@@ -23,6 +23,10 @@
 - [x] Delete checklist item
 - [x] Get task members
 - [x] Get list members
+- [x] Get space tags
+- [x] Create space tag
+- [x] Add tag to task
+- [x] Remove tag from task
 
 ## In Progress
 

@@ -12,6 +12,7 @@ from cucli.models import (
     Folder,
     ListMember,
     Space,
+    Tag,
     Task,
     TaskMember,
     Team,
@@ -1449,6 +1450,205 @@ def list_members(list_id: str, format: str, raw: bool) -> None:
             click.echo(
                 f"{str(member.id).ljust(max_id)}  {member.username.ljust(max_user)}  {member.email}"
             )
+
+
+@cli.command(name="tags")
+@click.argument("space_id")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def tags(space_id: str, format: str, raw: bool) -> None:
+    """List tags in a space.
+
+    SPACE_ID: The ID of the space.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.get_space_tags(space_id)
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            tags_list = [Tag(**tag) for tag in data["tags"]]
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+
+    if not tags_list:
+        click.echo("No tags found.")
+        return
+
+    if format == "json":
+        output = [
+            {
+                "name": t.name,
+                "foreground_color": t.tag_fg,
+                "background_color": t.tag_bg,
+            }
+            for t in tags_list
+        ]
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        # Calculate column widths
+        max_name = max(len(t.name) for t in tags_list)
+
+        # Print header
+        click.echo(f"{'NAME'.ljust(max_name)}  {'FG COLOR'}  {'BG COLOR'}")
+        click.echo("-" * (max_name + 22))
+
+        # Print rows
+        for tag in tags_list:
+            click.echo(
+                f"{tag.name.ljust(max_name)}  {tag.tag_fg.ljust(10)}  {tag.tag_bg}"
+            )
+
+
+@cli.command(name="create-tag")
+@click.argument("space_id")
+@click.option("--name", required=True, help="Tag name (required).")
+@click.option(
+    "--fg-color",
+    required=True,
+    help="Tag foreground color (hex, e.g., #000000).",
+)
+@click.option(
+    "--bg-color",
+    required=True,
+    help="Tag background color (hex, e.g., #FFFFFF).",
+)
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def create_tag(
+    space_id: str, name: str, fg_color: str, bg_color: str, format: str, raw: bool
+) -> None:
+    """Create a new tag in a space.
+
+    SPACE_ID: The ID of the space to create the tag in.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.create_space_tag(
+                space_id, name=name, tag_fg=fg_color, tag_bg=bg_color
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            if format == "json":
+                output = {
+                    "name": name,
+                    "foreground_color": fg_color,
+                    "background_color": bg_color,
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"Name:        {name}")
+                click.echo(f"FG Color:     {fg_color}")
+                click.echo(f"BG Color:     {bg_color}")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="add-tag")
+@click.argument("task_id")
+@click.argument("tag_name")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def add_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
+    """Add a tag to a task.
+
+    TASK_ID: The ID of the task to add the tag to.
+    TAG_NAME: The name of the tag to add.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.add_tag_to_task(task_id, tag_name)
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            if format == "json":
+                output = {
+                    "task_id": task_id,
+                    "tag": tag_name,
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"Task ID:  {task_id}")
+                click.echo(f"Tag:      {tag_name}")
+                click.echo("Tag added successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="remove-tag")
+@click.argument("task_id")
+@click.argument("tag_name")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def remove_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
+    """Remove a tag from a task.
+
+    TASK_ID: The ID of the task to remove the tag from.
+    TAG_NAME: The name of the tag to remove.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.remove_tag_from_task(task_id, tag_name)
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            if format == "json":
+                output = {
+                    "task_id": task_id,
+                    "tag": tag_name,
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"Task ID:  {task_id}")
+                click.echo(f"Tag:      {tag_name}")
+                click.echo("Tag removed successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
 
 
 def main() -> None:

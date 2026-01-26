@@ -1,0 +1,93 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - pk_272627274_QZU8LEFFQ2CDW3ASOXATNG51Q2I45PRY
+      Connection:
+      - keep-alive
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.clickup.com/api/v2/space/90159451300/tag
+  response:
+    body:
+      string: '{"tags":[{"name":"test-tag","project_id":"90159451300","tag_fg":"#622aea","tag_bg":"#622aea","creator":272627274},{"name":"test
+        tag","project_id":"90159451300","tag_fg":"#000000","tag_bg":"#FFFFFF","creator":272627274}]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '220'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 26 Jan 2026 20:34:40 GMT
+      Server:
+      - nginx
+      Server-Timing:
+      - cdn-upstream-layer;desc="EDGE",cdn-upstream-dns;dur=0,cdn-upstream-connect;dur=0,cdn-upstream-fbl;dur=89,cdn-cache-miss,cdn-pop;desc="MRS53-P1",cdn-rid;desc="YEBUMB77-tLo-QVhsVnSSAyc3ql_xXS7bT2uhIp7XZr1eTGAx00fuw==",cdn-downstream-fbl;dur=92
+      Timing-Allow-Origin:
+      - '*'
+      Via:
+      - 1.1 885f60dd355c44f5842663fc7e3ceea6.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - YEBUMB77-tLo-QVhsVnSSAyc3ql_xXS7bT2uhIp7XZr1eTGAx00fuw==
+      X-Amz-Cf-Pop:
+      - MRS53-P1
+      X-Cache:
+      - Miss from cloudfront
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - x-datadog-trace-id,server
+      cache-control:
+      - no-cache, no-store
+      content-language:
+      - en-US
+      content-security-policy:
+      - frame-ancestors 'self'
+      expect-ct:
+      - max-age=0
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Origin
+      x-content-type-options:
+      - nosniff
+      x-datadog-trace-id:
+      - '4030817604339275741'
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-permitted-cross-domain-policies:
+      - none
+      x-ratelimit-limit:
+      - '100'
+      x-ratelimit-remaining:
+      - '99'
+      x-ratelimit-reset:
+      - '1769459741'
+      x-received-from:
+      - shard-prod-eu-west-1-3
+      x-xss-protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -686,6 +686,91 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def get_space_tags(self, space_id: str | int) -> dict[str, Any]:
+        """Get tags in a space.
+
+        Args:
+            space_id: The space ID.
+
+        Returns:
+            The response from the /space/{space_id}/tag endpoint.
+        """
+        response = self._client.get(f"{self.base_url}/space/{space_id}/tag")
+        response.raise_for_status()
+        return response.json()
+
+    def create_space_tag(
+        self, space_id: str | int, *, name: str, tag_fg: str, tag_bg: str
+    ) -> dict[str, Any]:
+        """Create a new tag in a space.
+
+        Args:
+            space_id: The space ID to create the tag in.
+            name: The tag name.
+            tag_fg: The tag foreground color (hex color).
+            tag_bg: The tag background color (hex color).
+
+        Returns:
+            The response from the /space/{space_id}/tag endpoint.
+        """
+        data: dict[str, Any] = {
+            "tag": {
+                "name": name,
+                "tag_fg": tag_fg,
+                "tag_bg": tag_bg,
+            }
+        }
+
+        response = self._client.post(f"{self.base_url}/space/{space_id}/tag", json=data)
+        response.raise_for_status()
+        return response.json()
+
+    def add_tag_to_task(
+        self, task_id: str, tag_name: str, *, custom_task_ids: bool = False
+    ) -> dict[str, Any]:
+        """Add a tag to a task.
+
+        Args:
+            task_id: The task ID.
+            tag_name: The tag name to add.
+            custom_task_ids: Whether to use custom task IDs.
+
+        Returns:
+            The response from the /task/{task_id}/tag/{tag_name} endpoint.
+        """
+        params: dict[str, Any] = {}
+        if custom_task_ids:
+            params["custom_task_ids"] = "true"
+
+        response = self._client.post(
+            f"{self.base_url}/task/{task_id}/tag/{tag_name}", params=params
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def remove_tag_from_task(
+        self, task_id: str, tag_name: str, *, custom_task_ids: bool = False
+    ) -> dict[str, Any]:
+        """Remove a tag from a task.
+
+        Args:
+            task_id: The task ID.
+            tag_name: The tag name to remove.
+            custom_task_ids: Whether to use custom task IDs.
+
+        Returns:
+            The response from the /task/{task_id}/tag/{tag_name} endpoint.
+        """
+        params: dict[str, Any] = {}
+        if custom_task_ids:
+            params["custom_task_ids"] = "true"
+
+        response = self._client.delete(
+            f"{self.base_url}/task/{task_id}/tag/{tag_name}", params=params
+        )
+        response.raise_for_status()
+        return response.json()
+
     def close(self) -> None:
         """Close the HTTP client."""
         self._client.close()
