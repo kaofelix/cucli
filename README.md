@@ -864,6 +864,249 @@ cucli remove-tag <task_id> "urgent" --format table
 cucli remove-tag <task_id> "urgent" --raw
 ```
 
+### List goals
+
+```bash
+cucli goals <team_id>
+```
+
+List goals in a workspace.
+
+Output in JSON format (default):
+
+```json
+[
+  {
+    "id": "e28a27f0-9571-4f9c-9f7a-4712f21b605e",
+    "name": "Test Goal",
+    "due_date": "1738368000000",
+    "description": "Test goal description",
+    "percent_completed": 0,
+    "key_result_count": 2
+  }
+]
+```
+
+Output in table format:
+
+```bash
+cucli goals <team_id> --format table
+```
+
+```
+ID                                  NAME                          DUE DATE         PROGRESS
+-------------------------------------------------------------------------------------------
+e28a27f0-9571-4f9c-9f7a-4712f21b605e  Test Goal                      1738368000000     0%
+```
+
+Include completed goals:
+
+```bash
+cucli goals <team_id> --include-completed
+```
+
+Output raw JSON:
+
+```bash
+cucli goals <team_id> --raw
+```
+
+### Get goal details
+
+```bash
+cucli goal <goal_id>
+```
+
+Get detailed information about a specific goal.
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli goal e28a27f0-9571-4f9c-9f7a-4712f21b605e
+
+# Table format
+cucli goal e28a27f0-9571-4f9c-9f7a-4712f21b605e --format table
+
+# Raw JSON
+cucli goal e28a27f0-9571-4f9c-9f7a-4712f21b605e --raw
+```
+
+### Create goal
+
+```bash
+cucli create-goal <team_id> --name "Goal Name" --due-date 1738368000000
+```
+
+Create goal with additional options:
+
+```bash
+# With start date
+cucli create-goal <team_id> --name "Goal Name" --due-date 1738368000000 --start-date 1735689600000
+
+# With description
+cucli create-goal <team_id> --name "Goal Name" --due-date 1738368000000 --description "Goal description"
+
+# With multiple owners
+cucli create-goal <team_id> --name "Goal Name" --due-date 1738368000000 --multiple-owners --owner 123 --owner 456
+
+# With custom color
+cucli create-goal <team_id> --name "Goal Name" --due-date 1738368000000 --color "#ff5733"
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli create-goal <team_id> --name "New Goal" --due-date 1738368000000
+
+# Table format
+cucli create-goal <team_id> --name "New Goal" --due-date 1738368000000 --format table
+
+# Raw JSON
+cucli create-goal <team_id> --name "New Goal" --due-date 1738368000000 --raw
+```
+
+### Update goal
+
+```bash
+cucli update-goal <goal_id> --name "Updated Name"
+```
+
+Update goal with various options:
+
+```bash
+# Update name and due date
+cucli update-goal <goal_id> --name "New Name" --due-date 1738368000000
+
+# Update description and color
+cucli update-goal <goal_id> --description "New description" --color "#32a852"
+
+# Add owners
+cucli update-goal <goal_id> --add-owner 123 --add-owner 456
+
+# Remove owners
+cucli update-goal <goal_id> --remove-owner 789
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli update-goal <goal_id> --name "New Name"
+
+# Table format
+cucli update-goal <goal_id> --name "New Name" --format table
+
+# Raw JSON
+cucli update-goal <goal_id> --name "New Name" --raw
+```
+
+### Delete goal
+
+```bash
+cucli delete-goal <goal_id>
+```
+
+Delete with confirmation prompt (default):
+
+```bash
+cucli delete-goal <goal_id>
+# You will be prompted to confirm: "Are you sure you want to delete goal <goal_id>?"
+```
+
+Skip confirmation prompt:
+
+```bash
+cucli delete-goal <goal_id> --yes
+# or
+cucli delete-goal <goal_id> -y
+```
+
+### Create key result
+
+```bash
+cucli create-key-result <goal_id> --name "Key Result Name"
+```
+
+Create key result with additional options:
+
+```bash
+# With type (number, currency, boolean, percentage, automatic)
+cucli create-key-result <goal_id> --name "Sales Target" --type currency --unit "$"
+
+# With progress range
+cucli create-key-result <goal_id> --name "Completion Rate" --type percentage --steps-start 0 --steps-end 100
+
+# With owners
+cucli create-key-result <goal_id> --name "Key Result" --owner 123 --owner 456
+
+# Link tasks
+cucli create-key-result <goal_id> --name "Key Result" --task "86c7mc19h"
+
+# Link lists
+cucli create-key-result <goal_id> --name "Key Result" --list "90159451300"
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli create-key-result <goal_id> --name "New Key Result"
+
+# Table format
+cucli create-key-result <goal_id> --name "New Key Result" --format table
+
+# Raw JSON
+cucli create-key-result <goal_id> --name "New Key Result" --raw
+```
+
+### Update key result
+
+```bash
+cucli update-key-result <key_result_id> --steps-current 50
+```
+
+Update key result with note:
+
+```bash
+cucli update-key-result <key_result_id> --steps-current 75 --note "Progress made"
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli update-key-result <key_result_id> --steps-current 50
+
+# Table format
+cucli update-key-result <key_result_id> --steps-current 50 --format table
+
+# Raw JSON
+cucli update-key-result <key_result_id> --steps-current 50 --raw
+```
+
+### Delete key result
+
+```bash
+cucli delete-key-result <key_result_id>
+```
+
+Delete with confirmation prompt (default):
+
+```bash
+cucli delete-key-result <key_result_id>
+# You will be prompted to confirm: "Are you sure you want to delete key result <key_result_id>?"
+```
+
+Skip confirmation prompt:
+
+```bash
+cucli delete-key-result <key_result_id> --yes
+# or
+cucli delete-key-result <key_result_id> -y
+```
+
 ## Development
 
 Add a dependency:

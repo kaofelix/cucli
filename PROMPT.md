@@ -7,6 +7,7 @@ Our goal is to produce a working CLI client for the clickup API
 - If you need data in clickup for testing, you can create it with curl using CLICKUP_API_KEY as the key
 - The environment is pointing to a test ClickUp Workspace, it's ok to make changes for testing scenario and cassette recording
 - Only use VCR for a few happy test integration scenarios
+- NEVER manually create VCR cassettes
 - If test files grow too large, break them down into smaller files
 - Document the new added commands
 - If the documentation grows too large, break it down into smaller files

@@ -3,6 +3,7 @@
 import os
 
 import pytest
+from click.testing import CliRunner
 from cucli.api import ClickUpClient
 
 
@@ -36,3 +37,9 @@ def mock_api_key_env(api_key, monkeypatch):
     # Otherwise use the mock key (for playback)
     monkeypatch.setenv("CLICKUP_API_KEY", api_key)
     return api_key
+
+
+@pytest.fixture
+def runner():
+    """Provide a Click CliRunner for testing CLI commands."""
+    return CliRunner()

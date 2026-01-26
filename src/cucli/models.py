@@ -329,5 +329,112 @@ class TagsResponse(BaseModel):
     tags: list[Tag] = Field(default_factory=list)
 
 
+class GoalOwner(BaseModel):
+    """A goal owner."""
+
+    id: int
+    username: str
+    email: str
+    color: str
+    initials: str
+    profilePicture: str | None = None
+
+
+class GoalMember(BaseModel):
+    """A goal member."""
+
+    id: int
+    username: str
+    email: str
+    color: str
+    permission_level: str
+    profilePicture: str
+    initials: str
+    isCreator: bool
+
+
+class Goal(BaseModel):
+    """A ClickUp goal."""
+
+    id: str
+    name: str
+    team_id: str
+    creator: int
+    owner: str | None = None
+    color: str
+    date_created: str
+    start_date: str | None = None
+    due_date: str
+    description: str
+    private: bool = False
+    archived: bool = False
+    pretty_id: str
+    multiple_owners: bool = False
+    folder_id: str | None = None
+    owners: list[GoalOwner] = Field(default_factory=list)
+    members: list[str] = Field(default_factory=list)
+    key_results: list[str] = Field(default_factory=list)
+    percent_completed: int = 0
+    history: list[str] = Field(default_factory=list)
+    pretty_url: str
+    pinned: bool = False
+    last_update: str | None = None
+    date_updated: str | None = None
+
+
+class GoalsResponse(BaseModel):
+    """Response from the /team/{team_id}/goal endpoint."""
+
+    goals: list[Goal] = Field(default_factory=list)
+    folders: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class GoalResponse(BaseModel):
+    """Response from goal endpoints."""
+
+    goal: Goal
+
+
+class LastAction(BaseModel):
+    """A key result last action."""
+
+    id: str
+    key_result_id: str
+    userid: int
+    date_modified: str
+    steps_taken: str | None = None
+    steps_taken_float: int | None = None
+    note: str
+    steps_before: str | None = None
+    steps_before_float: int | None = None
+    steps_current: str | None = None
+    steps_current_float: str | None = None
+
+
+class KeyResult(BaseModel):
+    """A ClickUp key result."""
+
+    id: str
+    goal_id: str
+    name: str
+    type: str
+    unit: str
+    creator: int
+    date_created: str
+    goal_pretty_id: str
+    percent_completed: str | None = None
+    completed: bool = False
+    task_ids: list[str] = Field(default_factory=list)
+    subcategory_ids: list[str] = Field(default_factory=list)
+    owners: list[GoalOwner] = Field(default_factory=list)
+    last_action: LastAction | None = None
+
+
+class KeyResultResponse(BaseModel):
+    """Response from key result endpoints."""
+
+    key_result: KeyResult
+
+
 # For raw output when models don't match
 RawResponse = dict[str, Any]

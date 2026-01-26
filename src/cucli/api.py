@@ -1026,6 +1026,225 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def get_goals(
+        self, team_id: str | int, *, include_completed: bool | None = None
+    ) -> dict[str, Any]:
+        """Get goals in a workspace.
+
+        Args:
+            team_id: The team/workspace ID.
+            include_completed: Include completed goals.
+
+        Returns:
+            The response from the /team/{team_id}/goal endpoint.
+        """
+        params: dict[str, Any] = {}
+        if include_completed is not None:
+            params["include_completed"] = str(include_completed).lower()
+
+        response = self._client.get(
+            f"{self.base_url}/team/{team_id}/goal", params=params
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def get_goal(self, goal_id: str) -> dict[str, Any]:
+        """Get a goal by ID.
+
+        Args:
+            goal_id: The goal ID.
+
+        Returns:
+            The response from the /goal/{goal_id} endpoint.
+        """
+        response = self._client.get(f"{self.base_url}/goal/{goal_id}")
+        response.raise_for_status()
+        return response.json()
+
+    def create_goal(
+        self,
+        team_id: str | int,
+        *,
+        name: str,
+        due_date: int,
+        description: str = "",
+        multiple_owners: bool = False,
+        owners: list[int] | None = None,
+        color: str = "#32a852",
+        start_date: int | None = None,
+    ) -> dict[str, Any]:
+        """Create a new goal in a workspace.
+
+        Args:
+            team_id: The team/workspace ID.
+            name: The goal name (required).
+            due_date: Due date as Unix timestamp in milliseconds (required).
+            description: The goal description.
+            multiple_owners: Whether the goal has multiple owners.
+            owners: Array of owner user IDs.
+            color: The goal color (hex).
+            start_date: Start date as Unix timestamp in milliseconds.
+
+        Returns:
+            The response from the /team/{team_id}/goal endpoint.
+        """
+        data: dict[str, Any] = {
+            "name": name,
+            "due_date": due_date,
+            "description": description,
+            "multiple_owners": multiple_owners,
+            "owners": owners if owners is not None else [],
+            "color": color,
+        }
+
+        if start_date is not None:
+            data["start_date"] = start_date
+
+        response = self._client.post(f"{self.base_url}/team/{team_id}/goal", json=data)
+        response.raise_for_status()
+        return response.json()
+
+    def update_goal(
+        self,
+        goal_id: str,
+        *,
+        name: str | None = None,
+        due_date: int | None = None,
+        description: str | None = None,
+        rem_owners: list[int] | None = None,
+        add_owners: list[int] | None = None,
+        color: str | None = None,
+    ) -> dict[str, Any]:
+        """Update a goal.
+
+        Args:
+            goal_id: The goal ID to update.
+            name: The new goal name.
+            due_date: New due date as Unix timestamp in milliseconds.
+            description: New goal description.
+            rem_owners: Owner user IDs to remove.
+            add_owners: Owner user IDs to add.
+            color: New goal color (hex).
+
+        Returns:
+            The response from the /goal/{goal_id} endpoint.
+        """
+        data: dict[str, Any] = {
+            "name": name if name is not None else "",
+            "due_date": due_date if due_date is not None else 0,
+            "description": description if description is not None else "",
+            "rem_owners": rem_owners if rem_owners is not None else [],
+            "add_owners": add_owners if add_owners is not None else [],
+            "color": color if color is not None else "",
+        }
+
+        response = self._client.put(f"{self.base_url}/goal/{goal_id}", json=data)
+        response.raise_for_status()
+        return response.json()
+
+    def delete_goal(self, goal_id: str) -> dict[str, Any]:
+        """Delete a goal.
+
+        Args:
+            goal_id: The goal ID to delete.
+
+        Returns:
+            The response from the /goal/{goal_id} endpoint.
+        """
+        response = self._client.delete(
+            f"{self.base_url}/goal/{goal_id}",
+            headers={"Content-Type": "application/json"},
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def create_key_result(
+        self,
+        goal_id: str,
+        *,
+        name: str,
+        owners: list[int],
+        type: str = "number",
+        steps_start: int = 0,
+        steps_end: int = 100,
+        unit: str = "",
+        task_ids: list[str] | None = None,
+        list_ids: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Create a key result for a goal.
+
+        Args:
+            goal_id: The goal ID.
+            name: The key result name (required).
+            owners: Array of owner user IDs (required).
+            type: The key result type (number, currency, boolean, percentage, automatic).
+            steps_start: Starting value.
+            steps_end: Ending value.
+            unit: Unit of measurement.
+            task_ids: Array of task IDs to link.
+            list_ids: Array of list IDs to link.
+
+        Returns:
+            The response from the /goal/{goal_id}/key_result endpoint.
+        """
+        data: dict[str, Any] = {
+            "name": name,
+            "owners": owners,
+            "type": type,
+            "steps_start": steps_start,
+            "steps_end": steps_end,
+            "unit": unit,
+            "task_ids": task_ids if task_ids is not None else [],
+            "list_ids": list_ids if list_ids is not None else [],
+        }
+
+        response = self._client.post(
+            f"{self.base_url}/goal/{goal_id}/key_result", json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def update_key_result(
+        self,
+        key_result_id: str,
+        *,
+        steps_current: int | None = None,
+        note: str = "",
+    ) -> dict[str, Any]:
+        """Update a key result.
+
+        Args:
+            key_result_id: The key result ID.
+            steps_current: Current progress value.
+            note: Update note.
+
+        Returns:
+            The response from the /key_result/{key_result_id} endpoint.
+        """
+        data: dict[str, Any] = {
+            "steps_current": steps_current if steps_current is not None else 0,
+            "note": note,
+        }
+
+        response = self._client.put(
+            f"{self.base_url}/key_result/{key_result_id}", json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def delete_key_result(self, key_result_id: str) -> dict[str, Any]:
+        """Delete a key result.
+
+        Args:
+            key_result_id: The key result ID to delete.
+
+        Returns:
+            The response from the /key_result/{key_result_id} endpoint.
+        """
+        response = self._client.delete(f"{self.base_url}/key_result/{key_result_id}")
+        response.raise_for_status()
+        return response.json()
+
     def close(self) -> None:
         """Close the HTTP client."""
         self._client.close()

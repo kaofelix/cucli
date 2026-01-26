@@ -28,12 +28,11 @@
 - [x] Add tag to task
 - [x] Remove tag from task
 
-## In Progress
+## Completed
 - [x] Time tracking API (start, stop, get running, get entries, create, update, delete)
-- [ ] Time tracking CLI commands (cassettes need to be recorded)
+- [x] Time tracking CLI commands (all commands implemented and tested)
 
 ## Planned
-- [ ] Goals and key results
 - [ ] Task dependencies
 - [ ] Task attachments
 - [ ] Task links
