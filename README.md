@@ -60,6 +60,49 @@ Output raw JSON (useful for debugging or when models don't match):
 cucli workspaces --raw
 ```
 
+### List spaces in a workspace
+
+```bash
+cucli spaces <team_id>
+```
+
+Output in JSON format (default):
+
+```json
+[
+  {
+    "id": "90159451300",
+    "name": "Team Space",
+    "private": false,
+    "archived": false
+  }
+]
+```
+
+Output in table format:
+
+```bash
+cucli spaces <team_id> --format table
+```
+
+```
+ID           NAME        PRIVATE
+----------------------------------------
+90159451300  Team Space  No
+```
+
+Include archived spaces:
+
+```bash
+cucli spaces <team_id> --archived
+```
+
+Output raw JSON:
+
+```bash
+cucli spaces <team_id> --raw
+```
+
 ### Get task details
 
 ```bash

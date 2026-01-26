@@ -2,7 +2,7 @@
 
 import pytest
 from cucli.api import ClickUpClient
-from cucli.models import Team, Task, TeamsResponse
+from cucli.models import SpacesResponse, Team, Task, TeamsResponse
 
 
 class TestClickUpClient:
@@ -145,6 +145,52 @@ class TestClickUpClient:
 
         with pytest.raises(httpx.HTTPStatusError) as exc_info:
             clickup_client.get_team_tasks(team_id)
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_get_spaces(self, clickup_client):
+        """Test getting spaces from a team."""
+        # Using a real team ID from the test workspace
+        team_id = "90152245421"
+
+        response = clickup_client.get_spaces(team_id)
+
+        # Verify response structure
+        assert "spaces" in response
+        assert isinstance(response["spaces"], list)
+
+        # Parse with Pydantic model
+        spaces_response = SpacesResponse(**response)
+        assert len(spaces_response.spaces) >= 0
+
+        # If there are spaces, validate first space structure
+        if spaces_response.spaces:
+            space = spaces_response.spaces[0]
+            assert isinstance(space.id, str)
+            assert isinstance(space.name, str)
+            assert isinstance(space.private, bool)
+
+    @pytest.mark.vcr
+    def test_get_spaces_with_archived(self, clickup_client):
+        """Test getting spaces with archived filter."""
+        team_id = "90152245421"
+
+        response = clickup_client.get_spaces(team_id, archived=True)
+
+        assert "spaces" in response
+        assert isinstance(response["spaces"], list)
+
+    @pytest.mark.vcr
+    def test_get_spaces_not_found(self, clickup_client):
+        """Test that get_spaces raises HTTPStatusError for non-existent team."""
+        import httpx
+
+        team_id = "99999999"  # Non-existent team ID
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.get_spaces(team_id)
 
         # Should get a 404 or similar error
         assert exc_info.value.response.status_code >= 400

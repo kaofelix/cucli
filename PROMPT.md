@@ -5,5 +5,8 @@ Our goal is to produce a working CLI client for the clickup API
 - Track progress in TODO.md with simple items per endpoint / functionality. No details
 - Use TDD to implement new features: always write a test first, then implement
 - If you need data in clickup for testing, you can create it with curl using CLICKUP_API_KEY as the key
+- Only use VCR for a few happy test integration scenarios
+- If test files grow too large, break them down into smaller files
 - Document the new added commands
+- If the documentation grows too large, break it down into smaller files
 - Commit when finished with a succint one line message

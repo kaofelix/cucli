@@ -63,6 +63,85 @@ class TestWorkspacesCommand:
         assert "Error:" in result.output or "CLICKUP_API_KEY" in result.output
 
 
+class TestSpacesCommand:
+    """Test cases for the spaces command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_spaces_json_output(self, runner, mock_api_key_env):
+        """Test spaces command with JSON output (default)."""
+        team_id = "90152245421"
+        result = runner.invoke(cli, ["spaces", team_id])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert isinstance(output, list)
+        # Validate structure if there are spaces
+        if output:
+            space = output[0]
+            assert "id" in space
+            assert "name" in space
+            assert "private" in space
+
+    @pytest.mark.vcr
+    def test_spaces_table_output(self, runner, mock_api_key_env):
+        """Test spaces command with table output."""
+        team_id = "90152245421"
+        result = runner.invoke(cli, ["spaces", team_id, "--format", "table"])
+
+        assert result.exit_code == 0
+        # Table format should have headers
+        assert "ID" in result.output
+        assert "NAME" in result.output
+        assert "PRIVATE" in result.output
+
+    @pytest.mark.vcr
+    def test_spaces_raw_output(self, runner, mock_api_key_env):
+        """Test spaces command with raw JSON output."""
+        team_id = "90152245421"
+        result = runner.invoke(cli, ["spaces", team_id, "--raw"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        # Raw output should include all fields from API
+        assert "spaces" in output
+        assert isinstance(output["spaces"], list)
+
+    @pytest.mark.vcr
+    def test_spaces_with_archived(self, runner, mock_api_key_env):
+        """Test spaces command with archived flag."""
+        team_id = "90152245421"
+        result = runner.invoke(cli, ["spaces", team_id, "--archived"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert isinstance(output, list)
+
+    @pytest.mark.vcr
+    def test_spaces_not_found(self, runner, mock_api_key_env):
+        """Test spaces command with non-existent team ID."""
+        team_id = "99999999"
+        result = runner.invoke(cli, ["spaces", team_id])
+
+        assert result.exit_code != 0
+        assert "Error" in result.output or "HTTP Error" in result.output
+
+    def test_spaces_missing_api_key(self, runner, monkeypatch):
+        """Test spaces command fails gracefully without API key."""
+        monkeypatch.delenv("CLICKUP_API_KEY", raising=False)
+        team_id = "90152245421"
+        result = runner.invoke(cli, ["spaces", team_id])
+
+        assert result.exit_code != 0
+        assert "Error:" in result.output or "CLICKUP_API_KEY" in result.output
+
+
 class TestTaskCommand:
     """Test cases for the task command."""
 
@@ -246,3 +325,11 @@ class TestCLI:
         assert "--format" in result.output
         assert "--raw" in result.output
         assert "--md-only" in result.output
+
+    def test_spaces_help(self, runner):
+        """Test spaces command help."""
+        result = runner.invoke(cli, ["spaces", "--help"])
+        assert result.exit_code == 0
+        assert "--format" in result.output
+        assert "--raw" in result.output
+        assert "--archived" in result.output

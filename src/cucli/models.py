@@ -87,5 +87,23 @@ class TaskResponse(BaseModel):
     task: Task | None = None
 
 
+class Space(BaseModel):
+    """A ClickUp space."""
+
+    id: str
+    name: str
+    private: bool
+    statuses: list[dict[str, Any]] = Field(default_factory=list)
+    multiple_assignees: bool | None = None
+    features: dict[str, Any] | None = None
+    archived: bool | None = None
+
+
+class SpacesResponse(BaseModel):
+    """Response from the /team/{team_id}/space endpoint."""
+
+    spaces: list[Space] = Field(default_factory=list)
+
+
 # For raw output when models don't match
 RawResponse = dict[str, Any]
