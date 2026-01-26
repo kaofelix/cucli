@@ -1,0 +1,488 @@
+# Create Folderless List
+
+Add a new List in a Space.
+
+# OpenAPI definition
+
+```json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ClickUp API v2 Reference",
+    "description": "The ClickUp API enables you to programmatically access and manage your ClickUp resources.\n\n## Authentication\nThe API supports two authentication methods:\n- **Personal API Token**: Use for testing and personal integrations. Add token to requests with header: `Authorization: pk_...`\n- **OAuth 2.0**: Required for building apps for other users. Uses authorization code flow.\n\n## Getting Started\nOur [Getting Started Guide](https://developer.clickup.com/docs/index) provides a comprehensive overview of how to use the ClickUp API.\n",
+    "contact": {},
+    "version": "2.0"
+  },
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "servers": [
+    {
+      "url": "https://api.clickup.com/api",
+      "description": "ClickUp",
+      "variables": {}
+    }
+  ],
+  "paths": {
+    "/v2/space/{space_id}/list": {
+      "post": {
+        "summary": "Create Folderless List",
+        "tags": [
+          "Lists"
+        ],
+        "description": "Add a new List in a Space.",
+        "operationId": "CreateFolderlessList",
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "number",
+              "contentEncoding": "double",
+              "examples": [
+                789
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "title": "CreateFolderlessListrequest",
+                "required": [
+                  "name"
+                ],
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "markdown_content": {
+                    "type": "string",
+                    "description": "Use `markdown_content` instead of `content` to format your List description."
+                  },
+                  "due_date": {
+                    "type": "integer",
+                    "contentEncoding": "int64"
+                  },
+                  "due_date_time": {
+                    "type": "boolean"
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "contentEncoding": "int32"
+                  },
+                  "assignee": {
+                    "description": "Include a `user_id` to add a List owner.",
+                    "type": "integer",
+                    "contentEncoding": "int32"
+                  },
+                  "status": {
+                    "description": "**Status** refers to the List color rather than the task Statuses available in the List.",
+                    "type": "string"
+                  }
+                },
+                "examples": [
+                  {
+                    "name": "New List Name",
+                    "content": "New List Content",
+                    "due_date": 1567780450202,
+                    "due_date_time": false,
+                    "priority": 1,
+                    "assignee": 183,
+                    "status": "red"
+                  }
+                ]
+              },
+              "example": {
+                "name": "New List Name",
+                "content": "New List Content",
+                "markdown_content": "# This is markdown\n ***bold and italicized text***",
+                "due_date": 1567780450202,
+                "due_date_time": false,
+                "priority": 1,
+                "assignee": 183,
+                "status": "red"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "CreateFolderlessListresponse",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "orderindex": {
+                      "type": "integer",
+                      "contentEncoding": "int32"
+                    },
+                    "content": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "title": "Status5",
+                      "required": [
+                        "status",
+                        "color",
+                        "hide_label"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string"
+                        },
+                        "color": {
+                          "type": "string"
+                        },
+                        "hide_label": {
+                          "type": "boolean"
+                        }
+                      },
+                      "examples": [
+                        {
+                          "status": "red",
+                          "color": "#e50000",
+                          "hide_label": true
+                        }
+                      ]
+                    },
+                    "priority": {
+                      "title": "Priority1",
+                      "required": [
+                        "priority",
+                        "color"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "priority": {
+                          "type": "string"
+                        },
+                        "color": {
+                          "type": "string"
+                        }
+                      },
+                      "examples": [
+                        {
+                          "priority": "urgent",
+                          "color": "#f50000"
+                        }
+                      ]
+                    },
+                    "assignee": {
+                      "title": "Assignee3",
+                      "required": [
+                        "id",
+                        "color",
+                        "username",
+                        "initials",
+                        "profilePicture"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "contentEncoding": "int32"
+                        },
+                        "color": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "initials": {
+                          "type": "string"
+                        },
+                        "profilePicture": {
+                          "type": "string"
+                        }
+                      },
+                      "examples": [
+                        {
+                          "id": 183,
+                          "color": "#827718",
+                          "username": "John Doe",
+                          "initials": "J",
+                          "profilePicture": "https://attachments.clickup.com/profilePictures/profile.jpg"
+                        }
+                      ]
+                    },
+                    "task_count": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "due_date": {
+                      "type": "string"
+                    },
+                    "due_date_time": {
+                      "type": "boolean"
+                    },
+                    "start_date": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "start_date_time": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "folder": {
+                      "title": "Folder3",
+                      "required": [
+                        "id",
+                        "name",
+                        "hidden",
+                        "access"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "hidden": {
+                          "type": "boolean"
+                        },
+                        "access": {
+                          "type": "boolean"
+                        }
+                      },
+                      "examples": [
+                        {
+                          "id": "1217",
+                          "name": "Shared with me",
+                          "hidden": false,
+                          "access": false
+                        }
+                      ]
+                    },
+                    "space": {
+                      "title": "Space2",
+                      "required": [
+                        "id",
+                        "name",
+                        "access"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "access": {
+                          "type": "boolean"
+                        }
+                      },
+                      "examples": [
+                        {
+                          "id": "789",
+                          "name": "Space Name",
+                          "access": true
+                        }
+                      ]
+                    },
+                    "statuses": {
+                      "type": "array",
+                      "items": {
+                        "title": "Status",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "color": {
+                            "type": "string"
+                          },
+                          "orderindex": {
+                            "type": "integer",
+                            "contentEncoding": "int32"
+                          },
+                          "type": {
+                            "type": "string"
+                          }
+                        },
+                        "examples": [
+                          {
+                            "id": "p7001234_FxGmgrnk",
+                            "status": "in progress",
+                            "color": "#d3d3d3",
+                            "orderindex": 1,
+                            "type": "custom"
+                          }
+                        ]
+                      },
+                      "description": ""
+                    },
+                    "inbound_address": {
+                      "type": "string"
+                    }
+                  },
+                  "examples": [
+                    {
+                      "id": "124",
+                      "name": "New List Name",
+                      "orderindex": 1,
+                      "content": "New List Content",
+                      "status": {
+                        "status": "red",
+                        "color": "#e50000",
+                        "hide_label": true
+                      },
+                      "priority": {
+                        "priority": "urgent",
+                        "color": "#f50000"
+                      },
+                      "assignee": {
+                        "id": 183,
+                        "color": "#827718",
+                        "username": "Jerry",
+                        "initials": "J",
+                        "profilePicture": "https://attachments.clickup.com/profilePictures/profile.jpg"
+                      },
+                      "task_count": null,
+                      "due_date": "1567780450202",
+                      "due_date_time": false,
+                      "start_date": null,
+                      "start_date_time": null,
+                      "folder": {
+                        "id": "457",
+                        "name": "hidden",
+                        "hidden": true,
+                        "access": true
+                      },
+                      "space": {
+                        "id": "789",
+                        "name": "Space Name",
+                        "access": true
+                      },
+                      "statuses": [
+                        {
+                          "status": "to do",
+                          "orderindex": 0,
+                          "color": "#d3d3d3",
+                          "type": "open"
+                        },
+                        {
+                          "status": "complete",
+                          "orderindex": 1,
+                          "color": "#6bc950",
+                          "type": "closed"
+                        }
+                      ],
+                      "inbound_address": "add.task.1389.ac725f.31518a6a-05bb-4997-92a6-1dcfe2f527ca@tasks.clickup.com"
+                    }
+                  ]
+                },
+                "example": {
+                  "id": "124",
+                  "name": "New List Name",
+                  "orderindex": 1,
+                  "content": "New List Content",
+                  "status": {
+                    "status": "red",
+                    "color": "#e50000",
+                    "hide_label": true
+                  },
+                  "priority": {
+                    "priority": "urgent",
+                    "color": "#f50000"
+                  },
+                  "assignee": {
+                    "id": 183,
+                    "color": "#827718",
+                    "username": "Jerry",
+                    "initials": "J",
+                    "profilePicture": "https://attachments.clickup.com/profilePictures/profile.jpg"
+                  },
+                  "task_count": null,
+                  "due_date": "1567780450202",
+                  "due_date_time": false,
+                  "start_date": null,
+                  "start_date_time": null,
+                  "folder": {
+                    "id": "457",
+                    "name": "hidden",
+                    "hidden": true,
+                    "access": true
+                  },
+                  "space": {
+                    "id": "789",
+                    "name": "Space Name",
+                    "access": true
+                  },
+                  "statuses": [
+                    {
+                      "status": "to do",
+                      "orderindex": 0,
+                      "color": "#d3d3d3",
+                      "type": "open"
+                    },
+                    {
+                      "status": "complete",
+                      "orderindex": 1,
+                      "color": "#6bc950",
+                      "type": "closed"
+                    }
+                  ],
+                  "inbound_address": "add.task.1389.ac725f.31518a6a-05bb-4997-92a6-1dcfe2f527ca@tasks.clickup.com"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "parameters": []
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Authorization_Token": {
+        "name": "Authorization",
+        "type": "apiKey",
+        "in": "header",
+        "description": "API token required for authentication. Two types of tokens are supported:\n**Personal API Key** Obtain from ClickUp's settings page under 'Apps' and add it to the header as `Authorization: pk_...`\n**OAuth2 Access Token** Generated through the OAuth2 flow and add it to the header as `Authorization: Bearer {access_token}`"
+      }
+    }
+  },
+  "security": [
+    {
+      "Authorization_Token": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Lists"
+    }
+  ]
+}
+```
