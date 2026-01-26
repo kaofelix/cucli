@@ -15,11 +15,11 @@
 - [x] Get task comments
 - [x] Add task comment
 - [x] Create folder
+- [x] Create list
 
 ## In Progress
 
 ## Planned
-- [ ] Create list
 - [ ] Task checklists (get, create, create items, update, delete)
 - [ ] Get task members
 - [ ] Get list members

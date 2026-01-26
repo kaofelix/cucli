@@ -121,6 +121,58 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def create_list(
+        self,
+        folder_id: str,
+        *,
+        name: str,
+        content: str | None = None,
+        markdown_content: str | None = None,
+        due_date: int | None = None,
+        due_date_time: bool | None = None,
+        priority: int | None = None,
+        assignee: int | None = None,
+        status: str | None = None,
+    ) -> dict[str, Any]:
+        """Create a new list in a folder.
+
+        Args:
+            folder_id: The folder ID to create the list in.
+            name: The list name (required).
+            content: The list description (text content).
+            markdown_content: The list description (markdown content).
+            due_date: Due date as Unix timestamp in milliseconds.
+            due_date_time: Whether the due date includes a time.
+            priority: The list priority (0: Urgent, 1: High, 2: Normal, 3: Low, 4: None).
+            assignee: Assignee user ID.
+            status: The list status (color).
+
+        Returns:
+            The response from the /folder/{folder_id}/list endpoint.
+        """
+        data: dict[str, Any] = {"name": name}
+
+        if content is not None:
+            data["content"] = content
+        if markdown_content is not None:
+            data["markdown_content"] = markdown_content
+        if due_date is not None:
+            data["due_date"] = due_date
+        if due_date_time is not None:
+            data["due_date_time"] = due_date_time
+        if priority is not None:
+            data["priority"] = priority
+        if assignee is not None:
+            data["assignee"] = assignee
+        if status is not None:
+            data["status"] = status
+
+        response = self._client.post(
+            f"{self.base_url}/folder/{folder_id}/list", json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
     def get_task(self, task_id: str) -> dict[str, Any]:
         """Get a task by ID.
 

@@ -246,6 +246,92 @@ def create_folder(space_id: str, name: str, format: str, raw: bool) -> None:
         raise click.Abort()
 
 
+@cli.command(name="create-list")
+@click.argument("folder_id")
+@click.option("--name", required=True, help="List name (required).")
+@click.option("--description", help="List description (text content).")
+@click.option("--markdown-description", help="List description (markdown content).")
+@click.option(
+    "--due-date",
+    type=int,
+    help="Due date as Unix timestamp in milliseconds.",
+)
+@click.option("--due-date-time", is_flag=True, help="Due date includes a time.")
+@click.option(
+    "--priority",
+    type=int,
+    help="List priority (0: Urgent, 1: High, 2: Normal, 3: Low, 4: None).",
+)
+@click.option("--assignee", type=int, help="Assignee user ID to assign the list to.")
+@click.option("--status", help="List status (color).")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def create_list(
+    folder_id: str,
+    name: str,
+    description: str | None,
+    markdown_description: str | None,
+    due_date: int | None,
+    due_date_time: bool,
+    priority: int | None,
+    assignee: int | None,
+    status: str | None,
+    format: str,
+    raw: bool,
+) -> None:
+    """Create a new list in a folder.
+
+    FOLDER_ID: The ID of the folder to create the list in.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.create_list(
+                folder_id,
+                name=name,
+                content=description,
+                markdown_content=markdown_description,
+                due_date=due_date,
+                due_date_time=due_date_time,
+                priority=priority,
+                assignee=assignee,
+                status=status,
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            if format == "json":
+                output = {
+                    "id": data.get("id"),
+                    "name": data.get("name"),
+                    "folder_id": data.get("folder", {}).get("id"),
+                    "space_id": data.get("space", {}).get("id"),
+                    "task_count": data.get("task_count"),
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:         {data.get('id')}")
+                click.echo(f"Name:       {data.get('name')}")
+                click.echo(f"Folder ID:  {data.get('folder', {}).get('id')}")
+                click.echo(f"Space ID:   {data.get('space', {}).get('id')}")
+                click.echo(f"Task Count: {data.get('task_count')}")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
 @cli.command(name="lists")
 @click.argument("folder_id")
 @click.option(

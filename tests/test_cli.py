@@ -1033,3 +1033,128 @@ class TestCreateFolderCommand:
         result = runner.invoke(cli, ["create-folder", "--help"])
         assert result.exit_code == 0
         assert "--name" in result.output
+
+
+class TestCreateListCommand:
+    """Test cases for the create-list command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_create_list_basic(self, runner, mock_api_key_env):
+        """Test create-list command with minimal options."""
+        folder_id = "901513787576"
+        result = runner.invoke(
+            cli, ["create-list", folder_id, "--name", "Test List from CLI"]
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "id" in output
+        assert output["name"] == "Test List from CLI"
+
+    @pytest.mark.vcr
+    def test_create_list_with_description(self, runner, mock_api_key_env):
+        """Test create-list command with description."""
+        folder_id = "901513787576"
+        result = runner.invoke(
+            cli,
+            [
+                "create-list",
+                folder_id,
+                "--name",
+                "Test List with Description",
+                "--description",
+                "Test description",
+            ],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "id" in output
+        assert output["name"] == "Test List with Description"
+
+    @pytest.mark.vcr
+    def test_create_list_with_options(self, runner, mock_api_key_env):
+        """Test create-list command with various options."""
+        folder_id = "901513787576"
+        result = runner.invoke(
+            cli,
+            [
+                "create-list",
+                folder_id,
+                "--name",
+                "Test List with Options",
+                "--description",
+                "Test description",
+                "--status",
+                "red",
+                "--priority",
+                "1",
+            ],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "id" in output
+        assert output["name"] == "Test List with Options"
+
+    @pytest.mark.vcr
+    def test_create_list_table_output(self, runner, mock_api_key_env):
+        """Test create-list command with table output."""
+        folder_id = "901513787576"
+        result = runner.invoke(
+            cli,
+            [
+                "create-list",
+                folder_id,
+                "--name",
+                "Test List Table",
+                "--format",
+                "table",
+            ],
+        )
+
+        assert result.exit_code == 0
+        assert "ID:" in result.output
+        assert "Name:" in result.output
+
+    @pytest.mark.vcr
+    def test_create_list_raw_output(self, runner, mock_api_key_env):
+        """Test create-list command with raw output."""
+        folder_id = "901513787576"
+        result = runner.invoke(
+            cli, ["create-list", folder_id, "--name", "Test List Raw", "--raw"]
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        # Raw output includes all fields from API
+        assert "id" in output
+        assert "name" in output
+
+    @pytest.mark.vcr
+    def test_create_list_invalid_folder(self, runner, mock_api_key_env):
+        """Test create-list command with invalid folder ID."""
+        folder_id = "99999999"
+        result = runner.invoke(cli, ["create-list", folder_id, "--name", "Test List"])
+
+        assert result.exit_code != 0
+        assert "Error" in result.output or "HTTP Error" in result.output
+
+    def test_create_list_missing_name(self, runner, mock_api_key_env):
+        """Test create-list command fails without required name."""
+        folder_id = "901513787576"
+        result = runner.invoke(cli, ["create-list", folder_id])
+
+        assert result.exit_code != 0
+        assert "name" in result.output.lower() or "missing" in result.output.lower()
+
+    def test_create_list_help(self, runner):
+        """Test create-list command help."""
+        result = runner.invoke(cli, ["create-list", "--help"])
+        assert result.exit_code == 0
+        assert "--name" in result.output

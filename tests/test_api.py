@@ -538,3 +538,50 @@ class TestClickUpClient:
 
         # Should get a 404 or similar error
         assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_create_list(self, clickup_client):
+        """Test creating a list in a folder."""
+        folder_id = "901513787576"
+
+        response = clickup_client.create_list(folder_id, name="Test List from API")
+
+        # Verify response structure
+        assert "id" in response
+        assert "name" in response
+        assert response["name"] == "Test List from API"
+        assert "folder" in response
+        assert response["folder"]["id"] == folder_id
+        assert "space" in response
+
+    @pytest.mark.vcr
+    def test_create_list_with_options(self, clickup_client):
+        """Test creating a list with various options."""
+        folder_id = "901513787576"
+
+        response = clickup_client.create_list(
+            folder_id,
+            name="Test List with Options",
+            content="List description",
+            status="red",
+            priority=1,
+        )
+
+        # Verify response structure
+        assert "id" in response
+        assert response["name"] == "Test List with Options"
+        assert "status" in response
+        assert "priority" in response
+
+    @pytest.mark.vcr
+    def test_create_list_not_found(self, clickup_client):
+        """Test creating a list in a non-existent folder."""
+        import httpx
+
+        folder_id = "99999999"
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.create_list(folder_id, name="Test List")
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400

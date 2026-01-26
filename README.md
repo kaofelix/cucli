@@ -208,6 +208,50 @@ cucli create-folder <space_id> --name "New Folder" --format table
 cucli create-folder <space_id> --name "New Folder" --raw
 ```
 
+### Create list
+
+```bash
+cucli create-list <folder_id> --name "List Name"
+```
+
+Create list with additional options:
+
+```bash
+# With description
+cucli create-list <folder_id> --name "List Name" --description "List description"
+
+# With markdown description
+cucli create-list <folder_id> --name "List Name" --markdown-description "# List Description"
+
+# With due date (Unix timestamp in milliseconds)
+cucli create-list <folder_id> --name "List Name" --due-date 1737907200000
+
+# With due date including time
+cucli create-list <folder_id> --name "List Name" --due-date 1737907200000 --due-date-time
+
+# With priority (0: Urgent, 1: High, 2: Normal, 3: Low, 4: None)
+cucli create-list <folder_id> --name "List Name" --priority 2
+
+# With assignee
+cucli create-list <folder_id> --name "List Name" --assignee 123
+
+# With status (color)
+cucli create-list <folder_id> --name "List Name" --status "red"
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli create-list <folder_id> --name "New List"
+
+# Table format
+cucli create-list <folder_id> --name "New List" --format table
+
+# Raw JSON (useful for debugging or when models don't match)
+cucli create-list <folder_id> --name "New List" --raw
+```
+
 ### Get task details
 
 ```bash
