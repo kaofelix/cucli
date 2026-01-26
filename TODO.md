@@ -27,10 +27,8 @@
 - [x] Create space tag
 - [x] Add tag to task
 - [x] Remove tag from task
-
-## Completed
-- [x] Time tracking API (start, stop, get running, get entries, create, update, delete)
-- [x] Time tracking CLI commands (all commands implemented and tested)
+- [x] Goals (list, get, create, update, delete)
+- [x] Key results (create, update, delete)
 
 ## Planned
 - [ ] Task dependencies
