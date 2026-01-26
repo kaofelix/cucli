@@ -1,0 +1,91 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.clickup.com/api/v2/team
+  response:
+    body:
+      string: "{\"teams\":[{\"id\":\"90152245421\",\"name\":\"Test\",\"color\":\"#40BC86\",\"avatar\":null,\"members\":[{\"user\":{\"id\":272627274,\"username\":\"Kao
+        Cardoso F\xE9lix\",\"email\":\"me@kaofelix.dev\",\"color\":\"#595d66\",\"profilePicture\":null,\"initials\":\"KF\",\"role\":1,\"role_subtype\":0,\"role_key\":\"owner\",\"custom_role\":null,\"last_active\":\"1768902925448\",\"date_joined\":\"1768558001241\",\"date_invited\":\"1768558001241\"}}]}]}"
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '385'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 26 Jan 2026 12:44:54 GMT
+      Server:
+      - nginx
+      Server-Timing:
+      - cdn-upstream-layer;desc="EDGE",cdn-upstream-dns;dur=0,cdn-upstream-connect;dur=0,cdn-upstream-fbl;dur=147,cdn-cache-miss,cdn-pop;desc="MRS53-P1",cdn-rid;desc="ZHIGTWWPHIG6EMXi3PQjOs-NJPu6p2F6XusACYNj5advPdAl_URiKw==",cdn-downstream-fbl;dur=150
+      Timing-Allow-Origin:
+      - '*'
+      Via:
+      - 1.1 d9f2836b4d2caa47cb15d311b128293a.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - ZHIGTWWPHIG6EMXi3PQjOs-NJPu6p2F6XusACYNj5advPdAl_URiKw==
+      X-Amz-Cf-Pop:
+      - MRS53-P1
+      X-Cache:
+      - Miss from cloudfront
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - x-datadog-trace-id,server
+      cache-control:
+      - no-cache, no-store
+      content-language:
+      - en-US
+      content-security-policy:
+      - frame-ancestors 'self'
+      expect-ct:
+      - max-age=0
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Origin
+      x-content-type-options:
+      - nosniff
+      x-datadog-trace-id:
+      - '4277929747523836238'
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-permitted-cross-domain-policies:
+      - none
+      x-ratelimit-limit:
+      - '100'
+      x-ratelimit-remaining:
+      - '98'
+      x-ratelimit-reset:
+      - '1769431555'
+      x-received-from:
+      - shard-prod-eu-west-1-3
+      x-xss-protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

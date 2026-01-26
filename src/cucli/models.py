@@ -53,7 +53,7 @@ class Team(BaseModel):
     id: str
     name: str
     color: str
-    avatar: str
+    avatar: str | None = None
     members: list[Member] = Field(default_factory=list)
 
 

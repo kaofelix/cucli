@@ -108,3 +108,38 @@ Run the CLI:
 ```bash
 uv run cucli <command>
 ```
+
+## Testing
+
+Install test dependencies:
+
+```bash
+uv sync --extra test
+```
+
+Run all tests:
+
+```bash
+uv run pytest
+```
+
+Run tests with verbose output:
+
+```bash
+uv run pytest -v
+```
+
+### VCR Recording
+
+Tests use [pytest-recording](https://github.com/kiwicom/pytest-recording) with [VCR.py](https://vcrpy.readthedocs.io/) to record and replay HTTP interactions. This means tests can run without making actual API calls after the first recording.
+
+To record new cassettes:
+
+```bash
+export CLICKUP_API_KEY=pk_your_actual_api_key_here
+uv run pytest
+```
+
+Cassettes are stored in `tests/cassettes/` and should be committed to the repository.
+
+See [tests/README.md](tests/README.md) for more details.

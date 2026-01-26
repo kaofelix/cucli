@@ -13,9 +13,38 @@ dependencies = [
     "pydantic>=2.12.5",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0.0",
+    "pytest-recording>=0.13.0",
+]
+
 [project.scripts]
 cucli = "cucli:main"
 
 [build-system]
 requires = ["uv_build>=0.9.24,<0.10.0"]
 build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "-ra",
+]
+markers = [
+    "vcr: marks tests as using VCR recording",
+]
+
+[tool.pytest-recording]
+record_mode = "once"
+match_on = ["method", "uri", "query"]
+cassette_library_dir = "tests/cassettes"
+
+# Filter sensitive headers from cassettes
+filter_headers = ["authorization"]
+
