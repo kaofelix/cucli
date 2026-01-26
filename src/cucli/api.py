@@ -660,6 +660,32 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def get_task_members(self, task_id: str) -> dict[str, Any]:
+        """Get members with explicit access to a task.
+
+        Args:
+            task_id: The task ID.
+
+        Returns:
+            The response from the /task/{task_id}/member endpoint.
+        """
+        response = self._client.get(f"{self.base_url}/task/{task_id}/member")
+        response.raise_for_status()
+        return response.json()
+
+    def get_list_members(self, list_id: str | int) -> dict[str, Any]:
+        """Get members with explicit access to a list.
+
+        Args:
+            list_id: The list ID (string or integer).
+
+        Returns:
+            The response from the /list/{list_id}/member endpoint.
+        """
+        response = self._client.get(f"{self.base_url}/list/{list_id}/member")
+        response.raise_for_status()
+        return response.json()
+
     def close(self) -> None:
         """Close the HTTP client."""
         self._client.close()

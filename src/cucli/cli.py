@@ -10,9 +10,11 @@ from cucli.models import (
     ClickUpList,
     Comment,
     Folder,
+    ListMember,
     Space,
-    Team,
     Task,
+    TaskMember,
+    Team,
 )
 
 
@@ -1323,6 +1325,130 @@ def delete_checklist_item(checklist_id: str, checklist_item_id: str, yes: bool) 
     except Exception as e:
         click.echo(f"Unexpected error: {e}", err=True)
         raise click.Abort()
+
+
+@cli.command(name="task-members")
+@click.argument("task_id")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def task_members(task_id: str, format: str, raw: bool) -> None:
+    """Get members with explicit access to a task.
+
+    TASK_ID: The ID of the task to get members from.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.get_task_members(task_id)
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            members = [TaskMember(**member) for member in data["members"]]
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+
+    if not members:
+        click.echo("No members found.")
+        return
+
+    if format == "json":
+        output = [
+            {
+                "id": m.id,
+                "username": m.username,
+                "email": m.email,
+                "initials": m.initials,
+            }
+            for m in members
+        ]
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        # Calculate column widths
+        max_id = max(len(str(m.id)) for m in members)
+        max_user = max(len(m.username) for m in members)
+        max_email = max(len(m.email) for m in members)
+
+        # Print header
+        click.echo(f"{'ID'.ljust(max_id)}  {'USERNAME'.ljust(max_user)}  {'EMAIL'}")
+        click.echo("-" * (max_id + max_user + max_email + 6))
+
+        # Print rows
+        for member in members:
+            click.echo(
+                f"{str(member.id).ljust(max_id)}  {member.username.ljust(max_user)}  {member.email}"
+            )
+
+
+@cli.command(name="list-members")
+@click.argument("list_id")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def list_members(list_id: str, format: str, raw: bool) -> None:
+    """Get members with explicit access to a list.
+
+    LIST_ID: The ID of the list to get members from.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.get_list_members(list_id)
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            members = [ListMember(**member) for member in data["members"]]
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+
+    if not members:
+        click.echo("No members found.")
+        return
+
+    if format == "json":
+        output = [
+            {
+                "id": m.id,
+                "username": m.username,
+                "email": m.email,
+                "initials": m.initials,
+            }
+            for m in members
+        ]
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        # Calculate column widths
+        max_id = max(len(str(m.id)) for m in members)
+        max_user = max(len(m.username) for m in members)
+        max_email = max(len(m.email) for m in members)
+
+        # Print header
+        click.echo(f"{'ID'.ljust(max_id)}  {'USERNAME'.ljust(max_user)}  {'EMAIL'}")
+        click.echo("-" * (max_id + max_user + max_email + 6))
+
+        # Print rows
+        for member in members:
+            click.echo(
+                f"{str(member.id).ljust(max_id)}  {member.username.ljust(max_user)}  {member.email}"
+            )
 
 
 def main() -> None:

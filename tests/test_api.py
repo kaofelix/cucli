@@ -8,10 +8,14 @@ from cucli.models import (
     CommentsResponse,
     Folder,
     FoldersResponse,
+    ListMember,
+    ListMembersResponse,
     ListsResponse,
     SpacesResponse,
-    Team,
     Task,
+    TaskMember,
+    TaskMembersResponse,
+    Team,
     TeamsResponse,
 )
 
@@ -710,3 +714,103 @@ class TestClickUpClient:
 
         # Response should be an empty dict or similar
         assert isinstance(response, dict)
+
+    @pytest.mark.vcr
+    def test_get_task_members(self, clickup_client):
+        """Test getting members with explicit access to a task."""
+        # Using a real task ID from the test workspace
+        task_id = "86c7mc19h"
+
+        response = clickup_client.get_task_members(task_id)
+
+        # Verify response structure
+        assert "members" in response
+        assert isinstance(response["members"], list)
+
+        # Parse with Pydantic model
+        task_members_response = TaskMembersResponse(**response)
+        assert len(task_members_response.members) >= 0
+
+        # If there are members, validate first member structure
+        if task_members_response.members:
+            member = task_members_response.members[0]
+            assert isinstance(member.id, int)
+            assert isinstance(member.username, str)
+            assert isinstance(member.email, str)
+            assert isinstance(member.initials, str)
+
+    @pytest.mark.vcr
+    def test_get_task_members_parses_model(self, clickup_client):
+        """Test that get_task_members response can be parsed into Pydantic models."""
+        task_id = "86c7mc19h"
+
+        response = clickup_client.get_task_members(task_id)
+
+        for member_data in response["members"]:
+            member = TaskMember(**member_data)
+            assert member.id
+            assert member.username
+            assert member.email
+
+    @pytest.mark.vcr
+    def test_get_task_members_not_found(self, clickup_client):
+        """Test that get_task_members raises HTTPStatusError for non-existent task."""
+        import httpx
+
+        task_id = "00000000"
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.get_task_members(task_id)
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_get_list_members(self, clickup_client):
+        """Test getting members with explicit access to a list."""
+        # Using a real list ID from the test workspace
+        list_id = "901520401736"
+
+        response = clickup_client.get_list_members(list_id)
+
+        # Verify response structure
+        assert "members" in response
+        assert isinstance(response["members"], list)
+
+        # Parse with Pydantic model
+        list_members_response = ListMembersResponse(**response)
+        assert len(list_members_response.members) >= 0
+
+        # If there are members, validate first member structure
+        if list_members_response.members:
+            member = list_members_response.members[0]
+            assert isinstance(member.id, int)
+            assert isinstance(member.username, str)
+            assert isinstance(member.email, str)
+            assert isinstance(member.initials, str)
+
+    @pytest.mark.vcr
+    def test_get_list_members_parses_model(self, clickup_client):
+        """Test that get_list_members response can be parsed into Pydantic models."""
+        list_id = "901520401736"
+
+        response = clickup_client.get_list_members(list_id)
+
+        for member_data in response["members"]:
+            member = ListMember(**member_data)
+            assert member.id
+            assert member.username
+            assert member.email
+
+    @pytest.mark.vcr
+    def test_get_list_members_not_found(self, clickup_client):
+        """Test that get_list_members raises HTTPStatusError for non-existent list."""
+        import httpx
+
+        list_id = "00000000"
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.get_list_members(list_id)
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400

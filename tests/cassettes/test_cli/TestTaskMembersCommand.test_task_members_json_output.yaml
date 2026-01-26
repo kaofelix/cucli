@@ -1,0 +1,92 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - pk_272627274_QZU8LEFFQ2CDW3ASOXATNG51Q2I45PRY
+      Connection:
+      - keep-alive
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.clickup.com/api/v2/task/86c7mc19h/member
+  response:
+    body:
+      string: '{"members":[]}'
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '14'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 26 Jan 2026 20:24:23 GMT
+      Server:
+      - nginx
+      Server-Timing:
+      - cdn-upstream-layer;desc="EDGE",cdn-upstream-dns;dur=0,cdn-upstream-connect;dur=0,cdn-upstream-fbl;dur=300,cdn-cache-miss,cdn-pop;desc="MRS53-P1",cdn-rid;desc="K6bGlw4u3YC-5feSUcGmNn-r5AFoWiXFZI170Zy7Nm3XpOPnhH98yw==",cdn-downstream-fbl;dur=304
+      Timing-Allow-Origin:
+      - '*'
+      Via:
+      - 1.1 67df6fe103870fd16600e80cc9ff8440.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - K6bGlw4u3YC-5feSUcGmNn-r5AFoWiXFZI170Zy7Nm3XpOPnhH98yw==
+      X-Amz-Cf-Pop:
+      - MRS53-P1
+      X-Cache:
+      - Miss from cloudfront
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - x-datadog-trace-id,server
+      cache-control:
+      - no-cache, no-store
+      content-language:
+      - en-US
+      content-security-policy:
+      - frame-ancestors 'self'
+      expect-ct:
+      - max-age=0
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Origin
+      x-content-type-options:
+      - nosniff
+      x-datadog-trace-id:
+      - '1440682027235886623'
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-permitted-cross-domain-policies:
+      - none
+      x-ratelimit-limit:
+      - '100'
+      x-ratelimit-remaining:
+      - '99'
+      x-ratelimit-reset:
+      - '1769459124'
+      x-received-from:
+      - shard-prod-eu-west-1-3
+      x-xss-protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

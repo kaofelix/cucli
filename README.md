@@ -689,6 +689,84 @@ cucli delete-checklist-item <checklist_id> <checklist_item_id> --yes
 cucli delete-checklist-item <checklist_id> <checklist_item_id> -y
 ```
 
+### Get task members
+
+```bash
+cucli task-members <task_id>
+```
+
+Get members with explicit access to a task. Note that this does not include people with access through a Team, or people with access from the List, Folder, or Space where the task exists.
+
+Output in JSON format (default):
+
+```json
+[
+  {
+    "id": 272627274,
+    "username": "Kao Cardoso Félix",
+    "email": "me@kaofelix.dev",
+    "initials": "KF"
+  }
+]
+```
+
+Output in table format:
+
+```bash
+cucli task-members <task_id> --format table
+```
+
+```
+ID           USERNAME              EMAIL
+-------------------------------------------------
+272627274   Kao Cardoso Félix    me@kaofelix.dev
+```
+
+Output raw JSON:
+
+```bash
+cucli task-members <task_id> --raw
+```
+
+### Get list members
+
+```bash
+cucli list-members <list_id>
+```
+
+Get members with explicit access to a list. Note that this does not include people with access through a Team, or people with access from the Folder or Space where the list exists.
+
+Output in JSON format (default):
+
+```json
+[
+  {
+    "id": 272627274,
+    "username": "Kao Cardoso Félix",
+    "email": "me@kaofelix.dev",
+    "initials": "KF"
+  }
+]
+```
+
+Output in table format:
+
+```bash
+cucli list-members <list_id> --format table
+```
+
+```
+ID           USERNAME              EMAIL
+-------------------------------------------------
+272627274   Kao Cardoso Félix    me@kaofelix.dev
+```
+
+Output raw JSON:
+
+```bash
+cucli list-members <list_id> --raw
+```
+
 ## Development
 
 Add a dependency:

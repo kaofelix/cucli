@@ -1315,3 +1315,131 @@ class TestChecklistCommands:
 
         assert result.exit_code != 0
         assert "name" in result.output.lower() or "missing" in result.output.lower()
+
+
+class TestTaskMembersCommand:
+    """Test cases for the task-members command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_task_members_json_output(self, runner, mock_api_key_env):
+        """Test task-members command with JSON output (default)."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(cli, ["task-members", task_id])
+
+        assert result.exit_code == 0
+        # The task may have no explicit members
+        if "No members found" in result.output:
+            return
+
+        output = json.loads(result.output)
+
+        assert isinstance(output, list)
+        # Validate structure if there are members
+        if output:
+            member = output[0]
+            assert "id" in member
+            assert "username" in member
+            assert "email" in member
+
+    @pytest.mark.vcr
+    def test_task_members_table_output(self, runner, mock_api_key_env):
+        """Test task-members command with table output."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(cli, ["task-members", task_id, "--format", "table"])
+
+        assert result.exit_code == 0
+        # The task may have no explicit members
+        if "No members found" in result.output:
+            return
+
+        # Table format should have headers
+        assert "ID" in result.output
+        assert "USERNAME" in result.output
+        assert "EMAIL" in result.output
+
+    @pytest.mark.vcr
+    def test_task_members_raw_output(self, runner, mock_api_key_env):
+        """Test task-members command with raw JSON output."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(cli, ["task-members", task_id, "--raw"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        # Raw output should include all fields from API
+        assert "members" in output
+        assert isinstance(output["members"], list)
+
+    @pytest.mark.vcr
+    def test_task_members_not_found(self, runner, mock_api_key_env):
+        """Test task-members command with non-existent task."""
+        task_id = "00000000"
+        result = runner.invoke(cli, ["task-members", task_id])
+
+        assert result.exit_code != 0
+        assert "HTTP Error" in result.output or "Error" in result.output
+
+
+class TestListMembersCommand:
+    """Test cases for the list-members command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_list_members_json_output(self, runner, mock_api_key_env):
+        """Test list-members command with JSON output (default)."""
+        list_id = "901520401736"
+        result = runner.invoke(cli, ["list-members", list_id])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert isinstance(output, list)
+        # Validate structure if there are members
+        if output:
+            member = output[0]
+            assert "id" in member
+            assert "username" in member
+            assert "email" in member
+
+    @pytest.mark.vcr
+    def test_list_members_table_output(self, runner, mock_api_key_env):
+        """Test list-members command with table output."""
+        list_id = "901520401736"
+        result = runner.invoke(cli, ["list-members", list_id, "--format", "table"])
+
+        assert result.exit_code == 0
+        # Table format should have headers
+        assert "ID" in result.output
+        assert "USERNAME" in result.output
+        assert "EMAIL" in result.output
+
+    @pytest.mark.vcr
+    def test_list_members_raw_output(self, runner, mock_api_key_env):
+        """Test list-members command with raw JSON output."""
+        list_id = "901520401736"
+        result = runner.invoke(cli, ["list-members", list_id, "--raw"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        # Raw output should include all fields from API
+        assert "members" in output
+        assert isinstance(output["members"], list)
+
+    @pytest.mark.vcr
+    def test_list_members_not_found(self, runner, mock_api_key_env):
+        """Test list-members command with non-existent list."""
+        list_id = "00000000"
+        result = runner.invoke(cli, ["list-members", list_id])
+
+        assert result.exit_code != 0
+        assert "HTTP Error" in result.output or "Error" in result.output

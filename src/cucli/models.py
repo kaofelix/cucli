@@ -265,5 +265,55 @@ class ChecklistResponse(BaseModel):
     checklist: Checklist
 
 
+class ProfileInfo(BaseModel):
+    """Profile information for a member."""
+
+    display_profile: str | None = None
+    verified_ambassador: str | None = None
+    verified_consultant: str | None = None
+    top_tier_user: str | None = None
+    ai_expert: str | None = None
+    viewed_verified_ambassador: str | None = None
+    viewed_verified_consultant: str | None = None
+    viewed_top_tier_user: str | None = None
+    viewed_ai_expert: str | None = None
+
+
+class TaskMember(BaseModel):
+    """A member with explicit access to a task."""
+
+    id: int
+    username: str
+    email: str
+    color: str | None = None
+    initials: str
+    profilePicture: str | None = None
+    profileInfo: ProfileInfo
+
+
+class TaskMembersResponse(BaseModel):
+    """Response from the /task/{task_id}/member endpoint."""
+
+    members: list[TaskMember] = Field(default_factory=list)
+
+
+class ListMember(BaseModel):
+    """A member with explicit access to a list."""
+
+    id: int
+    username: str
+    email: str
+    color: str | None = None
+    initials: str
+    profilePicture: str | None = None
+    profileInfo: ProfileInfo
+
+
+class ListMembersResponse(BaseModel):
+    """Response from the /list/{list_id}/member endpoint."""
+
+    members: list[ListMember] = Field(default_factory=list)
+
+
 # For raw output when models don't match
 RawResponse = dict[str, Any]

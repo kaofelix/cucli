@@ -21,9 +21,9 @@
 - [x] Update checklist item
 - [x] Delete checklist
 - [x] Delete checklist item
+- [x] Get task members
+- [x] Get list members
 
 ## In Progress
 
 ## Planned
-- [ ] Get task members
-- [ ] Get list members
