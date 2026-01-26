@@ -7,11 +7,11 @@
 - [x] Get spaces in a workspace
 - [x] Get folders in a space
 - [x] Get lists in a folder
+- [x] Create task
 
 ## In Progress
 
 ## Planned
-- [ ] Create task
 - [ ] Update task status
 - [ ] Update task priority
 - [ ] Delete task

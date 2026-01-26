@@ -265,6 +265,59 @@ cucli tasks <team_id> --format table
 cucli tasks <team_id> --raw
 ```
 
+### Create task
+
+```bash
+cucli create-task <list_id> --name "Task Name"
+```
+
+Create task with additional options:
+
+```bash
+# With description
+cucli create-task <list_id> --name "Task Name" --description "Task description"
+
+# With status
+cucli create-task <list_id> --name "Task Name" --status "to do"
+
+# With priority (0: Urgent, 1: High, 2: Normal, 3: Low, 4: None)
+cucli create-task <list_id> --name "Task Name" --priority 3
+
+# With assignees
+cucli create-task <list_id> --name "Task Name" --assignee 123 --assignee 456
+
+# With tags
+cucli create-task <list_id> --name "Task Name" --tag "tag1" --tag "tag2"
+
+# With due date (Unix timestamp in milliseconds)
+cucli create-task <list_id> --name "Task Name" --due-date 1737907200000
+
+# With start date (Unix timestamp in milliseconds)
+cucli create-task <list_id> --name "Task Name" --start-date 1737820800000
+
+# With time estimate (milliseconds)
+cucli create-task <list_id> --name "Task Name" --time-estimate 3600000
+
+# With sprint points
+cucli create-task <list_id> --name "Task Name" --points 5
+
+# As a subtask
+cucli create-task <list_id> --name "Subtask Name" --parent <parent_task_id>
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli create-task <list_id> --name "Task Name"
+
+# Table format
+cucli create-task <list_id> --name "Task Name" --format table
+
+# Raw JSON (useful for debugging or when models don't match)
+cucli create-task <list_id> --name "Task Name" --raw
+```
+
 ### Get help
 
 ```bash

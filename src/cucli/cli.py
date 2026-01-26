@@ -476,6 +476,124 @@ def tasks(
         raise click.Abort()
 
 
+@cli.command(name="create-task")
+@click.argument("list_id")
+@click.option("--name", required=True, help="Task name (required).")
+@click.option("--description", help="Task description (text content).")
+@click.option("--markdown-description", help="Task description (markdown content).")
+@click.option("--status", help="Task status.")
+@click.option(
+    "--priority",
+    type=int,
+    help="Task priority (0: Urgent, 1: High, 2: Normal, 3: Low, 4: None).",
+)
+@click.option(
+    "--assignee",
+    multiple=True,
+    type=int,
+    help="Assignee user ID (can use multiple).",
+)
+@click.option("--tag", multiple=True, help="Tag name (can use multiple).")
+@click.option(
+    "--due-date",
+    type=int,
+    help="Due date as Unix timestamp in milliseconds.",
+)
+@click.option(
+    "--start-date",
+    type=int,
+    help="Start date as Unix timestamp in milliseconds.",
+)
+@click.option(
+    "--time-estimate",
+    type=int,
+    help="Time estimate in milliseconds.",
+)
+@click.option("--points", type=int, help="Sprint points.")
+@click.option("--parent", help="Parent task ID (for subtasks).")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def create_task(
+    list_id: str,
+    name: str,
+    description: str | None,
+    markdown_description: str | None,
+    status: str | None,
+    priority: int | None,
+    assignee: tuple[int, ...],
+    tag: tuple[str, ...],
+    due_date: int | None,
+    start_date: int | None,
+    time_estimate: int | None,
+    points: int | None,
+    parent: str | None,
+    format: str,
+    raw: bool,
+) -> None:
+    """Create a new task in a list.
+
+    LIST_ID: The ID of the list to create the task in.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.create_task(
+                list_id,
+                name=name,
+                description=description,
+                markdown_description=markdown_description,
+                status=status,
+                priority=priority,
+                assignees=list(assignee) if assignee else None,
+                tags=list(tag) if tag else None,
+                due_date=due_date,
+                start_date=start_date,
+                time_estimate=time_estimate,
+                points=points,
+                parent=parent,
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            if format == "json":
+                output = {
+                    "id": data.get("id"),
+                    "name": data.get("name"),
+                    "status": data.get("status", {}).get("status")
+                    if data.get("status")
+                    else None,
+                    "priority": data.get("priority", {}).get("priority")
+                    if data.get("priority")
+                    else None,
+                    "url": data.get("url"),
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:       {data.get('id')}")
+                click.echo(f"Name:     {data.get('name')}")
+                if data.get("status"):
+                    click.echo(f"Status:   {data.get('status', {}).get('status')}")
+                if data.get("priority"):
+                    click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
+                if data.get("url"):
+                    click.echo(f"URL:      {data.get('url')}")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
 def main() -> None:
     """Entry point for the CLI."""
     cli()

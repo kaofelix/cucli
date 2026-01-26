@@ -521,3 +521,167 @@ class TestCLI:
         assert "--format" in result.output
         assert "--raw" in result.output
         assert "--archived" in result.output
+
+
+class TestCreateTaskCommand:
+    """Test cases for the create-task command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_create_task_basic(self, runner, mock_api_key_env):
+        """Test create-task command with minimal options."""
+        list_id = "901520401736"
+        result = runner.invoke(
+            cli, ["create-task", list_id, "--name", "Test Task from CLI"]
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "id" in output
+        assert output["name"] == "Test Task from CLI"
+
+    @pytest.mark.vcr
+    def test_create_task_with_description(self, runner, mock_api_key_env):
+        """Test create-task command with description."""
+        list_id = "901520401736"
+        result = runner.invoke(
+            cli,
+            [
+                "create-task",
+                list_id,
+                "--name",
+                "Test Task with Description",
+                "--description",
+                "This is a test description",
+            ],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "id" in output
+        assert output["name"] == "Test Task with Description"
+
+    @pytest.mark.vcr
+    def test_create_task_with_status(self, runner, mock_api_key_env):
+        """Test create-task command with status."""
+        list_id = "901520401736"
+        result = runner.invoke(
+            cli,
+            [
+                "create-task",
+                list_id,
+                "--name",
+                "Test Task with Status",
+                "--status",
+                "to do",
+            ],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "id" in output
+
+    @pytest.mark.vcr
+    def test_create_task_with_priority(self, runner, mock_api_key_env):
+        """Test create-task command with priority."""
+        list_id = "901520401736"
+        result = runner.invoke(
+            cli,
+            [
+                "create-task",
+                list_id,
+                "--name",
+                "Test Task with Priority",
+                "--priority",
+                "3",
+            ],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "id" in output
+
+    @pytest.mark.vcr
+    def test_create_task_with_assignees(self, runner, mock_api_key_env):
+        """Test create-task command with assignees."""
+        list_id = "901520401736"
+        result = runner.invoke(
+            cli,
+            [
+                "create-task",
+                list_id,
+                "--name",
+                "Test Task with Assignee",
+                "--assignee",
+                "123",
+            ],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "id" in output
+
+    @pytest.mark.vcr
+    def test_create_task_with_tags(self, runner, mock_api_key_env):
+        """Test create-task command with tags."""
+        list_id = "901520401736"
+        result = runner.invoke(
+            cli,
+            [
+                "create-task",
+                list_id,
+                "--name",
+                "Test Task with Tag",
+                "--tag",
+                "test-tag",
+            ],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "id" in output
+
+    @pytest.mark.vcr
+    def test_create_task_raw_output(self, runner, mock_api_key_env):
+        """Test create-task command with raw output."""
+        list_id = "901520401736"
+        result = runner.invoke(
+            cli,
+            ["create-task", list_id, "--name", "Test Task Raw", "--raw"],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        # Raw output includes all fields from API
+        assert "id" in output
+        assert "name" in output
+
+    @pytest.mark.vcr
+    def test_create_task_invalid_list(self, runner, mock_api_key_env):
+        """Test create-task command with invalid list ID."""
+        list_id = "99999999"
+        result = runner.invoke(cli, ["create-task", list_id, "--name", "Test Task"])
+
+        assert result.exit_code != 0
+        assert "Error" in result.output or "HTTP Error" in result.output
+
+    def test_create_task_missing_name(self, runner, mock_api_key_env):
+        """Test create-task command fails without required name."""
+        list_id = "901520401736"
+        result = runner.invoke(cli, ["create-task", list_id])
+
+        assert result.exit_code != 0
+        assert "name" in result.output.lower() or "missing" in result.output.lower()
+
+    def test_create_task_help(self, runner):
+        """Test create-task command help."""
+        result = runner.invoke(cli, ["create-task", "--help"])
+        assert result.exit_code == 0
+        assert "--name" in result.output
+        assert "--description" in result.output
+        assert "--status" in result.output
+        assert "--priority" in result.output

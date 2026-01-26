@@ -299,3 +299,44 @@ class TestClickUpClient:
 
         # Should get a 404 or similar error
         assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_create_task(self, clickup_client):
+        """Test creating a task."""
+        list_id = "901520401736"
+        response = clickup_client.create_task(list_id, name="Test Task from API")
+
+        # Verify response structure
+        assert "id" in response
+        assert response["name"] == "Test Task from API"
+        assert "list" in response
+
+    @pytest.mark.vcr
+    def test_create_task_with_options(self, clickup_client):
+        """Test creating a task with various options."""
+        list_id = "901520401736"
+        response = clickup_client.create_task(
+            list_id,
+            name="Test Task with Options",
+            description="Test description",
+            status="to do",
+            priority=3,
+        )
+
+        # Verify response structure
+        assert "id" in response
+        assert response["name"] == "Test Task with Options"
+        assert "status" in response
+
+    @pytest.mark.vcr
+    def test_create_task_invalid_list(self, clickup_client):
+        """Test creating a task in non-existent list."""
+        import httpx
+
+        list_id = "99999999"
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.create_task(list_id, name="Test Task")
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400

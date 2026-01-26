@@ -217,6 +217,72 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def create_task(
+        self,
+        list_id: str,
+        *,
+        name: str,
+        description: str | None = None,
+        markdown_description: str | None = None,
+        status: str | None = None,
+        priority: int | None = None,
+        assignees: list[int] | None = None,
+        tags: list[str] | None = None,
+        due_date: int | None = None,
+        start_date: int | None = None,
+        time_estimate: int | None = None,
+        points: int | None = None,
+        parent: str | None = None,
+    ) -> dict[str, Any]:
+        """Create a new task in a list.
+
+        Args:
+            list_id: The list ID to create the task in.
+            name: The task name (required).
+            description: The task description (text content).
+            markdown_description: The task description (markdown content).
+            status: The task status.
+            priority: The task priority (0: Urgent, 1: High, 2: Normal, 3: Low, 4: None).
+            assignees: List of assignee user IDs.
+            tags: List of tag names.
+            due_date: Due date as Unix timestamp in milliseconds.
+            start_date: Start date as Unix timestamp in milliseconds.
+            time_estimate: Time estimate in milliseconds.
+            points: Sprint points.
+            parent: Parent task ID (for subtasks).
+
+        Returns:
+            The response from the /list/{list_id}/task endpoint.
+        """
+        data: dict[str, Any] = {"name": name}
+
+        if description is not None:
+            data["description"] = description
+        if markdown_description is not None:
+            data["markdown_content"] = markdown_description
+        if status is not None:
+            data["status"] = status
+        if priority is not None:
+            data["priority"] = priority
+        if assignees:
+            data["assignees"] = assignees
+        if tags:
+            data["tags"] = tags
+        if due_date is not None:
+            data["due_date"] = due_date
+        if start_date is not None:
+            data["start_date"] = start_date
+        if time_estimate is not None:
+            data["time_estimate"] = time_estimate
+        if points is not None:
+            data["points"] = points
+        if parent is not None:
+            data["parent"] = parent
+
+        response = self._client.post(f"{self.base_url}/list/{list_id}/task", json=data)
+        response.raise_for_status()
+        return response.json()
+
     def close(self) -> None:
         """Close the HTTP client."""
         self._client.close()
