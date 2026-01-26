@@ -5,7 +5,15 @@ import json
 import click
 import httpx
 from cucli.api import ClickUpClient
-from cucli.models import ClickUpList, Comment, Folder, Space, Team, Task
+from cucli.models import (
+    Checklist,
+    ClickUpList,
+    Comment,
+    Folder,
+    Space,
+    Team,
+    Task,
+)
 
 
 @click.group()
@@ -1001,6 +1009,311 @@ def add_comment(
             elif format == "table":
                 click.echo(f"ID:   {data.get('id')}")
                 click.echo(f"Date: {data.get('date')}")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="create-checklist")
+@click.argument("task_id")
+@click.option("--name", required=True, help="Checklist name (required).")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def create_checklist(task_id: str, name: str, format: str, raw: bool) -> None:
+    """Create a new checklist on a task.
+
+    TASK_ID: The ID of the task to create the checklist on.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.create_checklist(task_id, name=name)
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            checklist = Checklist(**data["checklist"])
+
+            if format == "json":
+                output = {
+                    "id": checklist.id,
+                    "task_id": checklist.task_id,
+                    "name": checklist.name,
+                    "resolved": checklist.resolved,
+                    "unresolved": checklist.unresolved,
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:         {checklist.id}")
+                click.echo(f"Task ID:    {checklist.task_id}")
+                click.echo(f"Name:       {checklist.name}")
+                click.echo(f"Resolved:    {checklist.resolved}")
+                click.echo(f"Unresolved:  {checklist.unresolved}")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="create-checklist-item")
+@click.argument("checklist_id")
+@click.option("--name", required=True, help="Checklist item name (required).")
+@click.option("--assignee", type=int, help="Assignee user ID.")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def create_checklist_item(
+    checklist_id: str, name: str, assignee: int | None, format: str, raw: bool
+) -> None:
+    """Create a new item in a checklist.
+
+    CHECKLIST_ID: The ID of the checklist to add the item to.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.create_checklist_item(
+                checklist_id, name=name, assignee=assignee
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            checklist = Checklist(**data["checklist"])
+
+            if format == "json":
+                output = {
+                    "id": checklist.id,
+                    "task_id": checklist.task_id,
+                    "name": checklist.name,
+                    "resolved": checklist.resolved,
+                    "unresolved": checklist.unresolved,
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:         {checklist.id}")
+                click.echo(f"Task ID:    {checklist.task_id}")
+                click.echo(f"Name:       {checklist.name}")
+                click.echo(f"Resolved:    {checklist.resolved}")
+                click.echo(f"Unresolved:  {checklist.unresolved}")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="update-checklist")
+@click.argument("checklist_id")
+@click.option("--name", help="Checklist name.")
+@click.option(
+    "--position",
+    type=int,
+    help="Position of the checklist (order).",
+)
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def update_checklist(
+    checklist_id: str, name: str | None, position: int | None, format: str, raw: bool
+) -> None:
+    """Update a checklist.
+
+    CHECKLIST_ID: The ID of the checklist to update.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.update_checklist(checklist_id, name=name, position=position)
+
+            if raw:
+                if data:
+                    click.echo(json.dumps(data, indent=2))
+                else:
+                    click.echo("{}")
+                return
+
+            if not data:
+                click.echo("No updates provided.")
+                return
+
+            if format == "json":
+                click.echo(json.dumps(data, indent=2))
+            elif format == "table":
+                click.echo(f"Checklist {checklist_id} updated successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="update-checklist-item")
+@click.argument("checklist_id")
+@click.argument("checklist_item_id")
+@click.option("--name", help="Checklist item name.")
+@click.option("--assignee", type=int, help="Assignee user ID.")
+@click.option("--resolved", type=bool, help="Mark as resolved (completed).")
+@click.option(
+    "--parent",
+    help="Parent checklist item ID (for nesting).",
+)
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def update_checklist_item(
+    checklist_id: str,
+    checklist_item_id: str,
+    name: str | None,
+    assignee: int | None,
+    resolved: bool | None,
+    parent: str | None,
+    format: str,
+    raw: bool,
+) -> None:
+    """Update a checklist item.
+
+    CHECKLIST_ID: The ID of the checklist.
+    CHECKLIST_ITEM_ID: The ID of the checklist item to update.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.update_checklist_item(
+                checklist_id,
+                checklist_item_id,
+                name=name,
+                assignee=assignee,
+                resolved=resolved,
+                parent=parent,
+            )
+
+            if raw:
+                if data:
+                    click.echo(json.dumps(data, indent=2))
+                else:
+                    click.echo("{}")
+                return
+
+            if not data:
+                click.echo("No updates provided.")
+                return
+
+            checklist = Checklist(**data["checklist"])
+
+            if format == "json":
+                output = {
+                    "id": checklist.id,
+                    "task_id": checklist.task_id,
+                    "name": checklist.name,
+                    "resolved": checklist.resolved,
+                    "unresolved": checklist.unresolved,
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:         {checklist.id}")
+                click.echo(f"Task ID:    {checklist.task_id}")
+                click.echo(f"Name:       {checklist.name}")
+                click.echo(f"Resolved:    {checklist.resolved}")
+                click.echo(f"Unresolved:  {checklist.unresolved}")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="delete-checklist")
+@click.argument("checklist_id")
+@click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
+def delete_checklist(checklist_id: str, yes: bool) -> None:
+    """Delete a checklist.
+
+    CHECKLIST_ID: The ID of the checklist to delete.
+    """
+    if not yes:
+        if not click.confirm(
+            f"Are you sure you want to delete checklist {checklist_id}?"
+        ):
+            click.echo("Deletion cancelled.")
+            return
+
+    try:
+        with ClickUpClient() as client:
+            client.delete_checklist(checklist_id)
+            click.echo(f"Checklist {checklist_id} deleted successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="delete-checklist-item")
+@click.argument("checklist_id")
+@click.argument("checklist_item_id")
+@click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
+def delete_checklist_item(checklist_id: str, checklist_item_id: str, yes: bool) -> None:
+    """Delete a checklist item.
+
+    CHECKLIST_ID: The ID of the checklist.
+    CHECKLIST_ITEM_ID: The ID of the checklist item to delete.
+    """
+    if not yes:
+        if not click.confirm(
+            f"Are you sure you want to delete checklist item {checklist_item_id}?"
+        ):
+            click.echo("Deletion cancelled.")
+            return
+
+    try:
+        with ClickUpClient() as client:
+            client.delete_checklist_item(checklist_id, checklist_item_id)
+            click.echo(
+                f"Checklist item {checklist_item_id} deleted successfully from checklist {checklist_id}."
+            )
     except httpx.HTTPStatusError as e:
         click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
         raise click.Abort()

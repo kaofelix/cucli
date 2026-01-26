@@ -535,6 +535,160 @@ cucli --help
 cucli workspaces --help
 ```
 
+### Create checklist
+
+```bash
+cucli create-checklist <task_id> --name "Checklist Name"
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli create-checklist <task_id> --name "My Checklist"
+
+# Table format
+cucli create-checklist <task_id> --name "My Checklist" --format table
+
+# Raw JSON (useful for debugging or when models don't match)
+cucli create-checklist <task_id> --name "My Checklist" --raw
+```
+
+### Create checklist item
+
+```bash
+cucli create-checklist-item <checklist_id> --name "Item Name"
+```
+
+Create checklist item with assignee:
+
+```bash
+cucli create-checklist-item <checklist_id> --name "Item Name" --assignee 123
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli create-checklist-item <checklist_id> --name "My Item"
+
+# Table format
+cucli create-checklist-item <checklist_id> --name "My Item" --format table
+
+# Raw JSON
+cucli create-checklist-item <checklist_id> --name "My Item" --raw
+```
+
+### Update checklist
+
+```bash
+cucli update-checklist <checklist_id> --name "Updated Name"
+```
+
+Reorder checklist (position 0 = top):
+
+```bash
+cucli update-checklist <checklist_id> --position 0
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli update-checklist <checklist_id> --name "Updated Name"
+
+# Table format
+cucli update-checklist <checklist_id> --name "Updated Name" --format table
+
+# Raw JSON
+cucli update-checklist <checklist_id> --name "Updated Name" --raw
+```
+
+### Update checklist item
+
+```bash
+cucli update-checklist-item <checklist_id> <checklist_item_id> --name "Updated Item"
+```
+
+Mark checklist item as resolved (completed):
+
+```bash
+cucli update-checklist-item <checklist_id> <checklist_item_id> --resolved true
+```
+
+Mark checklist item as unresolved:
+
+```bash
+cucli update-checklist-item <checklist_id> <checklist_item_id> --resolved false
+```
+
+Set assignee:
+
+```bash
+cucli update-checklist-item <checklist_id> <checklist_item_id> --assignee 123
+```
+
+Nest checklist item under another item:
+
+```bash
+cucli update-checklist-item <checklist_id> <checklist_item_id> --parent <parent_item_id>
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli update-checklist-item <checklist_id> <checklist_item_id> --name "Updated Item"
+
+# Table format
+cucli update-checklist-item <checklist_id> <checklist_item_id> --name "Updated Item" --format table
+
+# Raw JSON
+cucli update-checklist-item <checklist_id> <checklist_item_id> --name "Updated Item" --raw
+```
+
+### Delete checklist
+
+```bash
+cucli delete-checklist <checklist_id>
+```
+
+Delete with confirmation prompt (default):
+
+```bash
+cucli delete-checklist <checklist_id>
+# You will be prompted to confirm: "Are you sure you want to delete checklist <checklist_id>?"
+```
+
+Skip confirmation prompt:
+
+```bash
+cucli delete-checklist <checklist_id> --yes
+# or
+cucli delete-checklist <checklist_id> -y
+```
+
+### Delete checklist item
+
+```bash
+cucli delete-checklist-item <checklist_id> <checklist_item_id>
+```
+
+Delete with confirmation prompt (default):
+
+```bash
+cucli delete-checklist-item <checklist_id> <checklist_item_id>
+# You will be prompted to confirm: "Are you sure you want to delete checklist item <checklist_item_id>?"
+```
+
+Skip confirmation prompt:
+
+```bash
+cucli delete-checklist-item <checklist_id> <checklist_item_id> --yes
+# or
+cucli delete-checklist-item <checklist_id> <checklist_item_id> -y
+```
+
 ## Development
 
 Add a dependency:

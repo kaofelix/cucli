@@ -222,5 +222,48 @@ class CommentsResponse(BaseModel):
     comments: list[Comment] = Field(default_factory=list)
 
 
+class ChecklistItemAssignee(BaseModel):
+    """Assignee for a checklist item."""
+
+    id: int
+    username: str
+    email: str
+    color: str
+    initials: str
+    profilePicture: str | None = None
+
+
+class ChecklistItem(BaseModel):
+    """A checklist item."""
+
+    id: str
+    name: str
+    orderindex: int | None = None
+    assignee: ChecklistItemAssignee | None = None
+    resolved: bool
+    parent: str | None = None
+    date_created: str
+    children: list[str] = Field(default_factory=list)
+
+
+class Checklist(BaseModel):
+    """A ClickUp checklist."""
+
+    id: str
+    task_id: str
+    name: str
+    orderindex: int
+    resolved: int
+    unresolved: int
+    items: list[ChecklistItem] = Field(default_factory=list)
+    date_created: str | None = None
+
+
+class ChecklistResponse(BaseModel):
+    """Response from checklist endpoints."""
+
+    checklist: Checklist
+
+
 # For raw output when models don't match
 RawResponse = dict[str, Any]

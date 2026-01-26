@@ -16,10 +16,14 @@
 - [x] Add task comment
 - [x] Create folder
 - [x] Create list
+- [x] Task checklists (create, create items, update, delete)
+- [x] Update checklist
+- [x] Update checklist item
+- [x] Delete checklist
+- [x] Delete checklist item
 
 ## In Progress
 
 ## Planned
-- [ ] Task checklists (get, create, create items, update, delete)
 - [ ] Get task members
 - [ ] Get list members

@@ -506,6 +506,160 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def create_checklist(self, task_id: str, *, name: str) -> dict[str, Any]:
+        """Create a new checklist on a task.
+
+        Args:
+            task_id: The task ID to create the checklist on.
+            name: The checklist name.
+
+        Returns:
+            The response from the /task/{task_id}/checklist endpoint.
+        """
+        data: dict[str, Any] = {"name": name}
+
+        response = self._client.post(
+            f"{self.base_url}/task/{task_id}/checklist", json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def create_checklist_item(
+        self,
+        checklist_id: str,
+        *,
+        name: str,
+        assignee: int | None = None,
+    ) -> dict[str, Any]:
+        """Create a new item in a checklist.
+
+        Args:
+            checklist_id: The checklist ID to add the item to.
+            name: The checklist item name.
+            assignee: Assignee user ID.
+
+        Returns:
+            The response from the /checklist/{checklist_id}/checklist_item endpoint.
+        """
+        data: dict[str, Any] = {"name": name}
+
+        if assignee is not None:
+            data["assignee"] = assignee
+
+        response = self._client.post(
+            f"{self.base_url}/checklist/{checklist_id}/checklist_item", json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def update_checklist(
+        self,
+        checklist_id: str,
+        *,
+        name: str | None = None,
+        position: int | None = None,
+    ) -> dict[str, Any]:
+        """Update a checklist.
+
+        Args:
+            checklist_id: The checklist ID to update.
+            name: The new checklist name.
+            position: The position (order) of the checklist.
+
+        Returns:
+            The response from the /checklist/{checklist_id} endpoint.
+        """
+        data: dict[str, Any] = {}
+
+        if name is not None:
+            data["name"] = name
+        if position is not None:
+            data["position"] = position
+
+        if data:
+            response = self._client.put(
+                f"{self.base_url}/checklist/{checklist_id}", json=data
+            )
+            response.raise_for_status()
+            return response.json()
+
+        return {}
+
+    def update_checklist_item(
+        self,
+        checklist_id: str,
+        checklist_item_id: str,
+        *,
+        name: str | None = None,
+        assignee: int | None = None,
+        resolved: bool | None = None,
+        parent: str | None = None,
+    ) -> dict[str, Any]:
+        """Update a checklist item.
+
+        Args:
+            checklist_id: The checklist ID.
+            checklist_item_id: The checklist item ID to update.
+            name: The new checklist item name.
+            assignee: Assignee user ID.
+            resolved: Whether the item is resolved (completed).
+            parent: Parent checklist item ID (for nesting).
+
+        Returns:
+            The response from the /checklist/{checklist_id}/checklist_item/{checklist_item_id} endpoint.
+        """
+        data: dict[str, Any] = {}
+
+        if name is not None:
+            data["name"] = name
+        if assignee is not None:
+            data["assignee"] = assignee
+        if resolved is not None:
+            data["resolved"] = resolved
+        if parent is not None:
+            data["parent"] = parent
+
+        if data:
+            response = self._client.put(
+                f"{self.base_url}/checklist/{checklist_id}/checklist_item/{checklist_item_id}",
+                json=data,
+            )
+            response.raise_for_status()
+            return response.json()
+
+        return {}
+
+    def delete_checklist(self, checklist_id: str) -> dict[str, Any]:
+        """Delete a checklist.
+
+        Args:
+            checklist_id: The checklist ID to delete.
+
+        Returns:
+            The response from the /checklist/{checklist_id} endpoint.
+        """
+        response = self._client.delete(f"{self.base_url}/checklist/{checklist_id}")
+        response.raise_for_status()
+        return response.json()
+
+    def delete_checklist_item(
+        self, checklist_id: str, checklist_item_id: str
+    ) -> dict[str, Any]:
+        """Delete a checklist item.
+
+        Args:
+            checklist_id: The checklist ID.
+            checklist_item_id: The checklist item ID to delete.
+
+        Returns:
+            The response from the /checklist/{checklist_id}/checklist_item/{checklist_item_id} endpoint.
+        """
+        response = self._client.delete(
+            f"{self.base_url}/checklist/{checklist_id}/checklist_item/{checklist_item_id}"
+        )
+        response.raise_for_status()
+        return response.json()
+
     def close(self) -> None:
         """Close the HTTP client."""
         self._client.close()

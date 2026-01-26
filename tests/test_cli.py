@@ -1158,3 +1158,160 @@ class TestCreateListCommand:
         result = runner.invoke(cli, ["create-list", "--help"])
         assert result.exit_code == 0
         assert "--name" in result.output
+
+
+class TestChecklistCommands:
+    """Test cases for checklist commands."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_create_checklist_json_output(self, runner, mock_api_key_env):
+        """Test create-checklist command with JSON output (default)."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(
+            cli, ["create-checklist", task_id, "--name", "Test Checklist"]
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert "id" in output
+        assert "task_id" in output
+        assert "name" in output
+        assert output["name"] == "Test Checklist"
+        assert "resolved" in output
+        assert "unresolved" in output
+
+    @pytest.mark.vcr
+    def test_create_checklist_table_output(self, runner, mock_api_key_env):
+        """Test create-checklist command with table output."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(
+            cli,
+            [
+                "create-checklist",
+                task_id,
+                "--name",
+                "Test Checklist",
+                "--format",
+                "table",
+            ],
+        )
+
+        assert result.exit_code == 0
+        assert "ID:" in result.output
+        assert "Task ID:" in result.output
+        assert "Name:" in result.output
+        assert "Test Checklist" in result.output
+
+    @pytest.mark.vcr
+    def test_create_checklist_raw_output(self, runner, mock_api_key_env):
+        """Test create-checklist command with raw JSON output."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(
+            cli, ["create-checklist", task_id, "--name", "Test Checklist", "--raw"]
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        # Raw output includes all fields from API
+        assert "checklist" in output
+
+    @pytest.mark.vcr
+    def test_create_checklist_item_json_output(self, runner, mock_api_key_env):
+        """Test create-checklist-item command with JSON output (default)."""
+        checklist_id = "143aaa01-22fe-4b98-ab9b-96794a1c5901"
+        result = runner.invoke(
+            cli, ["create-checklist-item", checklist_id, "--name", "Test Item"]
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert "id" in output
+        assert "name" in output
+        assert "resolved" in output
+        assert "unresolved" in output
+
+    @pytest.mark.skip(reason="Requires existing assignee in test workspace")
+    def test_create_checklist_item_with_assignee(self, runner, mock_api_key_env):
+        """Test create-checklist-item command with assignee."""
+        checklist_id = "143aaa01-22fe-4b98-ab9b-96794a1c5901"
+        result = runner.invoke(
+            cli,
+            [
+                "create-checklist-item",
+                checklist_id,
+                "--name",
+                "Test Item",
+                "--assignee",
+                "183",
+            ],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "id" in output
+
+    @pytest.mark.vcr
+    def test_update_checklist(self, runner, mock_api_key_env):
+        """Test update-checklist command."""
+        checklist_id = "143aaa01-22fe-4b98-ab9b-96794a1c5901"
+        result = runner.invoke(
+            cli, ["update-checklist", checklist_id, "--name", "Updated Name"]
+        )
+
+        assert result.exit_code == 0
+
+    @pytest.mark.vcr
+    def test_update_checklist_item(self, runner, mock_api_key_env):
+        """Test update-checklist-item command."""
+        checklist_id = "143aaa01-22fe-4b98-ab9b-96794a1c5901"
+        checklist_item_id = "9a6fdb6b-83c2-48e5-9dd2-4b1749dbe966"
+        result = runner.invoke(
+            cli,
+            [
+                "update-checklist-item",
+                checklist_id,
+                checklist_item_id,
+                "--name",
+                "Updated Item",
+                "--resolved",
+                "true",
+            ],
+        )
+
+        assert result.exit_code == 0
+
+    @pytest.mark.vcr
+    def test_delete_checklist(self, runner, mock_api_key_env):
+        """Test delete-checklist command."""
+        checklist_id = "143aaa01-22fe-4b98-ab9b-96794a1c5901"
+        result = runner.invoke(cli, ["delete-checklist", checklist_id, "--yes"])
+
+        assert result.exit_code == 0
+        assert "deleted successfully" in result.output
+
+    @pytest.mark.vcr
+    def test_delete_checklist_item(self, runner, mock_api_key_env):
+        """Test delete-checklist-item command."""
+        checklist_id = "143aaa01-22fe-4b98-ab9b-96794a1c5901"
+        checklist_item_id = "9a6fdb6b-83c2-48e5-9dd2-4b1749dbe966"
+        result = runner.invoke(
+            cli, ["delete-checklist-item", checklist_id, checklist_item_id, "--yes"]
+        )
+
+        assert result.exit_code == 0
+        assert "deleted successfully" in result.output
+
+    def test_create_checklist_missing_name(self, runner, mock_api_key_env):
+        """Test create-checklist command fails without required name."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(cli, ["create-checklist", task_id])
+
+        assert result.exit_code != 0
+        assert "name" in result.output.lower() or "missing" in result.output.lower()

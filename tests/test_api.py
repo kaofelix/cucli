@@ -3,6 +3,7 @@
 import pytest
 from cucli.api import ClickUpClient
 from cucli.models import (
+    Checklist,
     Comment,
     CommentsResponse,
     Folder,
@@ -585,3 +586,127 @@ class TestClickUpClient:
 
         # Should get a 404 or similar error
         assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_create_checklist(self, clickup_client):
+        """Test creating a checklist on a task."""
+        # Using a real task ID from test workspace
+        task_id = "86c7mc19h"
+
+        response = clickup_client.create_checklist(
+            task_id, name="Test Checklist from API"
+        )
+
+        # Verify response structure
+        assert "checklist" in response
+        checklist_data = response["checklist"]
+        assert "id" in checklist_data
+        assert "task_id" in checklist_data
+        assert "name" in checklist_data
+        assert checklist_data["name"] == "Test Checklist from API"
+
+        # Parse with Pydantic model
+        checklist = Checklist(**checklist_data)
+        assert checklist.name == "Test Checklist from API"
+        assert checklist.task_id == task_id
+
+    @pytest.mark.vcr
+    def test_create_checklist_not_found(self, clickup_client):
+        """Test creating a checklist on a non-existent task."""
+        import httpx
+
+        task_id = "00000000"  # Non-existent task ID
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.create_checklist(task_id, name="Test Checklist")
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_create_checklist_item(self, clickup_client):
+        """Test creating a checklist item."""
+        # Using a real checklist ID from test workspace
+        checklist_id = "f73cd146-f271-4a9e-8ef0-93e8c4973532"
+
+        response = clickup_client.create_checklist_item(
+            checklist_id, name="Test Item from API"
+        )
+
+        # Verify response structure
+        assert "checklist" in response
+        checklist_data = response["checklist"]
+        assert "id" in checklist_data
+        assert "items" in checklist_data
+
+        # Parse with Pydantic model
+        checklist = Checklist(**checklist_data)
+        assert isinstance(checklist.items, list)
+
+    @pytest.mark.skip(reason="Requires existing assignee in test workspace")
+    def test_create_checklist_item_with_assignee(self, clickup_client):
+        """Test creating a checklist item with an assignee."""
+        checklist_id = "f73cd146-f271-4a9e-8ef0-93e8c4973532"
+
+        response = clickup_client.create_checklist_item(
+            checklist_id, name="Test Item with Assignee", assignee=183
+        )
+
+        # Verify response structure
+        assert "checklist" in response
+        checklist_data = response["checklist"]
+        assert "items" in checklist_data
+
+    @pytest.mark.vcr
+    def test_update_checklist(self, clickup_client):
+        """Test updating a checklist."""
+        checklist_id = "f73cd146-f271-4a9e-8ef0-93e8c4973532"
+
+        response = clickup_client.update_checklist(
+            checklist_id, name="Updated Checklist Name"
+        )
+
+        # Verify response structure
+        assert "checklist" in response
+
+        # Parse with Pydantic model
+        checklist = Checklist(**response["checklist"])
+        assert isinstance(checklist, Checklist)
+
+    @pytest.mark.vcr
+    def test_update_checklist_item(self, clickup_client):
+        """Test updating a checklist item."""
+        checklist_id = "f73cd146-f271-4a9e-8ef0-93e8c4973532"
+        checklist_item_id = "4c6ee69d-c42b-4f50-808a-d72ef3f5fab0"
+
+        response = clickup_client.update_checklist_item(
+            checklist_id, checklist_item_id, name="Updated Item Name", resolved=True
+        )
+
+        # Verify response structure
+        assert "checklist" in response
+
+        # Parse with Pydantic model
+        checklist = Checklist(**response["checklist"])
+        assert isinstance(checklist, Checklist)
+
+    @pytest.mark.vcr
+    def test_delete_checklist(self, clickup_client):
+        """Test deleting a checklist."""
+        checklist_id = "f73cd146-f271-4a9e-8ef0-93e8c4973532"
+
+        response = clickup_client.delete_checklist(checklist_id)
+
+        # Response should be an empty dict or similar
+        assert isinstance(response, dict)
+
+    @pytest.mark.vcr
+    def test_delete_checklist_item(self, clickup_client):
+        """Test deleting a checklist item."""
+        checklist_id = "f73cd146-f271-4a9e-8ef0-93e8c4973532"
+        checklist_item_id = "4c6ee69d-c42b-4f50-808a-d72ef3f5fab0"
+
+        response = clickup_client.delete_checklist_item(checklist_id, checklist_item_id)
+
+        # Response should be an empty dict or similar
+        assert isinstance(response, dict)
