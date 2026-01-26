@@ -2,7 +2,7 @@
 
 import pytest
 from cucli.api import ClickUpClient
-from cucli.models import SpacesResponse, Team, Task, TeamsResponse
+from cucli.models import FoldersResponse, SpacesResponse, Team, Task, TeamsResponse
 
 
 class TestClickUpClient:
@@ -191,6 +191,55 @@ class TestClickUpClient:
 
         with pytest.raises(httpx.HTTPStatusError) as exc_info:
             clickup_client.get_spaces(team_id)
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_get_folders(self, clickup_client):
+        """Test getting folders from a space."""
+        # Using a real space ID from the test workspace
+        space_id = "90159451300"
+
+        response = clickup_client.get_folders(space_id)
+
+        # Verify response structure
+        assert "folders" in response
+        assert isinstance(response["folders"], list)
+
+        # Parse with Pydantic model
+        folders_response = FoldersResponse(**response)
+        assert len(folders_response.folders) >= 0
+
+        # If there are folders, validate first folder structure
+        if folders_response.folders:
+            folder = folders_response.folders[0]
+            assert isinstance(folder.id, str)
+            assert isinstance(folder.name, str)
+            assert isinstance(folder.orderindex, int)
+            assert isinstance(folder.override_statuses, bool)
+            assert isinstance(folder.hidden, bool)
+            assert isinstance(folder.task_count, str)
+
+    @pytest.mark.vcr
+    def test_get_folders_with_archived(self, clickup_client):
+        """Test getting folders with archived filter."""
+        space_id = "90159451300"
+
+        response = clickup_client.get_folders(space_id, archived=True)
+
+        assert "folders" in response
+        assert isinstance(response["folders"], list)
+
+    @pytest.mark.vcr
+    def test_get_folders_not_found(self, clickup_client):
+        """Test that get_folders raises HTTPStatusError for non-existent space."""
+        import httpx
+
+        space_id = "99999999"  # Non-existent space ID
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.get_folders(space_id)
 
         # Should get a 404 or similar error
         assert exc_info.value.response.status_code >= 400

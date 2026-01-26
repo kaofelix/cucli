@@ -5,7 +5,7 @@ import json
 import click
 import httpx
 from cucli.api import ClickUpClient
-from cucli.models import Space, Team, Task
+from cucli.models import Folder, Space, Team, Task
 
 
 @click.group()
@@ -126,6 +126,76 @@ def spaces(team_id: str, format: str, raw: bool, archived: bool) -> None:
             private_str = "Yes" if space.private else "No"
             click.echo(
                 f"{space.id.ljust(max_id)}  {space.name.ljust(max_name)}  {private_str}"
+            )
+
+
+@cli.command(name="folders")
+@click.argument("space_id")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@click.option(
+    "--archived",
+    is_flag=True,
+    help="Include archived folders.",
+)
+def folders(space_id: str, format: str, raw: bool, archived: bool) -> None:
+    """List folders in a space.
+
+    SPACE_ID: The ID of the space.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.get_folders(space_id, archived=archived)
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            folders_list = [Folder(**folder) for folder in data["folders"]]
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+
+    if format == "json":
+        output = [
+            {
+                "id": f.id,
+                "name": f.name,
+                "hidden": f.hidden,
+                "task_count": f.task_count,
+            }
+            for f in folders_list
+        ]
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        if not folders_list:
+            click.echo("No folders found.")
+            return
+
+        # Calculate column widths
+        max_id = max(len(f.id) for f in folders_list)
+        max_name = max(len(f.name) for f in folders_list)
+        max_count = max(len(str(f.task_count)) for f in folders_list)
+
+        # Print header
+        click.echo(
+            f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TASKS'.ljust(max_count)}  {'HIDDEN'}"
+        )
+        click.echo("-" * (max_id + max_name + max_count + 12))
+
+        # Print rows
+        for folder in folders_list:
+            hidden_str = "Yes" if folder.hidden else "No"
+            click.echo(
+                f"{folder.id.ljust(max_id)}  {folder.name.ljust(max_name)}  {str(folder.task_count).ljust(max_count)}  {hidden_str}"
             )
 
 

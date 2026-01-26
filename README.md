@@ -103,6 +103,49 @@ Output raw JSON:
 cucli spaces <team_id> --raw
 ```
 
+### List folders in a space
+
+```bash
+cucli folders <space_id>
+```
+
+Output in JSON format (default):
+
+```json
+[
+  {
+    "id": "457",
+    "name": "Updated Folder Name",
+    "hidden": false,
+    "task_count": "0"
+  }
+]
+```
+
+Output in table format:
+
+```bash
+cucli folders <space_id> --format table
+```
+
+```
+ID      NAME                TASKS  HIDDEN
+----------------------------------------
+457     Updated Folder Name  0       No
+```
+
+Include archived folders:
+
+```bash
+cucli folders <space_id> --archived
+```
+
+Output raw JSON:
+
+```bash
+cucli folders <space_id> --raw
+```
+
 ### Get task details
 
 ```bash

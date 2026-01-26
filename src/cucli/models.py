@@ -105,5 +105,32 @@ class SpacesResponse(BaseModel):
     spaces: list[Space] = Field(default_factory=list)
 
 
+class FolderSpaceReference(BaseModel):
+    """A space reference within a folder."""
+
+    id: str
+    name: str
+    access: bool
+
+
+class Folder(BaseModel):
+    """A ClickUp folder."""
+
+    id: str
+    name: str
+    orderindex: int
+    override_statuses: bool
+    hidden: bool
+    space: FolderSpaceReference
+    task_count: str
+    lists: list[str] = Field(default_factory=list)
+
+
+class FoldersResponse(BaseModel):
+    """Response from the /space/{space_id}/folder endpoint."""
+
+    folders: list[Folder] = Field(default_factory=list)
+
+
 # For raw output when models don't match
 RawResponse = dict[str, Any]

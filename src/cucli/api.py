@@ -59,6 +59,28 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def get_folders(
+        self, space_id: str, *, archived: bool | None = None
+    ) -> dict[str, Any]:
+        """Get folders in a space.
+
+        Args:
+            space_id: The space ID.
+            archived: Include archived folders.
+
+        Returns:
+            The response from the /space/{space_id}/folder endpoint.
+        """
+        params: dict[str, Any] = {}
+        if archived is not None:
+            params["archived"] = str(archived).lower()
+
+        response = self._client.get(
+            f"{self.base_url}/space/{space_id}/folder", params=params
+        )
+        response.raise_for_status()
+        return response.json()
+
     def get_task(self, task_id: str) -> dict[str, Any]:
         """Get a task by ID.
 

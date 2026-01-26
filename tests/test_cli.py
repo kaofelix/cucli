@@ -142,6 +142,90 @@ class TestSpacesCommand:
         assert "Error:" in result.output or "CLICKUP_API_KEY" in result.output
 
 
+class TestFoldersCommand:
+    """Test cases for the folders command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_folders_json_output(self, runner, mock_api_key_env):
+        """Test folders command with JSON output (default)."""
+        space_id = "90159451300"
+        result = runner.invoke(cli, ["folders", space_id])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert isinstance(output, list)
+        # Validate structure if there are folders
+        if output:
+            folder = output[0]
+            assert "id" in folder
+            assert "name" in folder
+            assert "hidden" in folder
+            assert "task_count" in folder
+
+    @pytest.mark.vcr
+    def test_folders_table_output(self, runner, mock_api_key_env):
+        """Test folders command with table output."""
+        space_id = "90159451300"
+        result = runner.invoke(cli, ["folders", space_id, "--format", "table"])
+
+        assert result.exit_code == 0
+        # Either show headers if there are folders, or "No folders found"
+        if "No folders found" in result.output:
+            return
+        # Table format should have headers
+        assert "ID" in result.output
+        assert "NAME" in result.output
+        assert "TASKS" in result.output
+        assert "HIDDEN" in result.output
+
+    @pytest.mark.vcr
+    def test_folders_raw_output(self, runner, mock_api_key_env):
+        """Test folders command with raw JSON output."""
+        space_id = "90159451300"
+        result = runner.invoke(cli, ["folders", space_id, "--raw"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        # Raw output should include all fields from API
+        assert "folders" in output
+        assert isinstance(output["folders"], list)
+
+    @pytest.mark.vcr
+    def test_folders_with_archived(self, runner, mock_api_key_env):
+        """Test folders command with archived flag."""
+        space_id = "90159451300"
+        result = runner.invoke(cli, ["folders", space_id, "--archived"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert isinstance(output, list)
+
+    @pytest.mark.vcr
+    def test_folders_not_found(self, runner, mock_api_key_env):
+        """Test folders command with non-existent space ID."""
+        space_id = "99999999"
+        result = runner.invoke(cli, ["folders", space_id])
+
+        assert result.exit_code != 0
+        assert "Error" in result.output or "HTTP Error" in result.output
+
+    def test_folders_missing_api_key(self, runner, monkeypatch):
+        """Test folders command fails gracefully without API key."""
+        monkeypatch.delenv("CLICKUP_API_KEY", raising=False)
+        space_id = "90159451300"
+        result = runner.invoke(cli, ["folders", space_id])
+
+        assert result.exit_code != 0
+        assert "Error:" in result.output or "CLICKUP_API_KEY" in result.output
+
+
 class TestTaskCommand:
     """Test cases for the task command."""
 
@@ -310,6 +394,9 @@ class TestCLI:
         assert result.exit_code == 0
         assert "workspaces" in result.output
         assert "task" in result.output
+        assert "tasks" in result.output
+        assert "spaces" in result.output
+        assert "folders" in result.output
 
     def test_workspaces_help(self, runner):
         """Test workspaces command help."""
@@ -329,6 +416,14 @@ class TestCLI:
     def test_spaces_help(self, runner):
         """Test spaces command help."""
         result = runner.invoke(cli, ["spaces", "--help"])
+        assert result.exit_code == 0
+        assert "--format" in result.output
+        assert "--raw" in result.output
+        assert "--archived" in result.output
+
+    def test_folders_help(self, runner):
+        """Test folders command help."""
+        result = runner.invoke(cli, ["folders", "--help"])
         assert result.exit_code == 0
         assert "--format" in result.output
         assert "--raw" in result.output
