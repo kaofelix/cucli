@@ -1,7 +1,6 @@
 interactions:
 - request:
-    body: '{"start":1737925200000,"duration":3600000,"billable":false,"description":"Test
-      manual entry"}'
+    body: '{"billable":false,"tid":"86c7mc19h"}'
     headers:
       Accept:
       - '*/*'
@@ -12,7 +11,7 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '93'
+      - '36'
       Content-Type:
       - application/json
       Host:
@@ -20,34 +19,37 @@ interactions:
       User-Agent:
       - python-httpx/0.28.1
     method: POST
-    uri: https://api.clickup.com/api/v2/team/90152245421/time_entries
+    uri: https://api.clickup.com/api/v2/team/90152245421/time_entries/start
   response:
     body:
-      string: '{"err":"Your plan is limited to {{limit}} usages of Advanced Time Tracking,
-        {{usage}} usage.","ECODE":"TIMEENTRY_064"}'
+      string: "{\"data\":{\"id\":\"4927021473019559762\",\"task\":{\"id\":\"86c7mc19h\",\"name\":\"Task
+        1\",\"status\":{\"status\":\"in progress\",\"id\":\"p90159451300_g9uxhsQM\",\"color\":\"#1090e0\",\"type\":\"custom\",\"orderindex\":1}},\"wid\":\"90152245421\",\"user\":{\"id\":272627274,\"username\":\"Kao
+        Cardoso F\xE9lix\",\"email\":\"me@kaofelix.dev\",\"color\":\"#595d66\",\"initials\":\"KF\",\"profilePicture\":null},\"billable\":false,\"start\":1769469504061,\"duration\":-562,\"description\":\"\",\"tags\":[],\"at\":1769469504061,\"is_locked\":false,\"task_location\":{}}}"
     headers:
       Alt-Svc:
       - h3=":443"; ma=86400
       Connection:
       - keep-alive
       Content-Length:
-      - '118'
+      - '487'
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 26 Jan 2026 22:06:00 GMT
+      - Mon, 26 Jan 2026 23:18:24 GMT
       Server:
       - nginx
+      Server-Timing:
+      - cdn-upstream-layer;desc="EDGE",cdn-upstream-dns;dur=0,cdn-upstream-connect;dur=0,cdn-upstream-fbl;dur=607,cdn-cache-miss,cdn-pop;desc="LHR61-P7",cdn-rid;desc="QAzqa99xASGx4tMIBIC0h65ToB4K7tmS5bSISmHLkwOEu9047b_iMQ==",cdn-downstream-fbl;dur=610
       Timing-Allow-Origin:
       - '*'
       Via:
-      - 1.1 7d1643eda6aa456c21c5607fcc049b8e.cloudfront.net (CloudFront)
+      - 1.1 d9fff865f15be92cf9bd52ec2827f356.cloudfront.net (CloudFront)
       X-Amz-Cf-Id:
-      - L58nI7BtYvwVAYEt1Zohafs-NK6DotwLNYg9VwkS3H5Qqfkxrxq2Qg==
+      - QAzqa99xASGx4tMIBIC0h65ToB4K7tmS5bSISmHLkwOEu9047b_iMQ==
       X-Amz-Cf-Pop:
       - LHR61-P7
       X-Cache:
-      - Error from cloudfront
+      - Miss from cloudfront
       access-control-allow-credentials:
       - 'true'
       access-control-allow-origin:
@@ -71,7 +73,7 @@ interactions:
       x-content-type-options:
       - nosniff
       x-datadog-trace-id:
-      - '2000670728620243064'
+      - '7029788065470814009'
       x-dns-prefetch-control:
       - 'off'
       x-download-options:
@@ -81,14 +83,14 @@ interactions:
       x-ratelimit-limit:
       - '100'
       x-ratelimit-remaining:
-      - '98'
+      - '97'
       x-ratelimit-reset:
-      - '1769465167'
+      - '1769469564'
       x-received-from:
       - shard-prod-eu-west-1-3
       x-xss-protection:
       - '0'
     status:
-      code: 403
-      message: Forbidden
+      code: 200
+      message: OK
 version: 1

@@ -1686,7 +1686,9 @@ def running_time_entry(team_id: str, format: str, raw: bool) -> None:
                     "start": entry.get("start"),
                     "duration": entry.get("duration"),
                     "description": entry.get("description"),
-                    "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+                    "task_id": entry.get("task", {}).get("id")
+                    if entry.get("task")
+                    else None,
                 }
                 click.echo(json.dumps(output, indent=2))
             elif format == "table":
@@ -1721,7 +1723,12 @@ def running_time_entry(team_id: str, format: str, raw: bool) -> None:
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
 def start_time_entry(
-    team_id: str, description: str | None, task_id: str | None, billable: bool, format: str, raw: bool
+    team_id: str,
+    description: str | None,
+    task_id: str | None,
+    billable: bool,
+    format: str,
+    raw: bool,
 ) -> None:
     """Start a time entry.
 
@@ -1746,7 +1753,9 @@ def start_time_entry(
                     "start": entry.get("start"),
                     "duration": entry.get("duration"),
                     "description": entry.get("description"),
-                    "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+                    "task_id": entry.get("task", {}).get("id")
+                    if entry.get("task")
+                    else None,
                 }
                 click.echo(json.dumps(output, indent=2))
             elif format == "table":
@@ -1801,7 +1810,9 @@ def stop_time_entry(team_id: str, format: str, raw: bool) -> None:
                     "end": entry.get("end"),
                     "duration": entry.get("duration"),
                     "description": entry.get("description"),
-                    "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+                    "task_id": entry.get("task", {}).get("id")
+                    if entry.get("task")
+                    else None,
                 }
                 click.echo(json.dumps(output, indent=2))
             elif format == "table":
@@ -1827,8 +1838,12 @@ def stop_time_entry(team_id: str, format: str, raw: bool) -> None:
 
 @cli.command(name="time-entries")
 @click.argument("team_id")
-@click.option("--start-date", type=int, help="Start date as Unix timestamp in milliseconds.")
-@click.option("--end-date", type=int, help="End date as Unix timestamp in milliseconds.")
+@click.option(
+    "--start-date", type=int, help="Start date as Unix timestamp in milliseconds."
+)
+@click.option(
+    "--end-date", type=int, help="End date as Unix timestamp in milliseconds."
+)
 @click.option("--assignee", type=int, help="Filter by assignee user ID.")
 @click.option("--space-id", type=int, help="Filter by space ID.")
 @click.option("--folder-id", type=int, help="Filter by folder ID.")
@@ -1880,7 +1895,10 @@ def time_entries(
             entries = data.get("data", [])
 
             if not entries:
-                click.echo("No time entries found.")
+                if format == "json":
+                    click.echo(json.dumps([]))
+                else:
+                    click.echo("No time entries found.")
                 return
 
             if format == "json":
@@ -1893,7 +1911,9 @@ def time_entries(
                             "start": entry.get("start"),
                             "duration": entry.get("duration"),
                             "description": entry.get("description"),
-                            "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+                            "task_id": entry.get("task", {}).get("id")
+                            if entry.get("task")
+                            else None,
                         }
                     )
                 click.echo(json.dumps(output, indent=2))
@@ -1903,7 +1923,9 @@ def time_entries(
                 max_desc = max(len(e.get("description", "")[:30]) for e in entries)
 
                 # Print header
-                click.echo(f"{'ID'.ljust(max_id)}  {'DESCRIPTION'.ljust(max_desc)}  {'DURATION'}")
+                click.echo(
+                    f"{'ID'.ljust(max_id)}  {'DESCRIPTION'.ljust(max_desc)}  {'DURATION'}"
+                )
                 click.echo("-" * (max_id + max_desc + 20))
 
                 # Print rows
@@ -1914,7 +1936,9 @@ def time_entries(
                         else entry.get("description", "")
                     )
                     duration_ms = entry.get("duration", 0)
-                    duration_str = f"{duration_ms / 3600000:.2f}h" if duration_ms else "0h"
+                    duration_str = (
+                        f"{duration_ms / 3600000:.2f}h" if duration_ms else "0h"
+                    )
                     click.echo(
                         f"{str(entry.get('id', '')).ljust(max_id)}  {desc.ljust(max_desc)}  {duration_str}"
                     )
@@ -1931,8 +1955,15 @@ def time_entries(
 
 @cli.command(name="create-time-entry")
 @click.argument("team_id")
-@click.option("--start", type=int, required=True, help="Start time as Unix timestamp in milliseconds (required).")
-@click.option("--duration", type=int, required=True, help="Duration in milliseconds (required).")
+@click.option(
+    "--start",
+    type=int,
+    required=True,
+    help="Start time as Unix timestamp in milliseconds (required).",
+)
+@click.option(
+    "--duration", type=int, required=True, help="Duration in milliseconds (required)."
+)
 @click.option("--description", help="Time entry description.")
 @click.option("--task-id", help="Task ID to associate with the time entry.")
 @click.option("--billable", is_flag=True, help="Mark the time entry as billable.")
@@ -1981,7 +2012,9 @@ def create_time_entry(
                     "start": entry.get("start"),
                     "duration": entry.get("duration"),
                     "description": entry.get("description"),
-                    "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+                    "task_id": entry.get("task", {}).get("id")
+                    if entry.get("task")
+                    else None,
                 }
                 click.echo(json.dumps(output, indent=2))
             elif format == "table":
@@ -2066,7 +2099,10 @@ def update_time_entry(
                     "start": entry.get("start"),
                     "duration": entry.get("duration"),
                     "description": entry.get("description"),
-                    "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+                    "task_id": entry.get("task", {}).get("id")
+                    if entry.get("task")
+                    else None,
+                    "billable": entry.get("billable"),
                 }
                 click.echo(json.dumps(output, indent=2))
             elif format == "table":
@@ -2100,19 +2136,14 @@ def delete_time_entry(team_id: str, timer_id: str, yes: bool) -> None:
     TIMER_ID: The ID of the time entry to delete.
     """
     if not yes:
-        if not click.confirm(
-            f"Are you sure you want to delete time entry {timer_id}?"
-        ):
+        if not click.confirm(f"Are you sure you want to delete time entry {timer_id}?"):
             click.echo("Deletion cancelled.")
             return
 
     try:
         with ClickUpClient() as client:
-            data = client.delete_time_entry(team_id, timer_id)
-            entry = data.get("data", {})
-            click.echo(
-                f"Time entry {timer_id} deleted successfully."
-            )
+            client.delete_time_entry(team_id, timer_id)
+            click.echo(f"Time entry {timer_id} deleted successfully.")
     except httpx.HTTPStatusError as e:
         click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
         raise click.Abort()

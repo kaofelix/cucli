@@ -1,0 +1,96 @@
+interactions:
+- request:
+    body: '{"start":1737925200000,"duration":1800000,"billable":false,"tid":"86c7mc19h"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - pk_272627274_QZU8LEFFQ2CDW3ASOXATNG51Q2I45PRY
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '77'
+      Content-Type:
+      - application/json
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.clickup.com/api/v2/team/90152245421/time_entries
+  response:
+    body:
+      string: "{\"data\":{\"id\":\"4927023768293703520\",\"task\":{\"id\":\"86c7mc19h\",\"name\":\"Task
+        1\",\"status\":{\"status\":\"in progress\",\"id\":\"p90159451300_g9uxhsQM\",\"color\":\"#1090e0\",\"type\":\"custom\",\"orderindex\":1}},\"wid\":\"90152245421\",\"user\":{\"id\":272627274,\"username\":\"Kao
+        Cardoso F\xE9lix\",\"email\":\"me@kaofelix.dev\",\"color\":\"#595d66\",\"initials\":\"KF\",\"profilePicture\":null,\"timezone\":\"Europe/Madrid\"},\"billable\":false,\"start\":1737925200000,\"end\":\"1737927000000\",\"duration\":1800000,\"description\":\"\",\"tags\":[],\"at\":1769469641134,\"is_locked\":false,\"task_location\":{}}}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '539'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 26 Jan 2026 23:20:41 GMT
+      Server:
+      - nginx
+      Server-Timing:
+      - cdn-upstream-layer;desc="EDGE",cdn-upstream-dns;dur=0,cdn-upstream-connect;dur=0,cdn-upstream-fbl;dur=408,cdn-cache-miss,cdn-pop;desc="LHR61-P7",cdn-rid;desc="5Qyac49bfMKk7IjVuZnRm7VJI3eLKrRQHH8xmmSJsuQX3t8YJ5oajg==",cdn-downstream-fbl;dur=411
+      Timing-Allow-Origin:
+      - '*'
+      Via:
+      - 1.1 145b68c3ecd24e322402424a1db81138.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - 5Qyac49bfMKk7IjVuZnRm7VJI3eLKrRQHH8xmmSJsuQX3t8YJ5oajg==
+      X-Amz-Cf-Pop:
+      - LHR61-P7
+      X-Cache:
+      - Miss from cloudfront
+      access-control-allow-credentials:
+      - 'true'
+      access-control-allow-origin:
+      - '*'
+      access-control-expose-headers:
+      - x-datadog-trace-id,server
+      cache-control:
+      - no-cache, no-store
+      content-language:
+      - en-US
+      content-security-policy:
+      - frame-ancestors 'self'
+      expect-ct:
+      - max-age=0
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-datadog-trace-id:
+      - '7663510659116341760'
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-permitted-cross-domain-policies:
+      - none
+      x-ratelimit-limit:
+      - '100'
+      x-ratelimit-remaining:
+      - '92'
+      x-ratelimit-reset:
+      - '1769469699'
+      x-received-from:
+      - shard-prod-eu-west-1-3
+      x-xss-protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1
