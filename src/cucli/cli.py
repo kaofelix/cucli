@@ -1651,6 +1651,479 @@ def remove_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
         raise click.Abort()
 
 
+@cli.command(name="running-time-entry")
+@click.argument("team_id")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def running_time_entry(team_id: str, format: str, raw: bool) -> None:
+    """Get the currently running time entry.
+
+    TEAM_ID: The ID of the team/workspace.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.get_running_time_entry(team_id)
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            entry = data.get("data", {})
+
+            if not entry:
+                click.echo("No running timer found.")
+                return
+
+            if format == "json":
+                output = {
+                    "id": entry.get("id"),
+                    "wid": entry.get("wid"),
+                    "start": entry.get("start"),
+                    "duration": entry.get("duration"),
+                    "description": entry.get("description"),
+                    "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:          {entry.get('id')}")
+                click.echo(f"Start:       {entry.get('start')}")
+                click.echo(f"Duration:    {entry.get('duration')}")
+                if entry.get("description"):
+                    click.echo(f"Description: {entry.get('description')}")
+                if entry.get("task"):
+                    click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="start-time-entry")
+@click.argument("team_id")
+@click.option("--description", help="Time entry description.")
+@click.option("--task-id", help="Task ID to associate with the time entry.")
+@click.option("--billable", is_flag=True, help="Mark the time entry as billable.")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def start_time_entry(
+    team_id: str, description: str | None, task_id: str | None, billable: bool, format: str, raw: bool
+) -> None:
+    """Start a time entry.
+
+    TEAM_ID: The ID of the team/workspace.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.start_time_entry(
+                team_id, task_id=task_id, description=description, billable=billable
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            entry = data.get("data", {})
+
+            if format == "json":
+                output = {
+                    "id": entry.get("id"),
+                    "wid": entry.get("wid"),
+                    "start": entry.get("start"),
+                    "duration": entry.get("duration"),
+                    "description": entry.get("description"),
+                    "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:          {entry.get('id')}")
+                click.echo(f"Start:       {entry.get('start')}")
+                click.echo(f"Duration:    {entry.get('duration')}")
+                if entry.get("description"):
+                    click.echo(f"Description: {entry.get('description')}")
+                if entry.get("task"):
+                    click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
+                click.echo("Timer started successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="stop-time-entry")
+@click.argument("team_id")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def stop_time_entry(team_id: str, format: str, raw: bool) -> None:
+    """Stop the currently running time entry.
+
+    TEAM_ID: The ID of the team/workspace.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.stop_time_entry(team_id)
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            entry = data.get("data", {})
+
+            if format == "json":
+                output = {
+                    "id": entry.get("id"),
+                    "wid": entry.get("wid"),
+                    "start": entry.get("start"),
+                    "end": entry.get("end"),
+                    "duration": entry.get("duration"),
+                    "description": entry.get("description"),
+                    "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:          {entry.get('id')}")
+                click.echo(f"Start:       {entry.get('start')}")
+                click.echo(f"End:         {entry.get('end')}")
+                click.echo(f"Duration:    {entry.get('duration')}")
+                if entry.get("description"):
+                    click.echo(f"Description: {entry.get('description')}")
+                if entry.get("task"):
+                    click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
+                click.echo("Timer stopped successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="time-entries")
+@click.argument("team_id")
+@click.option("--start-date", type=int, help="Start date as Unix timestamp in milliseconds.")
+@click.option("--end-date", type=int, help="End date as Unix timestamp in milliseconds.")
+@click.option("--assignee", type=int, help="Filter by assignee user ID.")
+@click.option("--space-id", type=int, help="Filter by space ID.")
+@click.option("--folder-id", type=int, help="Filter by folder ID.")
+@click.option("--list-id", type=int, help="Filter by list ID.")
+@click.option("--task-id", help="Filter by task ID.")
+@click.option("--billable", is_flag=True, help="Filter by billable entries.")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def time_entries(
+    team_id: str,
+    start_date: int | None,
+    end_date: int | None,
+    assignee: int | None,
+    space_id: int | None,
+    folder_id: int | None,
+    list_id: int | None,
+    task_id: str | None,
+    billable: bool,
+    format: str,
+    raw: bool,
+) -> None:
+    """List time entries within a date range.
+
+    TEAM_ID: The ID of the team/workspace.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.get_time_entries(
+                team_id,
+                start_date=start_date,
+                end_date=end_date,
+                assignee=assignee,
+                space_id=space_id,
+                folder_id=folder_id,
+                list_id=list_id,
+                task_id=task_id,
+                is_billable=billable if billable else None,
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            entries = data.get("data", [])
+
+            if not entries:
+                click.echo("No time entries found.")
+                return
+
+            if format == "json":
+                output = []
+                for entry in entries:
+                    output.append(
+                        {
+                            "id": entry.get("id"),
+                            "wid": entry.get("wid"),
+                            "start": entry.get("start"),
+                            "duration": entry.get("duration"),
+                            "description": entry.get("description"),
+                            "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+                        }
+                    )
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                # Calculate column widths
+                max_id = max(len(str(e.get("id", ""))) for e in entries)
+                max_desc = max(len(e.get("description", "")[:30]) for e in entries)
+
+                # Print header
+                click.echo(f"{'ID'.ljust(max_id)}  {'DESCRIPTION'.ljust(max_desc)}  {'DURATION'}")
+                click.echo("-" * (max_id + max_desc + 20))
+
+                # Print rows
+                for entry in entries:
+                    desc = (
+                        entry.get("description", "")[:30] + "..."
+                        if len(entry.get("description", "")) > 30
+                        else entry.get("description", "")
+                    )
+                    duration_ms = entry.get("duration", 0)
+                    duration_str = f"{duration_ms / 3600000:.2f}h" if duration_ms else "0h"
+                    click.echo(
+                        f"{str(entry.get('id', '')).ljust(max_id)}  {desc.ljust(max_desc)}  {duration_str}"
+                    )
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="create-time-entry")
+@click.argument("team_id")
+@click.option("--start", type=int, required=True, help="Start time as Unix timestamp in milliseconds (required).")
+@click.option("--duration", type=int, required=True, help="Duration in milliseconds (required).")
+@click.option("--description", help="Time entry description.")
+@click.option("--task-id", help="Task ID to associate with the time entry.")
+@click.option("--billable", is_flag=True, help="Mark the time entry as billable.")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def create_time_entry(
+    team_id: str,
+    start: int,
+    duration: int,
+    description: str | None,
+    task_id: str | None,
+    billable: bool,
+    format: str,
+    raw: bool,
+) -> None:
+    """Create a manual time entry.
+
+    TEAM_ID: The ID of the team/workspace.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.create_time_entry(
+                team_id,
+                start=start,
+                duration=duration,
+                description=description,
+                task_id=task_id,
+                billable=billable,
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            entry = data.get("data", {})
+
+            if format == "json":
+                output = {
+                    "id": entry.get("id"),
+                    "wid": entry.get("wid"),
+                    "start": entry.get("start"),
+                    "duration": entry.get("duration"),
+                    "description": entry.get("description"),
+                    "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:          {entry.get('id')}")
+                click.echo(f"Start:       {entry.get('start')}")
+                click.echo(f"Duration:    {entry.get('duration')}")
+                if entry.get("description"):
+                    click.echo(f"Description: {entry.get('description')}")
+                if entry.get("task"):
+                    click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
+                click.echo("Time entry created successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="update-time-entry")
+@click.argument("team_id")
+@click.argument("timer_id")
+@click.option("--description", help="Time entry description.")
+@click.option("--start", type=int, help="Start time as Unix timestamp in milliseconds.")
+@click.option("--end", type=int, help="End time as Unix timestamp in milliseconds.")
+@click.option("--duration", type=int, help="Duration in milliseconds.")
+@click.option("--task-id", help="Task ID to associate with the time entry.")
+@click.option("--billable", is_flag=True, help="Mark the time entry as billable.")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def update_time_entry(
+    team_id: str,
+    timer_id: str,
+    description: str | None,
+    start: int | None,
+    end: int | None,
+    duration: int | None,
+    task_id: str | None,
+    billable: bool,
+    format: str,
+    raw: bool,
+) -> None:
+    """Update a time entry.
+
+    TEAM_ID: The ID of the team/workspace.
+    TIMER_ID: The ID of the time entry to update.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.update_time_entry(
+                team_id,
+                timer_id,
+                description=description,
+                start=start,
+                end=end,
+                duration=duration,
+                task_id=task_id,
+                billable=billable if billable else None,
+            )
+
+            if raw:
+                if data:
+                    click.echo(json.dumps(data, indent=2))
+                else:
+                    click.echo("{}")
+                return
+
+            entry = data.get("data", {})
+
+            if format == "json":
+                output = {
+                    "id": entry.get("id"),
+                    "wid": entry.get("wid"),
+                    "start": entry.get("start"),
+                    "duration": entry.get("duration"),
+                    "description": entry.get("description"),
+                    "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:          {entry.get('id')}")
+                click.echo(f"Start:       {entry.get('start')}")
+                click.echo(f"Duration:    {entry.get('duration')}")
+                if entry.get("description"):
+                    click.echo(f"Description: {entry.get('description')}")
+                if entry.get("task"):
+                    click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
+                click.echo("Time entry updated successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="delete-time-entry")
+@click.argument("team_id")
+@click.argument("timer_id")
+@click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
+def delete_time_entry(team_id: str, timer_id: str, yes: bool) -> None:
+    """Delete a time entry.
+
+    TEAM_ID: The ID of the team/workspace.
+    TIMER_ID: The ID of the time entry to delete.
+    """
+    if not yes:
+        if not click.confirm(
+            f"Are you sure you want to delete time entry {timer_id}?"
+        ):
+            click.echo("Deletion cancelled.")
+            return
+
+    try:
+        with ClickUpClient() as client:
+            data = client.delete_time_entry(team_id, timer_id)
+            entry = data.get("data", {})
+            click.echo(
+                f"Time entry {timer_id} deleted successfully."
+            )
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
 def main() -> None:
     """Entry point for the CLI."""
     cli()

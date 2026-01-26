@@ -771,6 +771,261 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def get_running_time_entry(self, team_id: str | int) -> dict[str, Any]:
+        """Get the currently running time entry.
+
+        Args:
+            team_id: The team/workspace ID.
+
+        Returns:
+            The response from the /team/{team_id}/time_entries/current endpoint.
+        """
+        response = self._client.get(
+            f"{self.base_url}/team/{team_id}/time_entries/current"
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def start_time_entry(
+        self,
+        team_id: str | int,
+        *,
+        task_id: str | None = None,
+        description: str | None = None,
+        billable: bool = False,
+        tags: list[dict[str, str]] | None = None,
+    ) -> dict[str, Any]:
+        """Start a time entry.
+
+        Args:
+            team_id: The team/workspace ID.
+            task_id: The task ID to associate with the time entry.
+            description: The time entry description.
+            billable: Whether the time entry is billable.
+            tags: List of tags (name, tag_fg, tag_bg).
+
+        Returns:
+            The response from the /team/{team_id}/time_entries/start endpoint.
+        """
+        data: dict[str, Any] = {
+            "billable": billable,
+        }
+
+        if task_id is not None:
+            data["tid"] = task_id
+        if description is not None:
+            data["description"] = description
+        if tags is not None:
+            data["tags"] = tags
+
+        response = self._client.post(
+            f"{self.base_url}/team/{team_id}/time_entries/start", json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def stop_time_entry(self, team_id: str | int) -> dict[str, Any]:
+        """Stop the currently running time entry.
+
+        Args:
+            team_id: The team/workspace ID.
+
+        Returns:
+            The response from the /team/{team_id}/time_entries/stop endpoint.
+        """
+        response = self._client.post(
+            f"{self.base_url}/team/{team_id}/time_entries/stop"
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def get_time_entries(
+        self,
+        team_id: str | int,
+        *,
+        start_date: int | None = None,
+        end_date: int | None = None,
+        assignee: int | None = None,
+        space_id: int | None = None,
+        folder_id: int | None = None,
+        list_id: int | None = None,
+        task_id: str | None = None,
+        is_billable: bool | None = None,
+        include_task_tags: bool = False,
+        include_location_names: bool = False,
+        include_approval_history: bool = False,
+        include_approval_details: bool = False,
+    ) -> dict[str, Any]:
+        """Get time entries within a date range.
+
+        Args:
+            team_id: The team/workspace ID.
+            start_date: Start date as Unix timestamp in milliseconds.
+            end_date: End date as Unix timestamp in milliseconds.
+            assignee: Filter by assignee user ID.
+            space_id: Filter by space ID.
+            folder_id: Filter by folder ID.
+            list_id: Filter by list ID.
+            task_id: Filter by task ID.
+            is_billable: Filter by billable status.
+            include_task_tags: Include task tags in response.
+            include_location_names: Include space/folder/list names.
+            include_approval_history: Include approval history.
+            include_approval_details: Include approval details.
+
+        Returns:
+            The response from the /team/{team_id}/time_entries endpoint.
+        """
+        params: dict[str, Any] = {}
+
+        if start_date is not None:
+            params["start_date"] = start_date
+        if end_date is not None:
+            params["end_date"] = end_date
+        if assignee is not None:
+            params["assignee"] = assignee
+        if space_id is not None:
+            params["space_id"] = space_id
+        if folder_id is not None:
+            params["folder_id"] = folder_id
+        if list_id is not None:
+            params["list_id"] = list_id
+        if task_id is not None:
+            params["task_id"] = task_id
+        if is_billable is not None:
+            params["is_billable"] = "true" if is_billable else "false"
+        if include_task_tags:
+            params["include_task_tags"] = "true"
+        if include_location_names:
+            params["include_location_names"] = "true"
+        if include_approval_history:
+            params["include_approval_history"] = "true"
+        if include_approval_details:
+            params["include_approval_details"] = "true"
+
+        response = self._client.get(
+            f"{self.base_url}/team/{team_id}/time_entries", params=params
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def create_time_entry(
+        self,
+        team_id: str | int,
+        *,
+        start: int,
+        duration: int,
+        task_id: str | None = None,
+        description: str | None = None,
+        billable: bool = False,
+        tags: list[dict[str, str]] | None = None,
+    ) -> dict[str, Any]:
+        """Create a manual time entry.
+
+        Args:
+            team_id: The team/workspace ID.
+            start: Start time as Unix timestamp in milliseconds.
+            duration: Duration in milliseconds.
+            task_id: The task ID to associate with the time entry.
+            description: The time entry description.
+            billable: Whether the time entry is billable.
+            tags: List of tags (name, tag_fg, tag_bg).
+
+        Returns:
+            The response from the /team/{team_id}/time_entries endpoint.
+        """
+        data: dict[str, Any] = {
+            "start": start,
+            "duration": duration,
+            "billable": billable,
+        }
+
+        if task_id is not None:
+            data["tid"] = task_id
+        if description is not None:
+            data["description"] = description
+        if tags is not None:
+            data["tags"] = tags
+
+        response = self._client.post(
+            f"{self.base_url}/team/{team_id}/time_entries", json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def update_time_entry(
+        self,
+        team_id: str | int,
+        timer_id: str | int,
+        *,
+        description: str | None = None,
+        start: int | None = None,
+        end: int | None = None,
+        duration: int | None = None,
+        task_id: str | None = None,
+        billable: bool | None = None,
+        tags: list[dict[str, str]] | None = None,
+        tag_action: str | None = None,
+    ) -> dict[str, Any]:
+        """Update a time entry.
+
+        Args:
+            team_id: The team/workspace ID.
+            timer_id: The time entry ID.
+            description: The time entry description.
+            start: Start time as Unix timestamp in milliseconds.
+            end: End time as Unix timestamp in milliseconds.
+            duration: Duration in milliseconds.
+            task_id: The task ID to associate with the time entry.
+            billable: Whether the time entry is billable.
+            tags: List of tags (name, tag_fg, tag_bg).
+            tag_action: Tag action - one of "replace", "add", "remove".
+
+        Returns:
+            The response from the /team/{team_id}/time_entries/{timer_id} endpoint.
+        """
+        data: dict[str, Any] = {
+            "tags": tags if tags is not None else [],
+            "tid": task_id if task_id is not None else "",
+        }
+
+        if description is not None:
+            data["description"] = description
+        if start is not None:
+            data["start"] = start
+        if end is not None:
+            data["end"] = end
+        if duration is not None:
+            data["duration"] = duration
+        if billable is not None:
+            data["billable"] = billable
+        if tag_action is not None:
+            data["tag_action"] = tag_action
+
+        response = self._client.put(
+            f"{self.base_url}/team/{team_id}/time_entries/{timer_id}", json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def delete_time_entry(
+        self, team_id: str | int, timer_id: str | int
+    ) -> dict[str, Any]:
+        """Delete a time entry.
+
+        Args:
+            team_id: The team/workspace ID.
+            timer_id: The time entry ID to delete.
+
+        Returns:
+            The response from the /team/{team_id}/time_entries/{timer_id} endpoint.
+        """
+        response = self._client.delete(
+            f"{self.base_url}/team/{team_id}/time_entries/{timer_id}"
+        )
+        response.raise_for_status()
+        return response.json()
+
     def close(self) -> None:
         """Close the HTTP client."""
         self._client.close()

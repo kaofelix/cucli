@@ -1,0 +1,94 @@
+interactions:
+- request:
+    body: '{"start":1737925200000,"duration":3600000,"billable":false,"description":"Test
+      manual entry"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - pk_272627274_QZU8LEFFQ2CDW3ASOXATNG51Q2I45PRY
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '93'
+      Content-Type:
+      - application/json
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.clickup.com/api/v2/team/90152245421/time_entries
+  response:
+    body:
+      string: '{"err":"Your plan is limited to {{limit}} usages of Advanced Time Tracking,
+        {{usage}} usage.","ECODE":"TIMEENTRY_064"}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '118'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 26 Jan 2026 22:06:00 GMT
+      Server:
+      - nginx
+      Timing-Allow-Origin:
+      - '*'
+      Via:
+      - 1.1 7d1643eda6aa456c21c5607fcc049b8e.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - L58nI7BtYvwVAYEt1Zohafs-NK6DotwLNYg9VwkS3H5Qqfkxrxq2Qg==
+      X-Amz-Cf-Pop:
+      - LHR61-P7
+      X-Cache:
+      - Error from cloudfront
+      access-control-allow-credentials:
+      - 'true'
+      access-control-allow-origin:
+      - '*'
+      access-control-expose-headers:
+      - x-datadog-trace-id,server
+      cache-control:
+      - no-cache, no-store
+      content-language:
+      - en-US
+      content-security-policy:
+      - frame-ancestors 'self'
+      expect-ct:
+      - max-age=0
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-datadog-trace-id:
+      - '2000670728620243064'
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-permitted-cross-domain-policies:
+      - none
+      x-ratelimit-limit:
+      - '100'
+      x-ratelimit-remaining:
+      - '98'
+      x-ratelimit-reset:
+      - '1769465167'
+      x-received-from:
+      - shard-prod-eu-west-1-3
+      x-xss-protection:
+      - '0'
+    status:
+      code: 403
+      message: Forbidden
+version: 1

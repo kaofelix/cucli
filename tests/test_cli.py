@@ -1443,3 +1443,405 @@ class TestListMembersCommand:
 
         assert result.exit_code != 0
         assert "HTTP Error" in result.output or "Error" in result.output
+
+
+class TestTimeTrackingCommands:
+    """Test cases for time tracking commands."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.fixture
+    def team_id(self):
+        """Provide a test team ID."""
+        return "90152245421"
+
+    @pytest.mark.vcr
+    def test_running_time_entry(self, runner, mock_api_key_env, team_id):
+        """Test running-time-entry command."""
+        result = runner.invoke(cli, ["running-time-entry", team_id])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert "id" in output
+        assert "wid" in output
+        assert "start" in output
+        assert "duration" in output
+        assert "description" in output
+
+    @pytest.mark.vcr
+    def test_running_time_entry_table(self, runner, mock_api_key_env, team_id):
+        """Test running-time-entry command with table format."""
+        result = runner.invoke(cli, ["running-time-entry", team_id, "--format", "table"])
+
+        assert result.exit_code == 0
+        # Should have headers or "No running timer" message
+        assert "ID" in result.output or "No running timer" in result.output
+
+    @pytest.mark.vcr
+    def test_running_time_entry_raw(self, runner, mock_api_key_env, team_id):
+        """Test running-time-entry command with raw JSON."""
+        result = runner.invoke(cli, ["running-time-entry", team_id, "--raw"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert "data" in output
+
+    @pytest.mark.vcr
+    def test_start_time_entry(self, runner, mock_api_key_env, team_id):
+        """Test start-time-entry command."""
+        result = runner.invoke(
+            cli, ["start-time-entry", team_id, "--description", "Test time entry"]
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert "id" in output
+        assert "wid" in output
+        assert "start" in output
+        assert "duration" in output
+        # Negative duration means timer is running
+        assert output["duration"] < 0
+        assert output.get("description") == "Test time entry"
+
+    @pytest.mark.vcr
+    def test_start_time_entry_with_task(self, runner, mock_api_key_env, team_id):
+        """Test start-time-entry command with task."""
+        task_id = "86c7mc19h"
+        result = runner.invoke(
+            cli, ["start-time-entry", team_id, "--task-id", task_id]
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert "id" in output
+        assert "task_id" in output
+        assert output["task_id"] == task_id
+
+    @pytest.mark.vcr
+    def test_start_time_entry_table(self, runner, mock_api_key_env, team_id):
+        """Test start-time-entry command with table format."""
+        result = runner.invoke(
+            cli,
+            ["start-time-entry", team_id, "--description", "Test timer", "--format", "table"],
+        )
+
+        assert result.exit_code == 0
+        # Should have timer information
+        assert "ID:" in result.output or "Timer started" in result.output
+
+    @pytest.mark.vcr
+    def test_stop_time_entry(self, runner, mock_api_key_env, team_id):
+        """Test stop-time-entry command."""
+        result = runner.invoke(cli, ["stop-time-entry", team_id])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert "id" in output
+        assert "wid" in output
+        assert "start" in output
+        assert "end" in output
+        assert "duration" in output
+        # Stopped entry should have positive duration
+        assert output["duration"] >= 0
+
+    @pytest.mark.vcr
+    def test_stop_time_entry_table(self, runner, mock_api_key_env, team_id):
+        """Test stop-time-entry command with table format."""
+        result = runner.invoke(cli, ["stop-time-entry", team_id, "--format", "table"])
+
+        assert result.exit_code == 0
+        assert "ID:" in result.output or "stopped" in result.output.lower()
+
+    @pytest.mark.vcr
+    def test_time_entries(self, runner, mock_api_key_env, team_id):
+        """Test time-entries command."""
+        # Use fixed timestamps to match cassette
+        start_date = 1736904000000
+        end_date = 1737766400000
+        result = runner.invoke(
+            cli,
+            ["time-entries", team_id, "--start-date", str(start_date), "--end-date", str(end_date)],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert isinstance(output, list)
+
+    @pytest.mark.vcr
+    def test_time_entries_table(self, runner, mock_api_key_env, team_id):
+        """Test time-entries command with table format."""
+        start_date = 1736904000000
+        end_date = 1737766400000
+        result = runner.invoke(
+            cli,
+            [
+                "time-entries",
+                team_id,
+                "--start-date",
+                str(start_date),
+                "--end-date",
+                str(end_date),
+                "--format",
+                "table",
+            ],
+        )
+
+        assert result.exit_code == 0
+        # Should have headers or "No time entries" message
+        assert "ID" in result.output or "No time entries" in result.output
+
+    @pytest.mark.vcr
+    def test_time_entries_raw(self, runner, mock_api_key_env, team_id):
+        """Test time-entries command with raw JSON."""
+        start_date = 1736904000000
+        end_date = 1737766400000
+        result = runner.invoke(
+            cli,
+            [
+                "time-entries",
+                team_id,
+                "--start-date",
+                str(start_date),
+                "--end-date",
+                str(end_date),
+                "--raw",
+            ],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert "data" in output
+        assert isinstance(output["data"], list)
+
+    @pytest.mark.vcr
+    def test_create_time_entry(self, runner, mock_api_key_env, team_id):
+        """Test create-time-entry command."""
+        start = 1737925200000
+        duration = 3600000  # 1 hour in milliseconds
+        result = runner.invoke(
+            cli,
+            [
+                "create-time-entry",
+                team_id,
+                "--start",
+                str(start),
+                "--duration",
+                str(duration),
+                "--description",
+                "Test manual entry",
+            ],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert "id" in output
+        assert "start" in output
+        assert "duration" in output
+        assert output.get("description") == "Test manual entry"
+
+    @pytest.mark.vcr
+    def test_create_time_entry_with_task(self, runner, mock_api_key_env, team_id):
+        """Test create-time-entry command with task."""
+        start = 1737925200000
+        duration = 1800000  # 30 minutes in milliseconds
+        task_id = "86c7mc19h"
+        result = runner.invoke(
+            cli,
+            [
+                "create-time-entry",
+                team_id,
+                "--start",
+                str(start),
+                "--duration",
+                str(duration),
+                "--task-id",
+                task_id,
+            ],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert "task_id" in output
+        assert output["task_id"] == task_id
+
+    @pytest.mark.vcr
+    def test_create_time_entry_table(self, runner, mock_api_key_env, team_id):
+        """Test create-time-entry command with table format."""
+        start = 1737925200000
+        duration = 3600000
+        result = runner.invoke(
+            cli,
+            [
+                "create-time-entry",
+                team_id,
+                "--start",
+                str(start),
+                "--duration",
+                str(duration),
+                "--format",
+                "table",
+            ],
+        )
+
+        assert result.exit_code == 0
+        assert "ID:" in result.output
+
+    @pytest.mark.vcr
+    def test_update_time_entry(self, runner, mock_api_key_env, team_id):
+        """Test update-time-entry command."""
+        # First create a time entry to get a timer_id
+        start = 1737925200000
+        duration = 3600000
+        create_result = runner.invoke(
+            cli,
+            [
+                "create-time-entry",
+                team_id,
+                "--start",
+                str(start),
+                "--duration",
+                str(duration),
+                "--description",
+                "Original description",
+            ],
+        )
+        assert create_result.exit_code == 0
+        timer_id = json.loads(create_result.output)["id"]
+
+        # Update the time entry
+        result = runner.invoke(
+            cli,
+            [
+                "update-time-entry",
+                team_id,
+                timer_id,
+                "--description",
+                "Updated description",
+                "--billable",
+            ],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert output["id"] == timer_id
+        assert output.get("description") == "Updated description"
+        assert output.get("billable") is True
+
+    @pytest.mark.vcr
+    def test_update_time_entry_table(self, runner, mock_api_key_env, team_id):
+        """Test update-time-entry command with table format."""
+        # First create a time entry to get a timer_id
+        start = 1737925200000
+        duration = 3600000
+        create_result = runner.invoke(
+            cli,
+            ["create-time-entry", team_id, "--start", str(start), "--duration", str(duration)],
+        )
+        assert create_result.exit_code == 0
+        timer_id = json.loads(create_result.output)["id"]
+
+        # Update the time entry
+        result = runner.invoke(
+            cli,
+            [
+                "update-time-entry",
+                team_id,
+                timer_id,
+                "--description",
+                "Updated",
+                "--format",
+                "table",
+            ],
+        )
+
+        assert result.exit_code == 0
+        assert "updated successfully" in result.output.lower()
+
+    @pytest.mark.vcr
+    def test_delete_time_entry(self, runner, mock_api_key_env, team_id):
+        """Test delete-time-entry command."""
+        # First create a time entry to get a timer_id
+        start = 1737925200000
+        duration = 3600000
+        create_result = runner.invoke(
+            cli,
+            [
+                "create-time-entry",
+                team_id,
+                "--start",
+                str(start),
+                "--duration",
+                str(duration),
+                "--description",
+                "Entry to delete",
+            ],
+        )
+        assert create_result.exit_code == 0
+        timer_id = json.loads(create_result.output)["id"]
+
+        # Delete the time entry
+        result = runner.invoke(
+            cli, ["delete-time-entry", team_id, timer_id, "--yes"]
+        )
+
+        assert result.exit_code == 0
+        assert "deleted" in result.output.lower()
+
+    @pytest.mark.vcr
+    def test_delete_time_entry_with_confirmation(self, runner, mock_api_key_env, team_id):
+        """Test delete-time-entry command prompts for confirmation."""
+        # First create a time entry to get a timer_id
+        start = 1737925200000
+        duration = 3600000
+        create_result = runner.invoke(
+            cli,
+            ["create-time-entry", team_id, "--start", str(start), "--duration", str(duration)],
+        )
+        assert create_result.exit_code == 0
+        timer_id = json.loads(create_result.output)["id"]
+
+        # Try to delete without --yes flag (should prompt)
+        result = runner.invoke(cli, ["delete-time-entry", team_id, timer_id], input="y")
+
+        assert result.exit_code == 0
+        assert "deleted" in result.output.lower()
+
+    def test_start_time_entry_missing_team_id(self, runner):
+        """Test start-time-entry command fails without team_id."""
+        result = runner.invoke(cli, ["start-time-entry"])
+
+        assert result.exit_code != 0
+        assert "Missing argument" in result.output or "team_id" in result.output.lower()
+
+    def test_create_time_entry_missing_start(self, runner, mock_api_key_env):
+        """Test create-time-entry command fails without start time."""
+        team_id = "90152245421"
+        result = runner.invoke(
+            cli, ["create-time-entry", team_id, "--duration", "3600000"]
+        )
+
+        assert result.exit_code != 0
+        assert "start" in result.output.lower() or "required" in result.output.lower()
+
+    def test_create_time_entry_missing_duration(self, runner, mock_api_key_env):
+        """Test create-time-entry command fails without duration."""
+        team_id = "90152245421"
+        result = runner.invoke(
+            cli, ["create-time-entry", team_id, "--start", "1737925200000"]
+        )
+
+        assert result.exit_code != 0
+        assert "duration" in result.output.lower() or "required" in result.output.lower()

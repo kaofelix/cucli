@@ -29,5 +29,13 @@
 - [x] Remove tag from task
 
 ## In Progress
+- [x] Time tracking API (start, stop, get running, get entries, create, update, delete)
+- [ ] Time tracking CLI commands (cassettes need to be recorded)
 
 ## Planned
+- [ ] Goals and key results
+- [ ] Task dependencies
+- [ ] Task attachments
+- [ ] Task links
+- [ ] Webhooks
+- [ ] Views
