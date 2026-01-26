@@ -318,6 +318,86 @@ cucli create-task <list_id> --name "Task Name" --format table
 cucli create-task <list_id> --name "Task Name" --raw
 ```
 
+### Update task
+
+```bash
+cucli update-task <task_id> --name "Updated Name"
+```
+
+Update task with various options:
+
+```bash
+# Update name
+cucli update-task <task_id> --name "New Name"
+
+# Update status
+cucli update-task <task_id> --status "in review"
+
+# Update priority (0: Urgent, 1: High, 2: Normal, 3: Low, 4: None)
+cucli update-task <task_id> --priority 1
+
+# Update description
+cucli update-task <task_id> --description "New description"
+
+# Update markdown description
+cucli update-task <task_id> --markdown-description "# New Description"
+
+# Update due date
+cucli update-task <task_id> --due-date 1737907200000
+
+# Update start date
+cucli update-task <task_id> --start-date 1737820800000
+
+# Update time estimate
+cucli update-task <task_id> --time-estimate 7200000
+
+# Update points
+cucli update-task <task_id> --points 8
+
+# Add assignees
+cucli update-task <task_id> --assignee-add 123 --assignee-add 456
+
+# Remove assignees
+cucli update-task <task_id> --assignee-remove 789
+
+# Update parent (move to new parent)
+cucli update-task <task_id> --parent <new_parent_id>
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli update-task <task_id> --name "New Name"
+
+# Table format
+cucli update-task <task_id> --name "New Name" --format table
+
+# Raw JSON (useful for debugging or when models don't match)
+cucli update-task <task_id> --name "New Name" --raw
+```
+
+### Delete task
+
+```bash
+cucli delete-task <task_id>
+```
+
+Delete with confirmation prompt (default):
+
+```bash
+cucli delete-task <task_id>
+# You will be prompted to confirm: "Are you sure you want to delete task <task_id>?"
+```
+
+Skip confirmation prompt:
+
+```bash
+cucli delete-task <task_id> --yes
+# or
+cucli delete-task <task_id> -y
+```
+
 ### Get help
 
 ```bash

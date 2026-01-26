@@ -482,6 +482,9 @@ class TestCLI:
         assert "spaces" in result.output
         assert "folders" in result.output
         assert "lists" in result.output
+        assert "create-task" in result.output
+        assert "update-task" in result.output
+        assert "delete-task" in result.output
 
     def test_workspaces_help(self, runner):
         """Test workspaces command help."""
@@ -685,3 +688,136 @@ class TestCreateTaskCommand:
         assert "--description" in result.output
         assert "--status" in result.output
         assert "--priority" in result.output
+
+
+class TestUpdateTaskCommand:
+    """Test cases for the update-task command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_update_task_name(self, runner, mock_api_key_env):
+        """Test update-task command with name change."""
+        # First create a task
+        list_id = "901520401736"
+        create_result = runner.invoke(
+            cli, ["create-task", list_id, "--name", "Task to Update"]
+        )
+        task_id = json.loads(create_result.output)["id"]
+
+        # Update the task
+        result = runner.invoke(
+            cli, ["update-task", task_id, "--name", "Updated Task Name"]
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert output["name"] == "Updated Task Name"
+
+    @pytest.mark.vcr
+    def test_update_task_status(self, runner, mock_api_key_env):
+        """Test update-task command with status change."""
+        list_id = "901520401736"
+        create_result = runner.invoke(
+            cli, ["create-task", list_id, "--name", "Task for Status"]
+        )
+        task_id = json.loads(create_result.output)["id"]
+
+        # Update status
+        result = runner.invoke(cli, ["update-task", task_id, "--status", "to do"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert output["status"] == "to do"
+
+    @pytest.mark.vcr
+    def test_update_task_priority(self, runner, mock_api_key_env):
+        """Test update-task command with priority change."""
+        list_id = "901520401736"
+        create_result = runner.invoke(
+            cli, ["create-task", list_id, "--name", "Task for Priority"]
+        )
+        task_id = json.loads(create_result.output)["id"]
+
+        # Update priority
+        result = runner.invoke(cli, ["update-task", task_id, "--priority", "1"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert output["priority"] == "urgent"
+
+    @pytest.mark.vcr
+    def test_update_task_raw_output(self, runner, mock_api_key_env):
+        """Test update-task command with raw output."""
+        list_id = "901520401736"
+        create_result = runner.invoke(
+            cli, ["create-task", list_id, "--name", "Task for Raw"]
+        )
+        task_id = json.loads(create_result.output)["id"]
+
+        result = runner.invoke(
+            cli, ["update-task", task_id, "--name", "Updated", "--raw"]
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "id" in output
+        assert "name" in output
+
+    @pytest.mark.vcr
+    def test_update_task_not_found(self, runner, mock_api_key_env):
+        """Test update-task command with invalid task ID."""
+        task_id = "00000000"
+        result = runner.invoke(cli, ["update-task", task_id, "--name", "New Name"])
+
+        assert result.exit_code != 0
+        assert "Error" in result.output or "HTTP Error" in result.output
+
+    def test_update_task_help(self, runner):
+        """Test update-task command help."""
+        result = runner.invoke(cli, ["update-task", "--help"])
+        assert result.exit_code == 0
+        assert "--name" in result.output
+        assert "--status" in result.output
+        assert "--priority" in result.output
+
+
+class TestDeleteTaskCommand:
+    """Test cases for the delete-task command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_delete_task(self, runner, mock_api_key_env):
+        """Test delete-task command."""
+        # First create a task
+        list_id = "901520401736"
+        create_result = runner.invoke(
+            cli, ["create-task", list_id, "--name", "Task to Delete"]
+        )
+        task_id = json.loads(create_result.output)["id"]
+
+        # Delete the task
+        result = runner.invoke(cli, ["delete-task", task_id, "--yes"])
+
+        assert result.exit_code == 0
+
+    @pytest.mark.vcr
+    def test_delete_task_not_found(self, runner, mock_api_key_env):
+        """Test delete-task command with invalid task ID."""
+        task_id = "00000000"
+        result = runner.invoke(cli, ["delete-task", task_id, "--yes"])
+
+        assert result.exit_code != 0
+        assert "Error" in result.output or "HTTP Error" in result.output
+
+    def test_delete_task_help(self, runner):
+        """Test delete-task command help."""
+        result = runner.invoke(cli, ["delete-task", "--help"])
+        assert result.exit_code == 0

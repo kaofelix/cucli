@@ -594,6 +594,164 @@ def create_task(
         raise click.Abort()
 
 
+@cli.command(name="update-task")
+@click.argument("task_id")
+@click.option("--name", help="Task name.")
+@click.option("--description", help="Task description (text content).")
+@click.option("--markdown-description", help="Task description (markdown content).")
+@click.option("--status", help="Task status.")
+@click.option(
+    "--priority",
+    type=int,
+    help="Task priority (0: Urgent, 1: High, 2: Normal, 3: Low, 4: None).",
+)
+@click.option(
+    "--due-date",
+    type=int,
+    help="Due date as Unix timestamp in milliseconds.",
+)
+@click.option(
+    "--start-date",
+    type=int,
+    help="Start date as Unix timestamp in milliseconds.",
+)
+@click.option(
+    "--time-estimate",
+    type=int,
+    help="Time estimate in milliseconds.",
+)
+@click.option("--points", type=int, help="Sprint points.")
+@click.option("--parent", help="Parent task ID (for subtasks).")
+@click.option(
+    "--assignee-add",
+    multiple=True,
+    type=int,
+    help="Assignee user ID to add (can use multiple).",
+)
+@click.option(
+    "--assignee-remove",
+    multiple=True,
+    type=int,
+    help="Assignee user ID to remove (can use multiple).",
+)
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def update_task(
+    task_id: str,
+    name: str | None,
+    description: str | None,
+    markdown_description: str | None,
+    status: str | None,
+    priority: int | None,
+    due_date: int | None,
+    start_date: int | None,
+    time_estimate: int | None,
+    points: int | None,
+    parent: str | None,
+    assignee_add: tuple[int, ...],
+    assignee_remove: tuple[int, ...],
+    format: str,
+    raw: bool,
+) -> None:
+    """Update a task.
+
+    TASK_ID: The ID of the task to update.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.update_task(
+                task_id,
+                name=name,
+                description=description,
+                markdown_description=markdown_description,
+                status=status,
+                priority=priority,
+                due_date=due_date,
+                start_date=start_date,
+                time_estimate=time_estimate,
+                points=points,
+                parent=parent,
+                assignees_add=list(assignee_add) if assignee_add else None,
+                assignees_remove=list(assignee_remove) if assignee_remove else None,
+            )
+
+            if raw:
+                if data:
+                    click.echo(json.dumps(data, indent=2))
+                else:
+                    click.echo("{}")
+                return
+
+            if not data:
+                click.echo("No updates provided.")
+                return
+
+            if format == "json":
+                output = {
+                    "id": data.get("id"),
+                    "name": data.get("name"),
+                    "status": data.get("status", {}).get("status")
+                    if data.get("status")
+                    else None,
+                    "priority": data.get("priority", {}).get("priority")
+                    if data.get("priority")
+                    else None,
+                    "url": data.get("url"),
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:       {data.get('id')}")
+                click.echo(f"Name:     {data.get('name')}")
+                if data.get("status"):
+                    click.echo(f"Status:   {data.get('status', {}).get('status')}")
+                if data.get("priority"):
+                    click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
+                if data.get("url"):
+                    click.echo(f"URL:      {data.get('url')}")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="delete-task")
+@click.argument("task_id")
+@click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
+def delete_task(task_id: str, yes: bool) -> None:
+    """Delete a task.
+
+    TASK_ID: The ID of the task to delete.
+    """
+    if not yes:
+        if not click.confirm(f"Are you sure you want to delete task {task_id}?"):
+            click.echo("Deletion cancelled.")
+            return
+
+    try:
+        with ClickUpClient() as client:
+            client.delete_task(task_id)
+            click.echo(f"Task {task_id} deleted successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
 def main() -> None:
     """Entry point for the CLI."""
     cli()

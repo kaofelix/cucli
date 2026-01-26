@@ -340,3 +340,88 @@ class TestClickUpClient:
 
         # Should get a 404 or similar error
         assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_update_task(self, clickup_client):
+        """Test updating a task."""
+        # First create a task
+        list_id = "901520401736"
+        create_response = clickup_client.create_task(list_id, name="Task to Update")
+        task_id = create_response["id"]
+
+        # Update the task
+        update_response = clickup_client.update_task(task_id, name="Updated Task Name")
+
+        # Verify response
+        assert "id" in update_response
+        assert update_response["name"] == "Updated Task Name"
+
+    @pytest.mark.vcr
+    def test_update_task_status(self, clickup_client):
+        """Test updating a task's status."""
+        list_id = "901520401736"
+        create_response = clickup_client.create_task(
+            list_id, name="Task for Status Update"
+        )
+        task_id = create_response["id"]
+
+        # Update status - using common status
+        update_response = clickup_client.update_task(task_id, status="to do")
+
+        assert "id" in update_response
+        assert update_response["status"]["status"] == "to do"
+
+    @pytest.mark.vcr
+    def test_update_task_priority(self, clickup_client):
+        """Test updating a task's priority."""
+        list_id = "901520401736"
+        create_response = clickup_client.create_task(
+            list_id, name="Task for Priority Update"
+        )
+        task_id = create_response["id"]
+
+        # Update priority
+        update_response = clickup_client.update_task(task_id, priority=1)
+
+        assert "id" in update_response
+        assert update_response["priority"]["priority"] == "urgent"
+
+    @pytest.mark.vcr
+    def test_update_task_not_found(self, clickup_client):
+        """Test updating a non-existent task."""
+        import httpx
+
+        task_id = "00000000"
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.update_task(task_id, name="Test")
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_delete_task(self, clickup_client):
+        """Test deleting a task."""
+        # First create a task
+        list_id = "901520401736"
+        create_response = clickup_client.create_task(list_id, name="Task to Delete")
+        task_id = create_response["id"]
+
+        # Delete the task
+        response = clickup_client.delete_task(task_id)
+
+        # Response should be empty (204 No Content)
+        assert response is None or response == {}
+
+    @pytest.mark.vcr
+    def test_delete_task_not_found(self, clickup_client):
+        """Test deleting a non-existent task."""
+        import httpx
+
+        task_id = "00000000"
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.delete_task(task_id)
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400

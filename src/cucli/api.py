@@ -283,6 +283,96 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def update_task(
+        self,
+        task_id: str,
+        *,
+        name: str | None = None,
+        description: str | None = None,
+        markdown_description: str | None = None,
+        status: str | None = None,
+        priority: int | None = None,
+        due_date: int | None = None,
+        start_date: int | None = None,
+        time_estimate: int | None = None,
+        points: int | None = None,
+        parent: str | None = None,
+        assignees_add: list[int] | None = None,
+        assignees_remove: list[int] | None = None,
+    ) -> dict[str, Any]:
+        """Update a task.
+
+        Args:
+            task_id: The task ID to update.
+            name: The task name.
+            description: The task description (text content).
+            markdown_description: The task description (markdown content).
+            status: The task status.
+            priority: The task priority (0: Urgent, 1: High, 2: Normal, 3: Low, 4: None).
+            due_date: Due date as Unix timestamp in milliseconds.
+            start_date: Start date as Unix timestamp in milliseconds.
+            time_estimate: Time estimate in milliseconds.
+            points: Sprint points.
+            parent: Parent task ID (for subtasks).
+            assignees_add: List of assignee user IDs to add.
+            assignees_remove: List of assignee user IDs to remove.
+
+        Returns:
+            The response from the /task/{task_id} endpoint.
+        """
+        data: dict[str, Any] = {}
+
+        if name is not None:
+            data["name"] = name
+        if description is not None:
+            data["description"] = description
+        if markdown_description is not None:
+            data["markdown_content"] = markdown_description
+        if status is not None:
+            data["status"] = status
+        if priority is not None:
+            data["priority"] = priority
+        if due_date is not None:
+            data["due_date"] = due_date
+        if start_date is not None:
+            data["start_date"] = start_date
+        if time_estimate is not None:
+            data["time_estimate"] = time_estimate
+        if points is not None:
+            data["points"] = points
+        if parent is not None:
+            data["parent"] = parent
+
+        if assignees_add or assignees_remove:
+            assignees_dict: dict[str, list[int]] = {}
+            if assignees_add:
+                assignees_dict["add"] = assignees_add
+            if assignees_remove:
+                assignees_dict["rem"] = assignees_remove
+            data["assignees"] = assignees_dict
+
+        if data:
+            response = self._client.put(f"{self.base_url}/task/{task_id}", json=data)
+            response.raise_for_status()
+            return response.json()
+
+        return {}
+
+    def delete_task(self, task_id: str) -> dict[str, Any] | None:
+        """Delete a task.
+
+        Args:
+            task_id: The task ID to delete.
+
+        Returns:
+            None (204 No Content) or response dict.
+        """
+        response = self._client.delete(f"{self.base_url}/task/{task_id}")
+        if response.status_code == 204:
+            return None
+        response.raise_for_status()
+        return response.json()
+
     def close(self) -> None:
         """Close the HTTP client."""
         self._client.close()

@@ -8,12 +8,13 @@
 - [x] Get folders in a space
 - [x] Get lists in a folder
 - [x] Create task
+- [x] Update task
+- [x] Update task status
+- [x] Update task priority
+- [x] Delete task
 
 ## In Progress
 
 ## Planned
-- [ ] Update task status
-- [ ] Update task priority
-- [ ] Delete task
 - [ ] Get task comments
 - [ ] Add task comment
