@@ -2,7 +2,14 @@
 
 import pytest
 from cucli.api import ClickUpClient
-from cucli.models import FoldersResponse, SpacesResponse, Team, Task, TeamsResponse
+from cucli.models import (
+    FoldersResponse,
+    ListsResponse,
+    SpacesResponse,
+    Team,
+    Task,
+    TeamsResponse,
+)
 
 
 class TestClickUpClient:
@@ -240,6 +247,55 @@ class TestClickUpClient:
 
         with pytest.raises(httpx.HTTPStatusError) as exc_info:
             clickup_client.get_folders(space_id)
+
+        # Should get a 404 or similar error
+        assert exc_info.value.response.status_code >= 400
+
+    @pytest.mark.vcr
+    def test_get_lists(self, clickup_client):
+        """Test getting lists from a folder."""
+        # Using a real folder ID from the test workspace
+        folder_id = "901513787576"
+
+        response = clickup_client.get_lists(folder_id)
+
+        # Verify response structure
+        assert "lists" in response
+        assert isinstance(response["lists"], list)
+
+        # Parse with Pydantic model
+        lists_response = ListsResponse(**response)
+        assert len(lists_response.lists) >= 0
+
+        # If there are lists, validate first list structure
+        if lists_response.lists:
+            list_obj = lists_response.lists[0]
+            assert isinstance(list_obj.id, str)
+            assert isinstance(list_obj.name, str)
+            assert isinstance(list_obj.orderindex, int)
+            assert isinstance(list_obj.archived, bool)
+            assert isinstance(list_obj.override_statuses, bool)
+            assert isinstance(list_obj.permission_level, str)
+
+    @pytest.mark.vcr
+    def test_get_lists_with_archived(self, clickup_client):
+        """Test getting lists with archived filter."""
+        folder_id = "901513787576"
+
+        response = clickup_client.get_lists(folder_id, archived=True)
+
+        assert "lists" in response
+        assert isinstance(response["lists"], list)
+
+    @pytest.mark.vcr
+    def test_get_lists_not_found(self, clickup_client):
+        """Test that get_lists raises HTTPStatusError for non-existent folder."""
+        import httpx
+
+        folder_id = "99999999"  # Non-existent folder ID
+
+        with pytest.raises(httpx.HTTPStatusError) as exc_info:
+            clickup_client.get_lists(folder_id)
 
         # Should get a 404 or similar error
         assert exc_info.value.response.status_code >= 400

@@ -5,7 +5,7 @@ import json
 import click
 import httpx
 from cucli.api import ClickUpClient
-from cucli.models import Folder, Space, Team, Task
+from cucli.models import ClickUpList, Folder, Space, Team, Task
 
 
 @click.group()
@@ -196,6 +196,76 @@ def folders(space_id: str, format: str, raw: bool, archived: bool) -> None:
             hidden_str = "Yes" if folder.hidden else "No"
             click.echo(
                 f"{folder.id.ljust(max_id)}  {folder.name.ljust(max_name)}  {str(folder.task_count).ljust(max_count)}  {hidden_str}"
+            )
+
+
+@cli.command(name="lists")
+@click.argument("folder_id")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@click.option(
+    "--archived",
+    is_flag=True,
+    help="Include archived lists.",
+)
+def lists(folder_id: str, format: str, raw: bool, archived: bool) -> None:
+    """List lists in a folder.
+
+    FOLDER_ID: The ID of the folder.
+    """
+    try:
+        with ClickUpClient() as client:
+            data = client.get_lists(folder_id, archived=archived)
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            lists_list = [ClickUpList(**lst) for lst in data["lists"]]
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+
+    if format == "json":
+        output = [
+            {
+                "id": lst.id,
+                "name": lst.name,
+                "archived": lst.archived,
+                "task_count": str(lst.task_count),
+            }
+            for lst in lists_list
+        ]
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        if not lists_list:
+            click.echo("No lists found.")
+            return
+
+        # Calculate column widths
+        max_id = max(len(lst.id) for lst in lists_list)
+        max_name = max(len(lst.name) for lst in lists_list)
+        max_count = max(len(str(lst.task_count)) for lst in lists_list)
+
+        # Print header
+        click.echo(
+            f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TASKS'.ljust(max_count)}  {'ARCHIVED'}"
+        )
+        click.echo("-" * (max_id + max_name + max_count + 14))
+
+        # Print rows
+        for lst in lists_list:
+            archived_str = "Yes" if lst.archived else "No"
+            click.echo(
+                f"{lst.id.ljust(max_id)}  {lst.name.ljust(max_name)}  {str(lst.task_count).ljust(max_count)}  {archived_str}"
             )
 
 

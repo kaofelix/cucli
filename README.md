@@ -146,6 +146,49 @@ Output raw JSON:
 cucli folders <space_id> --raw
 ```
 
+### List lists in a folder
+
+```bash
+cucli lists <folder_id>
+```
+
+Output in JSON format (default):
+
+```json
+[
+  {
+    "id": "124",
+    "name": "Updated List Name",
+    "archived": false,
+    "task_count": "0"
+  }
+]
+```
+
+Output in table format:
+
+```bash
+cucli lists <folder_id> --format table
+```
+
+```
+ID      NAME                TASKS  ARCHIVED
+----------------------------------------
+124     Updated List Name   0       No
+```
+
+Include archived lists:
+
+```bash
+cucli lists <folder_id> --archived
+```
+
+Output raw JSON:
+
+```bash
+cucli lists <folder_id> --raw
+```
+
 ### Get task details
 
 ```bash

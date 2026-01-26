@@ -226,6 +226,90 @@ class TestFoldersCommand:
         assert "Error:" in result.output or "CLICKUP_API_KEY" in result.output
 
 
+class TestListsCommand:
+    """Test cases for lists command."""
+
+    @pytest.fixture
+    def runner(self):
+        """Provide a Click CliRunner for testing CLI commands."""
+        return CliRunner()
+
+    @pytest.mark.vcr
+    def test_lists_json_output(self, runner, mock_api_key_env):
+        """Test lists command with JSON output (default)."""
+        folder_id = "901513787576"
+        result = runner.invoke(cli, ["lists", folder_id])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        assert isinstance(output, list)
+        # Validate structure if there are lists
+        if output:
+            lst = output[0]
+            assert "id" in lst
+            assert "name" in lst
+            assert "archived" in lst
+            assert "task_count" in lst
+
+    @pytest.mark.vcr
+    def test_lists_table_output(self, runner, mock_api_key_env):
+        """Test lists command with table output."""
+        folder_id = "901513787576"
+        result = runner.invoke(cli, ["lists", folder_id, "--format", "table"])
+
+        assert result.exit_code == 0
+        # Either show headers if there are lists, or "No lists found"
+        if "No lists found" in result.output:
+            return
+        # Table format should have headers
+        assert "ID" in result.output
+        assert "NAME" in result.output
+        assert "TASKS" in result.output
+        assert "ARCHIVED" in result.output
+
+    @pytest.mark.vcr
+    def test_lists_raw_output(self, runner, mock_api_key_env):
+        """Test lists command with raw JSON output."""
+        folder_id = "901513787576"
+        result = runner.invoke(cli, ["lists", folder_id, "--raw"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+
+        # Raw output should include all fields from API
+        assert "lists" in output
+        assert isinstance(output["lists"], list)
+
+    @pytest.mark.vcr
+    def test_lists_with_archived(self, runner, mock_api_key_env):
+        """Test lists command with archived flag."""
+        folder_id = "901513787576"
+        result = runner.invoke(cli, ["lists", folder_id, "--archived"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert isinstance(output, list)
+
+    @pytest.mark.vcr
+    def test_lists_not_found(self, runner, mock_api_key_env):
+        """Test lists command with non-existent folder ID."""
+        folder_id = "99999999"
+        result = runner.invoke(cli, ["lists", folder_id])
+
+        assert result.exit_code != 0
+        assert "Error" in result.output or "HTTP Error" in result.output
+
+    def test_lists_missing_api_key(self, runner, monkeypatch):
+        """Test lists command fails gracefully without API key."""
+        monkeypatch.delenv("CLICKUP_API_KEY", raising=False)
+        folder_id = "901513787576"
+        result = runner.invoke(cli, ["lists", folder_id])
+
+        assert result.exit_code != 0
+        assert "Error:" in result.output or "CLICKUP_API_KEY" in result.output
+
+
 class TestTaskCommand:
     """Test cases for the task command."""
 
@@ -397,6 +481,7 @@ class TestCLI:
         assert "tasks" in result.output
         assert "spaces" in result.output
         assert "folders" in result.output
+        assert "lists" in result.output
 
     def test_workspaces_help(self, runner):
         """Test workspaces command help."""
@@ -424,6 +509,14 @@ class TestCLI:
     def test_folders_help(self, runner):
         """Test folders command help."""
         result = runner.invoke(cli, ["folders", "--help"])
+        assert result.exit_code == 0
+        assert "--format" in result.output
+        assert "--raw" in result.output
+        assert "--archived" in result.output
+
+    def test_lists_help(self, runner):
+        """Test lists command help."""
+        result = runner.invoke(cli, ["lists", "--help"])
         assert result.exit_code == 0
         assert "--format" in result.output
         assert "--raw" in result.output

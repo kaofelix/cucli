@@ -81,6 +81,28 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def get_lists(
+        self, folder_id: str, *, archived: bool | None = None
+    ) -> dict[str, Any]:
+        """Get lists in a folder.
+
+        Args:
+            folder_id: The folder ID.
+            archived: Include archived lists.
+
+        Returns:
+            The response from the /folder/{folder_id}/list endpoint.
+        """
+        params: dict[str, Any] = {}
+        if archived is not None:
+            params["archived"] = str(archived).lower()
+
+        response = self._client.get(
+            f"{self.base_url}/folder/{folder_id}/list", params=params
+        )
+        response.raise_for_status()
+        return response.json()
+
     def get_task(self, task_id: str) -> dict[str, Any]:
         """Get a task by ID.
 

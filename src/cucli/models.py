@@ -132,5 +132,63 @@ class FoldersResponse(BaseModel):
     folders: list[Folder] = Field(default_factory=list)
 
 
+class FolderReference(BaseModel):
+    """A folder reference within a list."""
+
+    id: str
+    name: str
+    hidden: bool
+    access: bool
+
+
+class SpaceReference(BaseModel):
+    """A space reference within a list."""
+
+    id: str
+    name: str
+    access: bool
+
+
+class ListStatus(BaseModel):
+    """A list status."""
+
+    status: str | None = None
+    color: str | None = None
+    hide_label: bool | None = None
+
+
+class ListPriority(BaseModel):
+    """A list priority."""
+
+    priority: str | None = None
+    color: str | None = None
+
+
+class ClickUpList(BaseModel):
+    """A ClickUp list (named List to avoid conflict with Python's built-in list)."""
+
+    id: str
+    name: str
+    orderindex: int
+    content: str | None = None
+    status: ListStatus | None = None
+    priority: ListPriority | None = None
+    assignee: str | None = None
+    task_count: str | int | None = None
+    due_date: str | None = None
+    start_date: str | None = None
+    folder: FolderReference
+    space: SpaceReference
+    archived: bool
+    override_statuses: bool
+    permission_level: str
+
+
+class ListsResponse(BaseModel):
+    """Response from the /folder/{folder_id}/list endpoint."""
+
+    lists: list[ClickUpList] = Field(default_factory=list)
+
+
 # For raw output when models don't match
 RawResponse = dict[str, Any]
