@@ -2679,6 +2679,188 @@ def delete_key_result(key_result_id: str, yes: bool) -> None:
         raise click.Abort()
 
 
+@cli.command(name="add-dependency")
+@click.argument("task_id")
+@click.option(
+    "--depends-on",
+    "depends_on",
+    help="Task ID that must be completed before this task can start.",
+)
+@click.option(
+    "--dependency-of",
+    "dependency_of",
+    help="Task ID that is waiting for this task to be completed.",
+)
+@click.option(
+    "--custom-task-ids",
+    is_flag=True,
+    help="Use custom task IDs instead of default task IDs.",
+)
+@click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def add_dependency(
+    task_id: str,
+    depends_on: str | None,
+    dependency_of: str | None,
+    custom_task_ids: bool,
+    team_id: str | None,
+    format: str,
+    raw: bool,
+) -> None:
+    """Add a dependency between tasks.
+
+    TASK_ID: The task ID to add the dependency to.
+    """
+    if not depends_on and not dependency_of:
+        click.echo(
+            "Error: Either --depends-on or --dependency-of must be specified.",
+            err=True,
+        )
+        raise click.Abort()
+
+    if custom_task_ids and not team_id:
+        click.echo(
+            "Error: --team-id is required when using --custom-task-ids.",
+            err=True,
+        )
+        raise click.Abort()
+
+    try:
+        with ClickUpClient() as client:
+            data = client.add_dependency(
+                task_id,
+                depends_on=depends_on,
+                dependency_of=dependency_of,
+                custom_task_ids=custom_task_ids,
+                team_id=team_id,
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            if format == "json":
+                output = {"task_id": task_id}
+                if depends_on:
+                    output["depends_on"] = depends_on
+                if dependency_of:
+                    output["dependency_of"] = dependency_of
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"Task ID:     {task_id}")
+                if depends_on:
+                    click.echo(f"Depends On:   {depends_on}")
+                if dependency_of:
+                    click.echo(f"Dependency Of: {dependency_of}")
+                click.echo("Dependency added successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="delete-dependency")
+@click.argument("task_id")
+@click.option(
+    "--depends-on",
+    "depends_on",
+    help="Task ID to remove from depends_on relationship.",
+)
+@click.option(
+    "--dependency-of",
+    "dependency_of",
+    help="Task ID to remove from dependency_of relationship.",
+)
+@click.option(
+    "--custom-task-ids",
+    is_flag=True,
+    help="Use custom task IDs instead of default task IDs.",
+)
+@click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def delete_dependency(
+    task_id: str,
+    depends_on: str | None,
+    dependency_of: str | None,
+    custom_task_ids: bool,
+    team_id: str | None,
+    format: str,
+    raw: bool,
+) -> None:
+    """Delete a dependency between tasks.
+
+    TASK_ID: The task ID to remove the dependency from.
+    """
+    if not depends_on and not dependency_of:
+        click.echo(
+            "Error: Either --depends-on or --dependency-of must be specified.",
+            err=True,
+        )
+        raise click.Abort()
+
+    if custom_task_ids and not team_id:
+        click.echo(
+            "Error: --team-id is required when using --custom-task-ids.",
+            err=True,
+        )
+        raise click.Abort()
+
+    try:
+        with ClickUpClient() as client:
+            data = client.delete_dependency(
+                task_id,
+                depends_on=depends_on,
+                dependency_of=dependency_of,
+                custom_task_ids=custom_task_ids,
+                team_id=team_id,
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            if format == "json":
+                output = {"task_id": task_id}
+                if depends_on:
+                    output["depends_on"] = depends_on
+                if dependency_of:
+                    output["dependency_of"] = dependency_of
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"Task ID:     {task_id}")
+                if depends_on:
+                    click.echo(f"Depends On:   {depends_on}")
+                if dependency_of:
+                    click.echo(f"Dependency Of: {dependency_of}")
+                click.echo("Dependency deleted successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
 def main() -> None:
     """Entry point for the CLI."""
     cli()

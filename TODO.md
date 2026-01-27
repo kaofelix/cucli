@@ -31,7 +31,7 @@
 - [x] Key results (create, update, delete)
 
 ## Planned
-- [ ] Task dependencies
+- [x] Task dependencies
 - [ ] Task attachments
 - [ ] Task links
 - [ ] Webhooks

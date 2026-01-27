@@ -461,6 +461,80 @@ cucli delete-task <task_id> --yes
 cucli delete-task <task_id> -y
 ```
 
+### Add dependency between tasks
+
+```bash
+cucli add-dependency <task_id> --depends-on <depends_on_task_id>
+```
+
+Mark a task as waiting on another task to complete:
+
+```bash
+cucli add-dependency <task_id> --depends-on <depends_on_task_id>
+```
+
+Mark a task as blocking another task:
+
+```bash
+cucli add-dependency <task_id> --dependency-of <blocked_task_id>
+```
+
+Use custom task IDs:
+
+```bash
+cucli add-dependency <task_id> --depends-on <depends_on_task_id> --custom-task-ids --team-id <team_id>
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli add-dependency <task_id> --depends-on <depends_on_task_id>
+
+# Table format
+cucli add-dependency <task_id> --depends-on <depends_on_task_id> --format table
+
+# Raw JSON
+cucli add-dependency <task_id> --depends-on <depends_on_task_id> --raw
+```
+
+### Delete dependency between tasks
+
+```bash
+cucli delete-dependency <task_id> --depends-on <depends_on_task_id>
+```
+
+Remove a dependency where task depends on another:
+
+```bash
+cucli delete-dependency <task_id> --depends-on <depends_on_task_id>
+```
+
+Remove a dependency where task is blocking another:
+
+```bash
+cucli delete-dependency <task_id> --dependency-of <blocked_task_id>
+```
+
+Use custom task IDs:
+
+```bash
+cucli delete-dependency <task_id> --depends-on <depends_on_task_id> --custom-task-ids --team-id <team_id>
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli delete-dependency <task_id> --depends-on <depends_on_task_id>
+
+# Table format
+cucli delete-dependency <task_id> --depends-on <depends_on_task_id> --format table
+
+# Raw JSON
+cucli delete-dependency <task_id> --depends-on <depends_on_task_id> --raw
+```
+
 ### Get task comments
 
 ```bash

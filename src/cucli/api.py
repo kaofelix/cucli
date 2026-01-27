@@ -1245,6 +1245,88 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def add_dependency(
+        self,
+        task_id: str,
+        *,
+        depends_on: str | None = None,
+        dependency_of: str | None = None,
+        custom_task_ids: bool = False,
+        team_id: str | int | None = None,
+    ) -> dict[str, Any]:
+        """Add a dependency between tasks.
+
+        Args:
+            task_id: The task ID that is waiting on or blocking another task.
+            depends_on: The task ID that must be completed before task_id can start.
+            dependency_of: The task ID that is waiting for task_id to be completed.
+            custom_task_ids: Whether to use custom task IDs.
+            team_id: The workspace ID (required when using custom_task_ids).
+
+        Returns:
+            The response from the /task/{task_id}/dependency endpoint.
+        """
+        if depends_on is None and dependency_of is None:
+            raise ValueError("Either depends_on or dependency_of must be provided.")
+
+        data: dict[str, Any] = {}
+        if depends_on is not None:
+            data["depends_on"] = depends_on
+        if dependency_of is not None:
+            data["depedency_of"] = dependency_of
+
+        params: dict[str, Any] = {}
+        if custom_task_ids:
+            params["custom_task_ids"] = "true"
+        if team_id is not None:
+            params["team_id"] = team_id
+
+        response = self._client.post(
+            f"{self.base_url}/task/{task_id}/dependency", params=params, json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def delete_dependency(
+        self,
+        task_id: str,
+        *,
+        depends_on: str | None = None,
+        dependency_of: str | None = None,
+        custom_task_ids: bool = False,
+        team_id: str | int | None = None,
+    ) -> dict[str, Any]:
+        """Delete a dependency between tasks.
+
+        Args:
+            task_id: The task ID.
+            depends_on: The task ID to remove from depends_on relationship.
+            dependency_of: The task ID to remove from dependency_of relationship.
+            custom_task_ids: Whether to use custom task IDs.
+            team_id: The workspace ID (required when using custom_task_ids).
+
+        Returns:
+            The response from the /task/{task_id}/dependency endpoint.
+        """
+        if depends_on is None and dependency_of is None:
+            raise ValueError("Either depends_on or dependency_of must be provided.")
+
+        params: dict[str, Any] = {}
+        if depends_on is not None:
+            params["depends_on"] = depends_on
+        if dependency_of is not None:
+            params["dependency_of"] = dependency_of
+        if custom_task_ids:
+            params["custom_task_ids"] = "true"
+        if team_id is not None:
+            params["team_id"] = team_id
+
+        response = self._client.delete(
+            f"{self.base_url}/task/{task_id}/dependency", params=params
+        )
+        response.raise_for_status()
+        return response.json()
+
     def close(self) -> None:
         """Close the HTTP client."""
         self._client.close()
