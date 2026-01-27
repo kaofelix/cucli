@@ -535,6 +535,33 @@ cucli delete-dependency <task_id> --depends-on <depends_on_task_id> --format tab
 cucli delete-dependency <task_id> --depends-on <depends_on_task_id> --raw
 ```
 
+### Create task attachment
+
+```bash
+cucli create-attachment <task_id> --file /path/to/file
+```
+
+Upload a file to a task as an attachment.
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli create-attachment <task_id> --file /path/to/file.txt
+
+# Table format
+cucli create-attachment <task_id> --file /path/to/file.txt --format table
+
+# Raw JSON (useful for debugging or when models don't match)
+cucli create-attachment <task_id> --file /path/to/file.txt --raw
+```
+
+Use custom task IDs:
+
+```bash
+cucli create-attachment <task_id> --file /path/to/file.txt --custom-task-ids --team-id <team_id>
+```
+
 ### Get task comments
 
 ```bash

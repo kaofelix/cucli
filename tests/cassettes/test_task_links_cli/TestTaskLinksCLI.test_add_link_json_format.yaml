@@ -1,0 +1,124 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - pk_272627274_QZU8LEFFQ2CDW3ASOXATNG51Q2I45PRY
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.clickup.com/api/v2/task/86c7mc19h/link/86c7ujp8z
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAE/61YbYvbOBD+K4v6NWr1/pJPdxwUjnLQg34rxcjyeOPGsY0tb7dd9gfd77g/dqM4
+        2U22B6XUgST2SBrNM8+MpNEDSWHak+0DaSqyJc5Ee4jc78iGxHlK/aHI8m5u22dBgkXKNqQLB8Bh
+        H1DHDccxCe5TEfsuQZdQjpIKpjg2Q2r6bhFMKaR5eppx8IxrrzSXjBW3fr7fTX//hePO3UjT3Qxj
+        fzvCNKE49m0/oqJXnHkGDCX9WMHYdBXcky3fkPR1yBYtxpPHDblsJ9J75oTVr9kPPqi4CgmKOAL+
+        Zddwa5zWjnErbYZ6bJ6H/Hdq9sp4oziX6ml020+Ard3Rf7lrUfUd2rcIwhh3zV3uUId2AvRwni3j
+        W+gQVhj8WrUh8wTjydnvQn/zRxirfupv3v77T9vc43Sxb/M48kp7XRmDEjiEpkVPHeC3fehrwH6v
+        K7jDFnRn3bTwvolpHk/GoKPCNDW3HcBEth8/bcjt2M9D8UL4JaS4gzF3WcHEpmtSE1rURt69RcN+
+        0mQ0Eo2J+7aZEur4uFhEKg+y9qApWKep0pLT0gdDhVIgyhhYNBVOlsK0Pwb3VdCffPwBpnTzxw4W
+        5Tf12B9ufn//Jw47khgzT5k3glGBweu4FupI+2W0iQtCkcYzlRjJfXuXR2MCzd3Va5PgkKF8etyc
+        0BjObShLQw23CtGoijpEQHnUQtbGlSLkLFgXjfOcawR7iUaugUb5MkqlSlppZqhygVNXgqHeRsWd
+        ETUvAeddFY0Q0kiBWi/RYEodScxJI+xTml2R8UNuvAlelCxQzTmiCUFQx6HESHOBBVUbG/O8q6KR
+        3GnrX6DRa3DjQ3SuLD2tdWBUcW+ol6CpZRYqG7ivhcV5fwIN9v7/dJHCaK6w+ZISuwYIAVxK7zmN
+        OiIlsY7UCQg0guR1XTvuRIXzrgTCmbzSXoJwa4Bg0SmmhKNK4LqlYilpwHCikdeV95WTyuQIWAWE
+        ts7nIL0E4dcAgamshSgtlcKVVJX446yzNFZgPRNKO79aOGkn2Mtw4ri6/nqK85qh5SbS0uIypcoS
+        qAOImOLGgxIWl2FYK560cyq75JIKjkeaX0chIzc1s+j8wCqqKlnSIJnCJxtdgFhZiCuhUMpo7VHZ
+        FYpVtkKovQfLBdWAy5KK0WNuG8wNxXw0uPA6kTetNdICUXhuXqJYZQvE0C9DsBV1+EuVjJI63Cko
+        rrEIDpTleq2IUsqK7yNqla2v5LzSzkoqfbRUqaip1wgKNB6yJKa9Y3lVWYMLLaSQmdiriFplywtl
+        4OCco2gwIApmqS9lpNqADL5moOo88UoojBYvI8qssdLKWvgYS00rjjQo7xjFU5ahrA615BGEtAon
+        XgeF4saisisufmnnxlN8Crf50PtwLicTnr4pCnEe/C3qWyxjXhkhAoSTqLwWxRFC6rEuFPZ0lHtE
+        tUMYj2XoUmylfihauIO2uJYPY9OPTfpKtku/aoYin1rO71iIjulKMvRNlwuOpX9qDlCgwc0BC8Xz
+        oKNwGo7Tc6WYliw7aamo6wbaKgNGGyvAThV0sYGTpG26PVRFZitLlgL9+0Ild3uWzp8H9w19kw2/
+        rlm9spIza3QOgRmryKZCb4qzn3DMl37cT0OIsKjzjGuB27MSnGQvtn0MuXrPxqDBCcJS/ZPLjlig
+        jrnY3KU0TNs3b8IwvI5tE/cz/veHN+mNM883C9MujE2HFD6QYS6xG9nWWAZiAby8FrkDFHA/NHgg
+        L/LNweLrU/OTA8lzebohT0RuyBOHmF59d7yMyE+HAxIyIeSQUoi781s80vJ2YWVDprlcnL/BuxEM
+        TBy5OxWCeWzs72BEsm+BZHf0e+jOrE/QF/2A3Dffcnl3xISF9QDjoZmmpu+WAET/xxEDFtCSXLs+
+        3YUcPcrww5XBtlMt+n7sP0NMN3nxCDEC3oNs0zhD1rw0XSngUhkhnXxWsGuqCo3ckNPDcfSGvNBV
+        9y1epKyi6hhNV5q80hwveAjaHNKz7/Gi4fHxPztVT06DEgAA
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 27 Jan 2026 00:18:28 GMT
+      Server:
+      - nginx
+      Server-Timing:
+      - cdn-upstream-layer;desc="EDGE",cdn-upstream-dns;dur=0,cdn-upstream-connect;dur=0,cdn-upstream-fbl;dur=749,cdn-cache-miss,cdn-pop;desc="CDG50-P3",cdn-rid;desc="ksGUaNVNYeyOd5Pos-JUQvv-cOSNfYz9Zx4_vsZkq4MVvj1wNVIYNw==",cdn-downstream-fbl;dur=751
+      Timing-Allow-Origin:
+      - '*'
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 5f4f23e5013b3049948ead330499c1a2.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - ksGUaNVNYeyOd5Pos-JUQvv-cOSNfYz9Zx4_vsZkq4MVvj1wNVIYNw==
+      X-Amz-Cf-Pop:
+      - CDG50-P3
+      X-Cache:
+      - Miss from cloudfront
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - x-datadog-trace-id,server
+      cache-control:
+      - no-cache, no-store
+      content-encoding:
+      - gzip
+      content-language:
+      - en-US
+      content-security-policy:
+      - frame-ancestors 'self'
+      expect-ct:
+      - max-age=0
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Origin
+      - accept-encoding
+      x-content-type-options:
+      - nosniff
+      x-datadog-trace-id:
+      - '3410136537748720522'
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-permitted-cross-domain-policies:
+      - none
+      x-ratelimit-limit:
+      - '100'
+      x-ratelimit-remaining:
+      - '99'
+      x-ratelimit-reset:
+      - '1769473168'
+      x-received-from:
+      - shard-prod-eu-west-1-3
+      x-xss-protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

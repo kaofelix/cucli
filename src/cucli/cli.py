@@ -2861,6 +2861,238 @@ def delete_dependency(
         raise click.Abort()
 
 
+@cli.command(name="add-link")
+@click.argument("task_id")
+@click.option(
+    "--links-to",
+    "links_to",
+    help="Task ID to link to.",
+)
+@click.option(
+    "--custom-task-ids",
+    is_flag=True,
+    help="Use custom task IDs instead of default task IDs.",
+)
+@click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def add_link(
+    task_id: str,
+    links_to: str | None,
+    custom_task_ids: bool,
+    team_id: str | None,
+    format: str,
+    raw: bool,
+) -> None:
+    """Add a link between two tasks.
+
+    TASK_ID: The task ID to initiate the link from.
+    """
+    if not links_to:
+        click.echo(
+            "Error: Either --links-to must be specified.",
+            err=True,
+        )
+        raise click.Abort()
+
+    if custom_task_ids and not team_id:
+        click.echo(
+            "Error: --team-id is required when using --custom-task-ids.",
+            err=True,
+        )
+        raise click.Abort()
+
+    try:
+        with ClickUpClient() as client:
+            data = client.add_task_link(
+                task_id,
+                links_to=links_to,
+                custom_task_ids=custom_task_ids,
+                team_id=team_id,
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            if format == "json":
+                output = {"task_id": task_id, "links_to": links_to}
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"Task ID:   {task_id}")
+                click.echo(f"Links To:  {links_to}")
+                click.echo("Link added successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="delete-link")
+@click.argument("task_id")
+@click.option(
+    "--links-to",
+    "links_to",
+    help="Task ID to unlink from.",
+)
+@click.option(
+    "--custom-task-ids",
+    is_flag=True,
+    help="Use custom task IDs instead of default task IDs.",
+)
+@click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def delete_link(
+    task_id: str,
+    links_to: str | None,
+    custom_task_ids: bool,
+    team_id: str | None,
+    format: str,
+    raw: bool,
+) -> None:
+    """Delete a link between two tasks.
+
+    TASK_ID: The task ID to remove the link from.
+    """
+    if not links_to:
+        click.echo(
+            "Error: Either --links-to must be specified.",
+            err=True,
+        )
+        raise click.Abort()
+
+    if custom_task_ids and not team_id:
+        click.echo(
+            "Error: --team-id is required when using --custom-task-ids.",
+            err=True,
+        )
+        raise click.Abort()
+
+    try:
+        with ClickUpClient() as client:
+            data = client.delete_task_link(
+                task_id,
+                links_to=links_to,
+                custom_task_ids=custom_task_ids,
+                team_id=team_id,
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            if format == "json":
+                output = {"task_id": task_id, "links_to": links_to}
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"Task ID:   {task_id}")
+                click.echo(f"Links To:  {links_to}")
+                click.echo("Link deleted successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
+@cli.command(name="create-attachment")
+@click.argument("task_id")
+@click.option(
+    "--file",
+    "file_path",
+    required=True,
+    help="Path to the file to upload (required).",
+)
+@click.option(
+    "--custom-task-ids",
+    is_flag=True,
+    help="Use custom task IDs instead of default task IDs.",
+)
+@click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "table"], case_sensitive=False),
+    default="json",
+    help="Output format.",
+)
+@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+def create_attachment(
+    task_id: str,
+    file_path: str,
+    custom_task_ids: bool,
+    team_id: str | None,
+    format: str,
+    raw: bool,
+) -> None:
+    """Upload a file as an attachment to a task.
+
+    TASK_ID: The task ID to attach the file to.
+    """
+    if custom_task_ids and not team_id:
+        click.echo(
+            "Error: --team-id is required when using --custom-task-ids.",
+            err=True,
+        )
+        raise click.Abort()
+
+    try:
+        with ClickUpClient() as client:
+            data = client.create_task_attachment(
+                task_id,
+                attachment_path=file_path,
+                custom_task_ids=custom_task_ids,
+                team_id=team_id,
+            )
+
+            if raw:
+                click.echo(json.dumps(data, indent=2))
+                return
+
+            if format == "json":
+                output = {
+                    "id": data.get("id"),
+                    "title": data.get("title"),
+                    "url": data.get("url"),
+                    "extension": data.get("extension"),
+                }
+                click.echo(json.dumps(output, indent=2))
+            elif format == "table":
+                click.echo(f"ID:         {data.get('id')}")
+                click.echo(f"Title:      {data.get('title')}")
+                click.echo(f"Extension:  {data.get('extension')}")
+                click.echo(f"URL:        {data.get('url')}")
+                click.echo("\nAttachment uploaded successfully.")
+    except httpx.HTTPStatusError as e:
+        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
+        raise click.Abort()
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        raise click.Abort()
+    except Exception as e:
+        click.echo(f"Unexpected error: {e}", err=True)
+        raise click.Abort()
+
+
 def main() -> None:
     """Entry point for the CLI."""
     cli()

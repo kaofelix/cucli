@@ -29,10 +29,18 @@
 - [x] Remove tag from task
 - [x] Goals (list, get, create, update, delete)
 - [x] Key results (create, update, delete)
+- [x] Task links (add, delete)
+- [x] Task attachments (create)
 
 ## Planned
-- [x] Task dependencies
 - [ ] Task attachments
-- [ ] Task links
+- [x] Task links
 - [ ] Webhooks
 - [ ] Views
+- [ ] List comments
+- [ ] Get folder details
+- [ ] Update folder
+- [ ] Delete folder
+- [ ] Get list details
+- [ ] Update list
+- [ ] Delete list

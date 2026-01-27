@@ -1,0 +1,96 @@
+interactions:
+- request:
+    body: "--77fe2e519eca26e366c9e8c49d2f3c4d\r\nContent-Disposition: form-data; name=\"attachment\";
+      filename=\"/private/var/folders/7b/pp53qjrs5gd7nd68jk5c0chc0000gn/T/pytest-of-kaofelix/pytest-11/test_create_attachment_raw0/test.txt\"\r\nContent-Type:
+      application/octet-stream\r\n\r\nTest content\r\n--77fe2e519eca26e366c9e8c49d2f3c4d--\r\n"
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - pk_272627274_QZU8LEFFQ2CDW3ASOXATNG51Q2I45PRY
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '316'
+      Content-Type:
+      - multipart/form-data; boundary=77fe2e519eca26e366c9e8c49d2f3c4d
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: https://api.clickup.com/api/v2/task/86c7mc19h/attachment
+  response:
+    body:
+      string: '{"id":"bdd1a9a3-3cda-4de1-906b-25c338a3d403.txt","version":"0","date":1769532331499,"name":"test.txt","title":"test.txt","extension":"txt","source":1,"thumbnail_small":null,"thumbnail_medium":null,"thumbnail_large":null,"url":"https://t90152245421.p.clickup-attachments.com/t90152245421/bdd1a9a3-3cda-4de1-906b-25c338a3d403/test.txt","url_w_query":"https://t90152245421.p.clickup-attachments.com/t90152245421/bdd1a9a3-3cda-4de1-906b-25c338a3d403/test.txt?view=open","url_w_host":"https://t90152245421.p.clickup-attachments.com/t90152245421/bdd1a9a3-3cda-4de1-906b-25c338a3d403/test.txt"}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '587'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 27 Jan 2026 16:45:31 GMT
+      Server:
+      - nginx
+      Server-Timing:
+      - cdn-upstream-layer;desc="EDGE",cdn-upstream-dns;dur=0,cdn-upstream-connect;dur=0,cdn-upstream-fbl;dur=427,cdn-cache-miss,cdn-pop;desc="BCN50-P2",cdn-rid;desc="DlNBFISvScavFMUPQJCkMzwgOZzDoIN4FdGehYfBrpPktEhqHQcypg==",cdn-downstream-fbl;dur=432
+      Timing-Allow-Origin:
+      - '*'
+      Via:
+      - 1.1 83e65135bbd5c350d37dc79cfa0bcf7c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - DlNBFISvScavFMUPQJCkMzwgOZzDoIN4FdGehYfBrpPktEhqHQcypg==
+      X-Amz-Cf-Pop:
+      - BCN50-P2
+      X-Cache:
+      - Miss from cloudfront
+      access-control-allow-credentials:
+      - 'true'
+      access-control-allow-origin:
+      - '*'
+      access-control-expose-headers:
+      - x-datadog-trace-id,server
+      cache-control:
+      - no-cache, no-store
+      content-language:
+      - en-US
+      content-security-policy:
+      - frame-ancestors 'self'
+      expect-ct:
+      - max-age=0
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-datadog-trace-id:
+      - '4018901522781790525'
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-permitted-cross-domain-policies:
+      - none
+      x-ratelimit-limit:
+      - '100'
+      x-ratelimit-remaining:
+      - '97'
+      x-ratelimit-reset:
+      - '1769532389'
+      x-received-from:
+      - shard-prod-eu-west-1-3
+      x-xss-protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1327,9 +1327,109 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
-    def close(self) -> None:
-        """Close the HTTP client."""
-        self._client.close()
+    def add_task_link(
+        self,
+        task_id: str,
+        *,
+        links_to: str | None = None,
+        custom_task_ids: bool = False,
+        team_id: str | int | None = None,
+    ) -> dict[str, Any]:
+        """Add a link between two tasks.
+
+        Args:
+            task_id: The task to initiate the link from.
+            links_to: The task to link to.
+            custom_task_ids: Whether to use custom task IDs.
+            team_id: The workspace ID (required when using custom_task_ids).
+
+        Returns:
+            The response from the /task/{task_id}/link/{links_to} endpoint.
+        """
+        if links_to is None:
+            raise ValueError("links_to must be provided.")
+
+        params: dict[str, Any] = {}
+        if custom_task_ids:
+            params["custom_task_ids"] = "true"
+        if team_id is not None:
+            params["team_id"] = team_id
+
+        response = self._client.post(
+            f"{self.base_url}/task/{task_id}/link/{links_to}", params=params
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def delete_task_link(
+        self,
+        task_id: str,
+        *,
+        links_to: str | None = None,
+        custom_task_ids: bool = False,
+        team_id: str | int | None = None,
+    ) -> dict[str, Any]:
+        """Delete a link between two tasks.
+
+        Args:
+            task_id: The task to remove the link from.
+            links_to: The linked task ID to remove.
+            custom_task_ids: Whether to use custom task IDs.
+            team_id: The workspace ID (required when using custom_task_ids).
+
+        Returns:
+            The response from the /task/{task_id}/link/{links_to} endpoint.
+        """
+        if links_to is None:
+            raise ValueError("links_to must be provided.")
+
+        params: dict[str, Any] = {}
+        if custom_task_ids:
+            params["custom_task_ids"] = "true"
+        if team_id is not None:
+            params["team_id"] = team_id
+
+        response = self._client.delete(
+            f"{self.base_url}/task/{task_id}/link/{links_to}", params=params
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def create_task_attachment(
+        self,
+        task_id: str,
+        *,
+        attachment_path: str,
+        custom_task_ids: bool = False,
+        team_id: str | int | None = None,
+    ) -> dict[str, Any]:
+        """Upload a file as an attachment to a task.
+
+        Args:
+            task_id: The task ID to attach the file to.
+            attachment_path: Path to the file to upload.
+            custom_task_ids: Whether to use custom task IDs.
+            team_id: The workspace ID (required when using custom_task_ids).
+
+        Returns:
+            The response from the /task/{task_id}/attachment endpoint.
+        """
+        params: dict[str, Any] = {}
+        if custom_task_ids:
+            params["custom_task_ids"] = "true"
+        if team_id is not None:
+            params["team_id"] = team_id
+
+        # Open the file in binary mode
+        with open(attachment_path, "rb") as f:
+            files = {"attachment": (attachment_path, f, "application/octet-stream")}
+            response = self._client.post(
+                f"{self.base_url}/task/{task_id}/attachment",
+                params=params,
+                files=files,
+            )
+            response.raise_for_status()
+            return response.json()
 
     def __enter__(self) -> "ClickUpClient":
         """Context manager entry."""
@@ -1338,3 +1438,7 @@ class ClickUpClient:
     def __exit__(self, *_: Any) -> None:
         """Context manager exit."""
         self.close()
+
+    def close(self) -> None:
+        """Close the HTTP client."""
+        self._client.close()
