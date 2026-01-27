@@ -2,7 +2,6 @@
 
 import json
 import pytest
-from click.testing import CliRunner
 from cucli.cli import cli
 
 
@@ -19,7 +18,9 @@ class TestTaskAttachmentsCLI:
         assert result.exit_code != 0
         assert "Missing option '--file'" in result.output
 
-    def test_create_attachment_custom_ids_requires_team_id(self, runner, mock_api_key_env):
+    def test_create_attachment_custom_ids_requires_team_id(
+        self, runner, mock_api_key_env
+    ):
         """Test that create-attachment command requires --team-id when using --custom-task-ids."""
         result = runner.invoke(
             cli,
@@ -33,7 +34,9 @@ class TestTaskAttachmentsCLI:
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code != 0
-        assert "Error: --team-id is required when using --custom-task-ids" in result.output
+        assert (
+            "Error: --team-id is required when using --custom-task-ids" in result.output
+        )
 
     @pytest.mark.vcr
     def test_create_attachment_json_format(self, runner, mock_api_key_env, tmp_path):
@@ -64,7 +67,14 @@ class TestTaskAttachmentsCLI:
 
         result = runner.invoke(
             cli,
-            ["create-attachment", "86c7mc19h", "--file", str(test_file), "--format", "table"],
+            [
+                "create-attachment",
+                "86c7mc19h",
+                "--file",
+                str(test_file),
+                "--format",
+                "table",
+            ],
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code == 0

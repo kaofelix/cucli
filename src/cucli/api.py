@@ -99,6 +99,50 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def get_folder(self, folder_id: str | int) -> dict[str, Any]:
+        """Get a folder by ID.
+
+        Args:
+            folder_id: The folder ID.
+
+        Returns:
+            The response from the /folder/{folder_id} endpoint.
+        """
+        response = self._client.get(f"{self.base_url}/folder/{folder_id}")
+        response.raise_for_status()
+        return response.json()
+
+    def update_folder(self, folder_id: str | int, *, name: str) -> dict[str, Any]:
+        """Update a folder.
+
+        Args:
+            folder_id: The folder ID to update.
+            name: The new folder name.
+
+        Returns:
+            The response from the /folder/{folder_id} endpoint.
+        """
+        data: dict[str, Any] = {"name": name}
+
+        response = self._client.put(f"{self.base_url}/folder/{folder_id}", json=data)
+        response.raise_for_status()
+        return response.json()
+
+    def delete_folder(self, folder_id: str | int) -> dict[str, Any] | None:
+        """Delete a folder.
+
+        Args:
+            folder_id: The folder ID to delete.
+
+        Returns:
+            None (204 No Content) or response dict.
+        """
+        response = self._client.delete(f"{self.base_url}/folder/{folder_id}")
+        if response.status_code == 204:
+            return None
+        response.raise_for_status()
+        return response.json()
+
     def get_lists(
         self, folder_id: str, *, archived: bool | None = None
     ) -> dict[str, Any]:
@@ -502,6 +546,67 @@ class ClickUpClient:
 
         response = self._client.post(
             f"{self.base_url}/task/{task_id}/comment", json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def get_list_comments(
+        self,
+        list_id: str | int,
+        *,
+        start: int | None = None,
+        start_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Get comments from a list.
+
+        Args:
+            list_id: The list ID.
+            start: The Unix timestamp (in milliseconds) of the reference comment for pagination.
+            start_id: The unique ID of the reference comment for pagination.
+
+        Returns:
+            The response from the /list/{list_id}/comment endpoint.
+        """
+        params: dict[str, Any] = {}
+
+        if start is not None:
+            params["start"] = start
+        if start_id is not None:
+            params["start_id"] = start_id
+
+        response = self._client.get(
+            f"{self.base_url}/list/{list_id}/comment", params=params
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def create_list_comment(
+        self,
+        list_id: str | int,
+        comment_text: str,
+        *,
+        assignee: int | None = None,
+        notify_all: bool = True,
+    ) -> dict[str, Any]:
+        """Create a comment on a list.
+
+        Args:
+            list_id: The list ID.
+            comment_text: The comment text (required).
+            assignee: Assignee user ID to assign the comment to.
+            notify_all: Whether to notify everyone including the creator.
+
+        Returns:
+            The response from the /list/{list_id}/comment endpoint.
+        """
+        data: dict[str, Any] = {
+            "comment_text": comment_text,
+            "assignee": assignee,
+            "notify_all": notify_all,
+        }
+
+        response = self._client.post(
+            f"{self.base_url}/list/{list_id}/comment", json=data
         )
         response.raise_for_status()
         return response.json()

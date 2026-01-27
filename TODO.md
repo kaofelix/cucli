@@ -14,6 +14,8 @@
 - [x] Delete task
 - [x] Get task comments
 - [x] Add task comment
+- [x] Get list comments
+- [x] Add list comment
 - [x] Create folder
 - [x] Create list
 - [x] Task checklists (create, create items, update, delete)
@@ -33,14 +35,10 @@
 - [x] Task attachments (create)
 
 ## Planned
-- [ ] Task attachments
-- [x] Task links
-- [ ] Webhooks
-- [ ] Views
 - [ ] List comments
-- [ ] Get folder details
-- [ ] Update folder
-- [ ] Delete folder
-- [ ] Get list details
-- [ ] Update list
-- [ ] Delete list
+- [ ] Folder CLI commands (get, update, delete)
+- [ ] List details (get single list)
+- [ ] List update
+- [ ] List delete
+- [ ] Webhooks (create, list, get, update, delete)
+- [ ] Views (get team views, get space views, get folder views, get list views, get view details)

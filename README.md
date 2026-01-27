@@ -629,6 +629,73 @@ cucli add-comment <task_id> --text "Comment text" --format table
 cucli add-comment <task_id> --text "Comment text" --raw
 ```
 
+### Get list comments
+
+```bash
+cucli list-comments <list_id>
+```
+
+Output in JSON format (default):
+
+```json
+[
+  {
+    "id": "462",
+    "text": "List comment content",
+    "user": "john.doe",
+    "resolved": false,
+    "date": "1234567890123"
+  }
+]
+```
+
+Output in table format:
+
+```bash
+cucli list-comments <list_id> --format table
+```
+
+```
+ID              USER        TEXT                           RESOLVED
+------------------------------------------------------------------------
+462             john.doe    List comment content            No
+```
+
+Output raw JSON:
+
+```bash
+cucli list-comments <list_id> --raw
+```
+
+### Add comment to list
+
+```bash
+cucli add-list-comment <list_id> --text "Comment text"
+```
+
+Add comment with additional options:
+
+```bash
+# With assignee
+cucli add-list-comment <list_id> --text "Comment text" --assignee 123
+
+# Don't notify everyone
+cucli add-list-comment <list_id> --text "Comment text" --no-notify
+```
+
+Output in different formats:
+
+```bash
+# JSON (default)
+cucli add-list-comment <list_id> --text "Comment text"
+
+# Table format
+cucli add-list-comment <list_id> --text "Comment text" --format table
+
+# Raw JSON (useful for debugging or when models don't match)
+cucli add-list-comment <list_id> --text "Comment text" --raw
+```
+
 ### Get help
 
 ```bash

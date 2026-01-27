@@ -123,7 +123,7 @@ class Folder(BaseModel):
     hidden: bool
     space: FolderSpaceReference
     task_count: str
-    lists: list[str] = Field(default_factory=list)
+    lists: list["ClickUpList"] = Field(default_factory=list)
 
 
 class FoldersResponse(BaseModel):

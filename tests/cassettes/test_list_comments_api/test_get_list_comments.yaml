@@ -1,0 +1,98 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - pk_272627274_QZU8LEFFQ2CDW3ASOXATNG51Q2I45PRY
+      Connection:
+      - keep-alive
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.clickup.com/api/v2/list/901520401736/comment
+  response:
+    body:
+      string: "{\"comments\":[{\"id\":\"90150189586874\",\"comment\":[{\"text\":\"Test
+        list comment with assignee\"}],\"comment_text\":\"Test list comment with assignee\",\"user\":{\"id\":272627274,\"username\":\"Kao
+        Cardoso F\xE9lix\",\"email\":\"me@kaofelix.dev\",\"color\":\"#595d66\",\"initials\":\"KF\",\"profilePicture\":null},\"resolved\":false,\"assignee\":{\"id\":272627274,\"username\":\"Kao
+        Cardoso F\xE9lix\",\"email\":\"me@kaofelix.dev\",\"color\":\"#595d66\",\"initials\":\"KF\",\"profilePicture\":null},\"group_assignee\":null,\"assigned_by\":{\"id\":272627274,\"username\":\"Kao
+        Cardoso F\xE9lix\",\"email\":\"me@kaofelix.dev\",\"color\":\"#595d66\",\"initials\":\"KF\",\"profilePicture\":null},\"reactions\":[],\"date\":\"1769535459837\",\"reply_count\":0},{\"id\":\"90150189586872\",\"comment\":[{\"text\":\"Test
+        list comment\"}],\"comment_text\":\"Test list comment\",\"user\":{\"id\":272627274,\"username\":\"Kao
+        Cardoso F\xE9lix\",\"email\":\"me@kaofelix.dev\",\"color\":\"#595d66\",\"initials\":\"KF\",\"profilePicture\":null},\"assignee\":null,\"group_assignee\":null,\"reactions\":[],\"date\":\"1769535459467\",\"reply_count\":0}]}"
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '990'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 27 Jan 2026 17:38:12 GMT
+      Server:
+      - nginx
+      Server-Timing:
+      - cdn-upstream-layer;desc="EDGE",cdn-upstream-dns;dur=0,cdn-upstream-connect;dur=0,cdn-upstream-fbl;dur=148,cdn-cache-miss,cdn-pop;desc="BCN50-P2",cdn-rid;desc="lCs37JydH5RaADRracsOZUCYXQdrQCeqrvg7wIXbCdkxNGzAJg82KQ==",cdn-downstream-fbl;dur=175
+      Timing-Allow-Origin:
+      - '*'
+      Via:
+      - 1.1 38fc40d2e799d9e91b382cc792e964ec.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - lCs37JydH5RaADRracsOZUCYXQdrQCeqrvg7wIXbCdkxNGzAJg82KQ==
+      X-Amz-Cf-Pop:
+      - BCN50-P2
+      X-Cache:
+      - Miss from cloudfront
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - x-datadog-trace-id,server
+      cache-control:
+      - no-cache, no-store
+      content-language:
+      - en-US
+      content-security-policy:
+      - frame-ancestors 'self'
+      expect-ct:
+      - max-age=0
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Origin
+      x-content-type-options:
+      - nosniff
+      x-datadog-trace-id:
+      - '7869875540963766217'
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-permitted-cross-domain-policies:
+      - none
+      x-ratelimit-limit:
+      - '100'
+      x-ratelimit-remaining:
+      - '99'
+      x-ratelimit-reset:
+      - '1769535553'
+      x-received-from:
+      - shard-prod-eu-west-1-3
+      x-xss-protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

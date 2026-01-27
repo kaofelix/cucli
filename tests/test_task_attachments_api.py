@@ -1,7 +1,6 @@
 """Tests for task attachments API."""
 
 import pytest
-from cucli.models import Task
 
 
 class TestTaskAttachmentsAPI:

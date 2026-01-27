@@ -1,0 +1,104 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - pk_272627274_QZU8LEFFQ2CDW3ASOXATNG51Q2I45PRY
+      Connection:
+      - keep-alive
+      Host:
+      - api.clickup.com
+      User-Agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://api.clickup.com/api/v2/list/901520401736/comment
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAE/+1XS07DMBC9SmS2EcrPn3SFhMSGDQt2CFUmmYKFE1exU1pVPRDn4GJMmoKgtNQS
+        C6oqi0TK+NmOn96bGS9JYaoKamfJ6G5JVElGJI9iGsUip0JkaUTCD8ga4WDuEHML1gVa4Wszn6zu
+        P4HjvaCQtBYaMup3SnjC8OFZH65lBbj0tTTBpWxKY01w9faq1Rx/ASqpNA5WcPEszQQwel7CDEcK
+        ow2uSM5oTkvGMKJq5ZTUFuHXV/g9bcxEabhRhWsb3KFutV6FRFqrHmvYBELy2Jh2Ot6ONiALp0yN
+        q93hCUvpcAKJOctpShkVacRxiwamejEuTFsjOdEq7M/3jcmkwxU92QOTIfnBZJTmnkymiDtNJhuw
+        Rs8AXThBAcNXkfaSQrv8o2V2W2RjmXL8sDgOZx/wLOdZhgry8GzcpZNi8Oy+7MdjIfyYjDrcwOTe
+        OsJS5pX9eMx9K3LwotxTsDEneNXnrSl9WT4WTw+ZUc3/2vP8mhmzPKHcKzPyeK3Wwc97/IxMJiLx
+        yYxMrBn3YXLLnD799taUwc8h8bwcnEKnk9FcpN2t42Cngyrs1OqjQq86gspv7Qnd85DJjO1g8n71
+        Dj4v/o9ADwAA
+    headers:
+      Access-Control-Allow-Origin:
+      - '*'
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 27 Jan 2026 17:41:19 GMT
+      Server:
+      - nginx
+      Server-Timing:
+      - cdn-upstream-layer;desc="EDGE",cdn-upstream-dns;dur=0,cdn-upstream-connect;dur=0,cdn-upstream-fbl;dur=150,cdn-cache-miss,cdn-pop;desc="BCN50-P2",cdn-rid;desc="nPBCJk-2IIyaGMvQOChI11HCult31gb9rJuHCWD96Ymx511kg50wuQ==",cdn-downstream-fbl;dur=153
+      Timing-Allow-Origin:
+      - '*'
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 75b9bdd59371b81ea5dc267da9de4d44.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - nPBCJk-2IIyaGMvQOChI11HCult31gb9rJuHCWD96Ymx511kg50wuQ==
+      X-Amz-Cf-Pop:
+      - BCN50-P2
+      X-Cache:
+      - Miss from cloudfront
+      access-control-allow-credentials:
+      - 'true'
+      access-control-expose-headers:
+      - x-datadog-trace-id,server
+      cache-control:
+      - no-cache, no-store
+      content-encoding:
+      - gzip
+      content-language:
+      - en-US
+      content-security-policy:
+      - frame-ancestors 'self'
+      expect-ct:
+      - max-age=0
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Origin
+      - accept-encoding
+      x-content-type-options:
+      - nosniff
+      x-datadog-trace-id:
+      - '6753036764387808427'
+      x-dns-prefetch-control:
+      - 'off'
+      x-download-options:
+      - noopen
+      x-permitted-cross-domain-policies:
+      - none
+      x-ratelimit-limit:
+      - '100'
+      x-ratelimit-remaining:
+      - '99'
+      x-ratelimit-reset:
+      - '1769535740'
+      x-received-from:
+      - shard-prod-eu-west-1-3
+      x-xss-protection:
+      - '0'
+    status:
+      code: 200
+      message: OK
+version: 1

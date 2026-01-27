@@ -2,7 +2,6 @@
 
 import json
 import pytest
-from click.testing import CliRunner
 from cucli.cli import cli
 
 
@@ -48,7 +47,9 @@ class TestTaskLinksCLI:
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code != 0
-        assert "Error: --team-id is required when using --custom-task-ids" in result.output
+        assert (
+            "Error: --team-id is required when using --custom-task-ids" in result.output
+        )
 
     def test_delete_link_custom_ids_requires_team_id(self, runner, mock_api_key_env):
         """Test that delete-link command requires --team-id when using --custom-task-ids."""
@@ -64,7 +65,9 @@ class TestTaskLinksCLI:
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code != 0
-        assert "Error: --team-id is required when using --custom-task-ids" in result.output
+        assert (
+            "Error: --team-id is required when using --custom-task-ids" in result.output
+        )
 
     @pytest.mark.vcr
     def test_add_link_json_format(self, runner, mock_api_key_env):
@@ -118,7 +121,14 @@ class TestTaskLinksCLI:
         """Test deleting a task link with table output format."""
         result = runner.invoke(
             cli,
-            ["delete-link", "86c7mc19h", "--links-to", "86c7ujp8z", "--format", "table"],
+            [
+                "delete-link",
+                "86c7mc19h",
+                "--links-to",
+                "86c7ujp8z",
+                "--format",
+                "table",
+            ],
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code == 0
