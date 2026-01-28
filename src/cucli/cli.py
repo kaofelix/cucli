@@ -4,7 +4,7 @@ import json
 
 import click
 from cucli.api import ClickUpClient, with_client
-from cucli.decorators import handle_api_errors
+from cucli.decorators import common_output_options, handle_api_errors
 from cucli.models import (
     Checklist,
     ClickUpList,
@@ -27,13 +27,7 @@ def cli() -> None:
 
 
 @cli.command(name="workspaces")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def workspaces(format: str, raw: bool) -> None:
     """List your ClickUp workspaces."""
@@ -71,13 +65,7 @@ def workspaces(format: str, raw: bool) -> None:
 
 @cli.command(name="spaces")
 @click.argument("team_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @click.option(
     "--archived",
     is_flag=True,
@@ -131,13 +119,7 @@ def spaces(team_id: str, format: str, raw: bool, archived: bool) -> None:
 
 @cli.command(name="folders")
 @click.argument("space_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @click.option(
     "--archived",
     is_flag=True,
@@ -195,13 +177,7 @@ def folders(space_id: str, format: str, raw: bool, archived: bool) -> None:
 @cli.command(name="create-folder")
 @click.argument("space_id")
 @click.option("--name", required=True, help="Folder name (required).")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def create_folder(space_id: str, name: str, format: str, raw: bool) -> None:
     """Create a new folder in a space.
@@ -231,13 +207,7 @@ def create_folder(space_id: str, name: str, format: str, raw: bool) -> None:
 
 @cli.command(name="folder")
 @click.argument("folder_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def folder(folder_id: str, format: str, raw: bool) -> None:
     """Get details for a specific folder.
@@ -268,13 +238,7 @@ def folder(folder_id: str, format: str, raw: bool) -> None:
 @cli.command(name="update-folder")
 @click.argument("folder_id")
 @click.option("--name", required=True, help="New folder name (required).")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def update_folder_cli(folder_id: str, name: str, format: str, raw: bool) -> None:
     """Update a folder.
@@ -341,13 +305,7 @@ def delete_folder(folder_id: str, yes: bool) -> None:
 )
 @click.option("--assignee", type=int, help="Assignee user ID to assign the list to.")
 @click.option("--status", help="List status (color).")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def create_list(
     folder_id: str,
@@ -402,13 +360,7 @@ def create_list(
 
 @cli.command(name="lists")
 @click.argument("folder_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @click.option(
     "--archived",
     is_flag=True,
@@ -465,13 +417,7 @@ def lists(folder_id: str, format: str, raw: bool, archived: bool) -> None:
 
 @cli.command(name="list")
 @click.argument("list_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def get_list_cli(list_id: str, format: str, raw: bool) -> None:
     """Get details for a specific list.
@@ -528,13 +474,7 @@ def get_list_cli(list_id: str, format: str, raw: bool) -> None:
 @click.option("--assignee", type=int, help="Assignee user ID.")
 @click.option("--status", help="List status (color).")
 @click.option("--unset-status", is_flag=True, help="Remove list status (color).")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def update_list_cli(
     list_id: str,
@@ -698,13 +638,7 @@ def task(task_id: str, format: str, raw: bool, md_only: bool) -> None:
 
 @cli.command(name="tasks")
 @click.argument("team_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @click.option("--page", type=int, help="Page to fetch (starts at 0).")
 @click.option("--status", multiple=True, help="Filter by status (can use multiple).")
 @click.option(
@@ -835,13 +769,7 @@ def tasks(
 )
 @click.option("--points", type=int, help="Sprint points.")
 @click.option("--parent", help="Parent task ID (for subtasks).")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def create_task(
     list_id: str,
@@ -949,13 +877,7 @@ def create_task(
     type=int,
     help="Assignee user ID to remove (can use multiple).",
 )
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def update_task(
     task_id: str,
@@ -1051,13 +973,7 @@ def delete_task(task_id: str, yes: bool) -> None:
 
 @cli.command(name="task-comments")
 @click.argument("task_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def task_comments(task_id: str, format: str, raw: bool) -> None:
     """List comments on a task.
@@ -1120,13 +1036,7 @@ def task_comments(task_id: str, format: str, raw: bool) -> None:
 @click.option(
     "--no-notify", is_flag=True, help="Don't notify everyone (default: notify all)."
 )
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def add_comment(
     task_id: str,
@@ -1162,13 +1072,7 @@ def add_comment(
 
 @cli.command(name="list-comments")
 @click.argument("list_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def list_comments(list_id: str, format: str, raw: bool) -> None:
     """List comments on a list.
@@ -1231,13 +1135,7 @@ def list_comments(list_id: str, format: str, raw: bool) -> None:
 @click.option(
     "--no-notify", is_flag=True, help="Don't notify everyone (default: notify all)."
 )
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def add_list_comment(
     list_id: str,
@@ -1274,13 +1172,7 @@ def add_list_comment(
 @cli.command(name="create-checklist")
 @click.argument("task_id")
 @click.option("--name", required=True, help="Checklist name (required).")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def create_checklist(task_id: str, name: str, format: str, raw: bool) -> None:
     """Create a new checklist on a task.
@@ -1316,13 +1208,7 @@ def create_checklist(task_id: str, name: str, format: str, raw: bool) -> None:
 @click.argument("checklist_id")
 @click.option("--name", required=True, help="Checklist item name (required).")
 @click.option("--assignee", type=int, help="Assignee user ID.")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def create_checklist_item(
     checklist_id: str, name: str, assignee: int | None, format: str, raw: bool
@@ -1368,13 +1254,7 @@ def create_checklist_item(
     type=int,
     help="Position of the checklist (order).",
 )
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def update_checklist(
     checklist_id: str, name: str | None, position: int | None, format: str, raw: bool
@@ -1416,13 +1296,7 @@ def update_checklist(
     "--parent",
     help="Parent checklist item ID (for nesting).",
 )
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def update_checklist_item(
     checklist_id: str,
@@ -1527,13 +1401,7 @@ def delete_checklist_item(checklist_id: str, checklist_item_id: str, yes: bool) 
 
 @cli.command(name="task-members")
 @click.argument("task_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def task_members(task_id: str, format: str, raw: bool) -> None:
     """Get members with explicit access to a task.
@@ -1582,13 +1450,7 @@ def task_members(task_id: str, format: str, raw: bool) -> None:
 
 @cli.command(name="list-members")
 @click.argument("list_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def list_members(list_id: str, format: str, raw: bool) -> None:
     """Get members with explicit access to a list.
@@ -1637,13 +1499,7 @@ def list_members(list_id: str, format: str, raw: bool) -> None:
 
 @cli.command(name="tags")
 @click.argument("space_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def tags(space_id: str, format: str, raw: bool) -> None:
     """List tags in a space.
@@ -1700,13 +1556,7 @@ def tags(space_id: str, format: str, raw: bool) -> None:
     required=True,
     help="Tag background color (hex, e.g., #FFFFFF).",
 )
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def create_tag(
     space_id: str, name: str, fg_color: str, bg_color: str, format: str, raw: bool
@@ -1740,13 +1590,7 @@ def create_tag(
 @cli.command(name="add-tag")
 @click.argument("task_id")
 @click.argument("tag_name")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def add_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
     """Add a tag to a task.
@@ -1775,13 +1619,7 @@ def add_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
 @cli.command(name="remove-tag")
 @click.argument("task_id")
 @click.argument("tag_name")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def remove_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
     """Remove a tag from a task.
@@ -1809,13 +1647,7 @@ def remove_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
 
 @cli.command(name="running-time-entry")
 @click.argument("team_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def running_time_entry(team_id: str, format: str, raw: bool) -> None:
     """Get the currently running time entry.
@@ -1859,13 +1691,7 @@ def running_time_entry(team_id: str, format: str, raw: bool) -> None:
 @click.option("--description", help="Time entry description.")
 @click.option("--task-id", help="Task ID to associate with the time entry.")
 @click.option("--billable", is_flag=True, help="Mark the time entry as billable.")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def start_time_entry(
     team_id: str,
@@ -1915,13 +1741,7 @@ def start_time_entry(
 
 @cli.command(name="stop-time-entry")
 @click.argument("team_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def stop_time_entry(team_id: str, format: str, raw: bool) -> None:
     """Stop the currently running time entry.
@@ -1973,13 +1793,7 @@ def stop_time_entry(team_id: str, format: str, raw: bool) -> None:
 @click.option("--list-id", type=int, help="Filter by list ID.")
 @click.option("--task-id", help="Filter by task ID.")
 @click.option("--billable", is_flag=True, help="Filter by billable entries.")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def time_entries(
     team_id: str,
@@ -2079,13 +1893,7 @@ def time_entries(
 @click.option("--description", help="Time entry description.")
 @click.option("--task-id", help="Task ID to associate with the time entry.")
 @click.option("--billable", is_flag=True, help="Mark the time entry as billable.")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def create_time_entry(
     team_id: str,
@@ -2149,13 +1957,7 @@ def create_time_entry(
 @click.option("--duration", type=int, help="Duration in milliseconds.")
 @click.option("--task-id", help="Task ID to associate with the time entry.")
 @click.option("--billable", is_flag=True, help="Mark the time entry as billable.")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 def update_time_entry(
     team_id: str,
     timer_id: str,
@@ -2257,13 +2059,7 @@ def delete_time_entry(team_id: str, timer_id: str, yes: bool) -> None:
     help="Use custom task IDs instead of default task IDs.",
 )
 @click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def add_dependency(
     task_id: str,
@@ -2339,13 +2135,7 @@ def add_dependency(
     help="Use custom task IDs instead of default task IDs.",
 )
 @click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def delete_dependency(
     task_id: str,
@@ -2416,13 +2206,7 @@ def delete_dependency(
     help="Use custom task IDs instead of default task IDs.",
 )
 @click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def add_link(
     task_id: str,
@@ -2484,13 +2268,7 @@ def add_link(
     help="Use custom task IDs instead of default task IDs.",
 )
 @click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def delete_link(
     task_id: str,
@@ -2553,13 +2331,7 @@ def delete_link(
     help="Use custom task IDs instead of default task IDs.",
 )
 @click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def create_attachment(
     task_id: str,
@@ -2610,13 +2382,7 @@ def create_attachment(
 
 @cli.command(name="team-views")
 @click.argument("team_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def team_views(team_id: str, format: str, raw: bool) -> None:
     """List views in a workspace (team).
@@ -2664,13 +2430,7 @@ def team_views(team_id: str, format: str, raw: bool) -> None:
 
 @cli.command(name="space-views")
 @click.argument("space_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def space_views(space_id: str, format: str, raw: bool) -> None:
     """List views in a space.
@@ -2718,13 +2478,7 @@ def space_views(space_id: str, format: str, raw: bool) -> None:
 
 @cli.command(name="folder-views")
 @click.argument("folder_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def folder_views(folder_id: str, format: str, raw: bool) -> None:
     """List views in a folder.
@@ -2772,13 +2526,7 @@ def folder_views(folder_id: str, format: str, raw: bool) -> None:
 
 @cli.command(name="list-views")
 @click.argument("list_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def list_views(list_id: str, format: str, raw: bool) -> None:
     """List views in a list.
@@ -2826,13 +2574,7 @@ def list_views(list_id: str, format: str, raw: bool) -> None:
 
 @cli.command(name="view")
 @click.argument("view_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def view(view_id: str, format: str, raw: bool) -> None:
     """Get details for a specific view.
@@ -2866,13 +2608,7 @@ def view(view_id: str, format: str, raw: bool) -> None:
 
 @cli.command(name="webhooks")
 @click.argument("team_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def webhooks(team_id: str, format: str, raw: bool) -> None:
     """List webhooks in a workspace.
@@ -2937,13 +2673,7 @@ def webhooks(team_id: str, format: str, raw: bool) -> None:
     multiple=True,
     help="Event to subscribe to (can be specified multiple times).",
 )
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def create_webhook(
     team_id: str,
@@ -2993,13 +2723,7 @@ def create_webhook(
 @click.option("--endpoint", help="The webhook endpoint URL.")
 @click.option("--event", help="Events to subscribe to (use * for all events).")
 @click.option("--status", help="The webhook status (e.g., active).")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"], case_sensitive=False),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@common_output_options
 @handle_api_errors
 def update_webhook_cli(
     webhook_id: str,
