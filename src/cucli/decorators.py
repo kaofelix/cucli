@@ -23,6 +23,7 @@ def handle_api_errors(func: Callable) -> Callable:
     Returns:
         The wrapped function with error handling.
     """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:

@@ -29,8 +29,6 @@
 - [x] Create space tag
 - [x] Add tag to task
 - [x] Remove tag from task
-- [x] Goals (list, get, create, update, delete)
-- [x] Key results (create, update, delete)
 - [x] Task links (add, delete)
 - [x] Task attachments (create)
 - [x] Folder CLI commands (get, update, delete)
@@ -46,3 +44,7 @@
 - [ ] Task templates (get)
 - [ ] Folder less lists (get)
 - [ ] Guests (add to/list/remove from folder/list/task/workspace)
+
+## Future Enhancements (Deprioritized)
+- [ ] Goals (list, get, create, update, delete)
+- [ ] Key results (create, update, delete)

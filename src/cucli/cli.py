@@ -550,9 +550,7 @@ def get_list_cli(list_id: str, format: str, raw: bool) -> None:
                 click.echo(f"ID:         {data.get('id')}")
                 click.echo(f"Name:       {data.get('name')}")
                 if data.get("status"):
-                    click.echo(
-                        f"Status:     {data.get('status', {}).get('status')}"
-                    )
+                    click.echo(f"Status:     {data.get('status', {}).get('status')}")
                 if data.get("priority"):
                     click.echo(
                         f"Priority:   {data.get('priority', {}).get('priority')}"
@@ -656,13 +654,9 @@ def update_list_cli(
                 click.echo(f"ID:      {data.get('id')}")
                 click.echo(f"Name:    {data.get('name')}")
                 if data.get("status"):
-                    click.echo(
-                        f"Status:  {data.get('status', {}).get('status')}"
-                    )
+                    click.echo(f"Status:  {data.get('status', {}).get('status')}")
                 if data.get("priority"):
-                    click.echo(
-                        f"Priority: {data.get('priority', {}).get('priority')}"
-                    )
+                    click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
                 click.echo("Updated successfully.")
     except httpx.HTTPStatusError as e:
         click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
@@ -2572,530 +2566,6 @@ def delete_time_entry(team_id: str, timer_id: str, yes: bool) -> None:
         raise click.Abort()
 
 
-@cli.command(name="goals")
-@click.argument("team_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"]),
-    default="json",
-    help="Output format.",
-)
-@click.option("--include-completed", is_flag=True, help="Include completed goals.")
-@click.option("--raw", is_flag=True, help="Output raw JSON response.")
-def goals(team_id: str, format: str, include_completed: bool, raw: bool) -> None:
-    """List goals in a workspace.
-
-    TEAM_ID: The ID of the team/workspace.
-    """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_goals(team_id, include_completed=include_completed)
-
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
-
-            goals_list = data.get("goals", [])
-
-            if format == "json":
-                output = [
-                    {
-                        "id": g.get("id"),
-                        "name": g.get("name"),
-                        "due_date": g.get("due_date"),
-                        "description": g.get("description"),
-                        "percent_completed": g.get("percent_completed"),
-                        "key_result_count": len(g.get("key_results", [])),
-                    }
-                    for g in goals_list
-                ]
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                if not goals_list:
-                    click.echo("No goals found.")
-                    return
-
-                click.echo(
-                    f"{'ID':<36}  {'NAME':<30}  {'DUE DATE':<15}  {'PROGRESS':<10}"
-                )
-                click.echo("-" * 91)
-                for g in goals_list:
-                    click.echo(
-                        f"{g.get('id'):<36}  "
-                        f"{g.get('name', '')[:30]:<30}  "
-                        f"{g.get('due_date', ''):<15}  "
-                        f"{g.get('percent_completed', 0):<10}%"
-                    )
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
-
-
-@cli.command(name="goal")
-@click.argument("goal_id")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"]),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON response.")
-def goal(goal_id: str, format: str, raw: bool) -> None:
-    """Get goal details.
-
-    GOAL_ID: The ID of the goal.
-    """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_goal(goal_id)
-
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
-
-            goal_data = data.get("goal", {})
-
-            if format == "json":
-                output = {
-                    "id": goal_data.get("id"),
-                    "name": goal_data.get("name"),
-                    "description": goal_data.get("description"),
-                    "due_date": goal_data.get("due_date"),
-                    "start_date": goal_data.get("start_date"),
-                    "percent_completed": goal_data.get("percent_completed"),
-                    "color": goal_data.get("color"),
-                    "pretty_id": goal_data.get("pretty_id"),
-                    "key_results": goal_data.get("key_results", []),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:           {goal_data.get('id')}")
-                click.echo(f"Name:         {goal_data.get('name')}")
-                click.echo(f"Description:  {goal_data.get('description', '')[:50]}")
-                click.echo(f"Due Date:     {goal_data.get('due_date')}")
-                if goal_data.get("start_date"):
-                    click.echo(f"Start Date:   {goal_data.get('start_date')}")
-                click.echo(f"Progress:     {goal_data.get('percent_completed', 0)}%")
-                click.echo(f"Color:        {goal_data.get('color')}")
-                click.echo(f"Key Results:  {len(goal_data.get('key_results', []))}")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
-
-
-@cli.command(name="create-goal")
-@click.argument("team_id")
-@click.option("--name", required=True, help="Goal name.")
-@click.option(
-    "--due-date",
-    required=True,
-    type=int,
-    help="Due date as Unix timestamp in milliseconds.",
-)
-@click.option(
-    "--start-date", type=int, help="Start date as Unix timestamp in milliseconds."
-)
-@click.option("--description", default="", help="Goal description.")
-@click.option(
-    "--owner",
-    "owners",
-    type=int,
-    multiple=True,
-    help="Owner user ID(s). Can be specified multiple times.",
-)
-@click.option("--color", default="#32a852", help="Goal color as hex value.")
-@click.option(
-    "--multiple-owners/--no-multiple-owners",
-    default=False,
-    help="Allow multiple owners.",
-)
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"]),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON response.")
-def create_goal(
-    team_id: str,
-    name: str,
-    due_date: int,
-    start_date: int | None,
-    description: str,
-    owners: tuple[int, ...],
-    color: str,
-    multiple_owners: bool,
-    format: str,
-    raw: bool,
-) -> None:
-    """Create a new goal.
-
-    TEAM_ID: The ID of the team/workspace.
-    """
-    try:
-        with ClickUpClient() as client:
-            data = client.create_goal(
-                team_id,
-                name=name,
-                due_date=due_date,
-                start_date=start_date,
-                description=description,
-                owners=list(owners) if owners else None,
-                color=color,
-                multiple_owners=multiple_owners,
-            )
-
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
-
-            goal_data = data.get("goal", {})
-
-            if format == "json":
-                output = {
-                    "id": goal_data.get("id"),
-                    "name": goal_data.get("name"),
-                    "due_date": goal_data.get("due_date"),
-                    "description": goal_data.get("description"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:      {goal_data.get('id')}")
-                click.echo(f"Name:    {goal_data.get('name')}")
-                click.echo(f"Due:     {goal_data.get('due_date')}")
-                click.echo("Created successfully!")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
-
-
-@cli.command(name="update-goal")
-@click.argument("goal_id")
-@click.option("--name", help="New goal name.")
-@click.option(
-    "--due-date", type=int, help="New due date as Unix timestamp in milliseconds."
-)
-@click.option("--description", help="New goal description.")
-@click.option(
-    "--add-owner",
-    "add_owners",
-    type=int,
-    multiple=True,
-    help="Owner user ID(s) to add. Can be specified multiple times.",
-)
-@click.option(
-    "--remove-owner",
-    "rem_owners",
-    type=int,
-    multiple=True,
-    help="Owner user ID(s) to remove. Can be specified multiple times.",
-)
-@click.option("--color", help="New goal color as hex value.")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"]),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON response.")
-def update_goal(
-    goal_id: str,
-    name: str | None,
-    due_date: int | None,
-    description: str | None,
-    add_owners: tuple[int, ...],
-    rem_owners: tuple[int, ...],
-    color: str | None,
-    format: str,
-    raw: bool,
-) -> None:
-    """Update a goal.
-
-    GOAL_ID: The ID of the goal to update.
-    """
-    try:
-        with ClickUpClient() as client:
-            data = client.update_goal(
-                goal_id,
-                name=name,
-                due_date=due_date,
-                description=description,
-                add_owners=list(add_owners) if add_owners else None,
-                rem_owners=list(rem_owners) if rem_owners else None,
-                color=color,
-            )
-
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
-
-            goal_data = data.get("goal", {})
-
-            if format == "json":
-                output = {
-                    "id": goal_data.get("id"),
-                    "name": goal_data.get("name"),
-                    "due_date": goal_data.get("due_date"),
-                    "description": goal_data.get("description"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:      {goal_data.get('id')}")
-                click.echo(f"Name:    {goal_data.get('name')}")
-                click.echo("Updated successfully!")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
-
-
-@cli.command(name="delete-goal")
-@click.argument("goal_id")
-@click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
-def delete_goal(goal_id: str, yes: bool) -> None:
-    """Delete a goal.
-
-    GOAL_ID: The ID of the goal to delete.
-    """
-    if not yes:
-        if not click.confirm(f"Are you sure you want to delete goal {goal_id}?"):
-            click.echo("Deletion cancelled.")
-            return
-
-    try:
-        with ClickUpClient() as client:
-            client.delete_goal(goal_id)
-            click.echo(f"Goal {goal_id} deleted successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
-
-
-@cli.command(name="create-key-result")
-@click.argument("goal_id")
-@click.option("--name", required=True, help="Key result name.")
-@click.option(
-    "--owner",
-    "owners",
-    type=int,
-    multiple=True,
-    help="Owner user ID(s). Can be specified multiple times.",
-)
-@click.option(
-    "--type",
-    type=click.Choice(["number", "currency", "boolean", "percentage", "automatic"]),
-    default="number",
-    help="Key result type.",
-)
-@click.option("--steps-start", type=int, default=0, help="Starting value.")
-@click.option("--steps-end", type=int, default=100, help="Target value.")
-@click.option("--unit", default="", help="Unit of measurement.")
-@click.option(
-    "--task",
-    "task_ids",
-    type=str,
-    multiple=True,
-    help="Task ID(s) to link. Can be specified multiple times.",
-)
-@click.option(
-    "--list",
-    "list_ids",
-    type=str,
-    multiple=True,
-    help="List ID(s) to link. Can be specified multiple times.",
-)
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"]),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON response.")
-def create_key_result(
-    goal_id: str,
-    name: str,
-    owners: tuple[int, ...],
-    type: str,
-    steps_start: int,
-    steps_end: int,
-    unit: str,
-    task_ids: tuple[str, ...],
-    list_ids: tuple[str, ...],
-    format: str,
-    raw: bool,
-) -> None:
-    """Create a key result for a goal.
-
-    GOAL_ID: The ID of the goal.
-    """
-    try:
-        with ClickUpClient() as client:
-            data = client.create_key_result(
-                goal_id,
-                name=name,
-                owners=list(owners) if owners else [],
-                type=type,
-                steps_start=steps_start,
-                steps_end=steps_end,
-                unit=unit,
-                task_ids=list(task_ids) if task_ids else None,
-                list_ids=list(list_ids) if list_ids else None,
-            )
-
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
-
-            key_result = data.get("key_result", {})
-
-            if format == "json":
-                output = {
-                    "id": key_result.get("id"),
-                    "name": key_result.get("name"),
-                    "type": key_result.get("type"),
-                    "unit": key_result.get("unit"),
-                    "goal_id": key_result.get("goal_id"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:      {key_result.get('id')}")
-                click.echo(f"Name:    {key_result.get('name')}")
-                click.echo(f"Type:    {key_result.get('type')}")
-                click.echo(f"Unit:    {key_result.get('unit')}")
-                click.echo("Created successfully!")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
-
-
-@cli.command(name="update-key-result")
-@click.argument("key_result_id")
-@click.option(
-    "--steps-current",
-    type=int,
-    help="Current progress value.",
-)
-@click.option("--note", default="", help="Update note.")
-@click.option(
-    "--format",
-    type=click.Choice(["json", "table"]),
-    default="json",
-    help="Output format.",
-)
-@click.option("--raw", is_flag=True, help="Output raw JSON response.")
-def update_key_result(
-    key_result_id: str,
-    steps_current: int | None,
-    note: str,
-    format: str,
-    raw: bool,
-) -> None:
-    """Update a key result.
-
-    KEY_RESULT_ID: The ID of the key result to update.
-    """
-    try:
-        with ClickUpClient() as client:
-            data = client.update_key_result(
-                key_result_id,
-                steps_current=steps_current,
-                note=note,
-            )
-
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
-
-            key_result = data.get("key_result", {})
-
-            if format == "json":
-                output = {
-                    "id": key_result.get("id"),
-                    "name": key_result.get("name"),
-                    "steps_current": key_result.get("last_action", {}).get(
-                        "steps_current"
-                    ),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:      {key_result_id}")
-                click.echo("Updated successfully!")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
-
-
-@cli.command(name="delete-key-result")
-@click.argument("key_result_id")
-@click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
-def delete_key_result(key_result_id: str, yes: bool) -> None:
-    """Delete a key result.
-
-    KEY_RESULT_ID: The ID of the key result to delete.
-    """
-    if not yes:
-        if not click.confirm(
-            f"Are you sure you want to delete key result {key_result_id}?"
-        ):
-            click.echo("Deletion cancelled.")
-            return
-
-    try:
-        with ClickUpClient() as client:
-            client.delete_key_result(key_result_id)
-            click.echo(f"Key result {key_result_id} deleted successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
-
-
 @cli.command(name="add-dependency")
 @click.argument("task_id")
 @click.option(
@@ -3561,9 +3031,7 @@ def team_views(team_id: str, format: str, raw: bool) -> None:
         max_type = max(len(view.get("type", "")) for view in views_list)
 
         # Print header
-        click.echo(
-            f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TYPE'}"
-        )
+        click.echo(f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TYPE'}")
         click.echo("-" * (max_id + max_name + max_type + 6))
 
         # Print rows
@@ -3624,9 +3092,7 @@ def space_views(space_id: str, format: str, raw: bool) -> None:
         max_type = max(len(view.get("type", "")) for view in views_list)
 
         # Print header
-        click.echo(
-            f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TYPE'}"
-        )
+        click.echo(f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TYPE'}")
         click.echo("-" * (max_id + max_name + max_type + 6))
 
         # Print rows
@@ -3687,9 +3153,7 @@ def folder_views(folder_id: str, format: str, raw: bool) -> None:
         max_type = max(len(view.get("type", "")) for view in views_list)
 
         # Print header
-        click.echo(
-            f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TYPE'}"
-        )
+        click.echo(f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TYPE'}")
         click.echo("-" * (max_id + max_name + max_type + 6))
 
         # Print rows
@@ -3750,9 +3214,7 @@ def list_views(list_id: str, format: str, raw: bool) -> None:
         max_type = max(len(view.get("type", "")) for view in views_list)
 
         # Print header
-        click.echo(
-            f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TYPE'}"
-        )
+        click.echo(f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TYPE'}")
         click.echo("-" * (max_id + max_name + max_type + 6))
 
         # Print rows
@@ -3784,7 +3246,9 @@ def view(view_id: str, format: str, raw: bool) -> None:
                 click.echo(json.dumps(data, indent=2))
                 return
 
-            view_data = data.get("view", data)  # Some responses have view wrapped, some don't
+            view_data = data.get(
+                "view", data
+            )  # Some responses have view wrapped, some don't
 
             if format == "json":
                 output = {
@@ -3861,7 +3325,9 @@ def webhooks(team_id: str, format: str, raw: bool) -> None:
         # Calculate column widths
         max_id = max(len(w.get("id", "")) for w in webhooks_list)
         max_endpoint = max(len(w.get("endpoint", "")) for w in webhooks_list)
-        max_health = max(len(w.get("health", {}).get("status", "")) for w in webhooks_list)
+        max_health = max(
+            len(w.get("health", {}).get("status", "")) for w in webhooks_list
+        )
 
         # Print header
         click.echo(
@@ -3916,9 +3382,7 @@ def create_webhook(
 
     try:
         with ClickUpClient() as client:
-            data = client.create_webhook(
-                team_id, endpoint=endpoint, events=events
-            )
+            data = client.create_webhook(team_id, endpoint=endpoint, events=events)
 
             if raw:
                 click.echo(json.dumps(data, indent=2))
@@ -4031,9 +3495,7 @@ def delete_webhook(webhook_id: str, yes: bool) -> None:
     WEBHOOK_ID: The ID of webhook to delete.
     """
     if not yes:
-        if not click.confirm(
-            f"Are you sure you want to delete webhook {webhook_id}?"
-        ):
+        if not click.confirm(f"Are you sure you want to delete webhook {webhook_id}?"):
             click.echo("Deletion cancelled.")
             return
 
