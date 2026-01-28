@@ -3944,7 +3944,7 @@ def create_webhook(
         }
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        click.echo(f"Webhook created successfully.")
+        click.echo("Webhook created successfully.")
         click.echo(f"ID:       {webhook.get('id')}")
         click.echo(f"Endpoint:  {webhook.get('endpoint')}")
         click.echo(f"Events:   {len(webhook.get('events', []))} event(s)")
