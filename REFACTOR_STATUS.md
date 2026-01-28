@@ -28,7 +28,7 @@ This document tracks the progress of refactoring cucli.
 - [ ] JSON output formatter (15+ occurrences)
 - [ ] Model parsing helper (10+ occurrences)
 - [ ] Empty collection handler (15 occurrences)
-- [ ] Params builder with bool conversion (10 occurrences)
+- [x] Params builder with bool conversion (10 occurrences) - Added _to_bool_str() helper
 
 ### Low Priority
 - [ ] Views output formatter (5 occurrences)
