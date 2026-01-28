@@ -5,7 +5,7 @@ import json
 import click
 from cucli.api import ClickUpClient, with_client
 from cucli.decorators import common_output_options, handle_api_errors
-from cucli.helpers import format_table
+from cucli.helpers import confirm_deletion, format_table
 from cucli.models import (
     Checklist,
     ClickUpList,
@@ -257,10 +257,8 @@ def delete_folder(folder_id: str, yes: bool) -> None:
 
     FOLDER_ID: The ID of the folder to delete.
     """
-    if not yes:
-        if not click.confirm(f"Are you sure you want to delete folder {folder_id}?"):
-            click.echo("Deletion cancelled.")
-            return
+    if not confirm_deletion("folder", folder_id, yes):
+        return
 
     with ClickUpClient() as client:
         client.delete_folder(folder_id)
@@ -523,10 +521,8 @@ def delete_list(list_id: str, yes: bool) -> None:
 
     LIST_ID: The ID of list to delete.
     """
-    if not yes:
-        if not click.confirm(f"Are you sure you want to delete list {list_id}?"):
-            click.echo("Deletion cancelled.")
-            return
+    if not confirm_deletion("list", list_id, yes):
+        return
 
     with ClickUpClient() as client:
         client.delete_list(list_id)
@@ -926,10 +922,8 @@ def delete_task(task_id: str, yes: bool) -> None:
 
     TASK_ID: The ID of the task to delete.
     """
-    if not yes:
-        if not click.confirm(f"Are you sure you want to delete task {task_id}?"):
-            click.echo("Deletion cancelled.")
-            return
+    if not confirm_deletion("task", task_id, yes):
+        return
 
     with ClickUpClient() as client:
         client.delete_task(task_id)
@@ -1327,12 +1321,8 @@ def delete_checklist(checklist_id: str, yes: bool) -> None:
 
     CHECKLIST_ID: The ID of the checklist to delete.
     """
-    if not yes:
-        if not click.confirm(
-            f"Are you sure you want to delete checklist {checklist_id}?"
-        ):
-            click.echo("Deletion cancelled.")
-            return
+    if not confirm_deletion("checklist", checklist_id, yes):
+        return
 
     with ClickUpClient() as client:
         client.delete_checklist(checklist_id)
@@ -1350,12 +1340,8 @@ def delete_checklist_item(checklist_id: str, checklist_item_id: str, yes: bool) 
     CHECKLIST_ID: The ID of the checklist.
     CHECKLIST_ITEM_ID: The ID of the checklist item to delete.
     """
-    if not yes:
-        if not click.confirm(
-            f"Are you sure you want to delete checklist item {checklist_item_id}?"
-        ):
-            click.echo("Deletion cancelled.")
-            return
+    if not confirm_deletion("checklist item", checklist_item_id, yes):
+        return
 
     with ClickUpClient() as client:
         client.delete_checklist_item(checklist_id, checklist_item_id)
@@ -1989,10 +1975,8 @@ def delete_time_entry(team_id: str, timer_id: str, yes: bool) -> None:
     TEAM_ID: The ID of the team/workspace.
     TIMER_ID: The ID of the time entry to delete.
     """
-    if not yes:
-        if not click.confirm(f"Are you sure you want to delete time entry {timer_id}?"):
-            click.echo("Deletion cancelled.")
-            return
+    if not confirm_deletion("time entry", timer_id, yes):
+        return
 
     with ClickUpClient() as client:
         client.delete_time_entry(team_id, timer_id)
@@ -2705,10 +2689,8 @@ def delete_webhook(webhook_id: str, yes: bool) -> None:
 
     WEBHOOK_ID: The ID of webhook to delete.
     """
-    if not yes:
-        if not click.confirm(f"Are you sure you want to delete webhook {webhook_id}?"):
-            click.echo("Deletion cancelled.")
-            return
+    if not confirm_deletion("webhook", webhook_id, yes):
+        return
 
     with ClickUpClient() as client:
         client.delete_webhook(webhook_id)

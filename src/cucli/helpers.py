@@ -106,6 +106,26 @@ def format_table(
         click.echo("  ".join(row_parts))
 
 
+def confirm_deletion(resource_type: str, resource_id: str, yes: bool = False) -> bool:
+    """Confirm deletion of a resource.
+
+    Args:
+        resource_type: The type of resource being deleted (e.g., "folder", "task").
+        resource_id: The ID of the resource to delete.
+        yes: If True, skip the confirmation prompt.
+
+    Returns:
+        True if deletion should proceed, False otherwise.
+    """
+    if not yes:
+        if not click.confirm(
+            f"Are you sure you want to delete {resource_type} {resource_id}?"
+        ):
+            click.echo("Deletion cancelled.")
+            return False
+    return True
+
+
 def _get_value(item: Any, key: str) -> Any:
     """Get a value from an item by key (supports both dict and object access).
 

@@ -11,6 +11,7 @@ This document tracks the progress of refactoring cucli.
 | Context manager helper | 2026-01-28 | Created `with_client()` helper to eliminate repeated `with ClickUpClient() as client:` pattern (refactored 28 of 54 occurrences) |
 | Common output options decorator | 2026-01-28 | Created `@common_output_options` decorator to replace duplicate --format and --raw option definitions (applied to 46 commands) |
 | Generic table formatter | 2026-01-28 | Created `format_table()` helper in helpers.py to replace duplicate table formatting logic (refactored 10 functions: workspaces, spaces, folders, lists, tags, team_views, space_views, folder_views, list_views, tasks) |
+| Deletion confirmation helper | 2026-01-28 | Created `confirm_deletion()` helper in helpers.py to replace duplicate deletion confirmation logic (refactored 7 functions: delete_folder, delete_list, delete_task, delete_checklist, delete_checklist_item, delete_time_entry, delete_webhook) |
 
 ## In Progress
 
@@ -28,7 +29,7 @@ This document tracks the progress of refactoring cucli.
 - [ ] Default features constant (API: 28 duplicate lines)
 
 ### Medium Priority
-- [ ] Deletion confirmation decorator (10 occurrences)
+- [x] Deletion confirmation decorator (10 occurrences) - Added confirm_deletion() helper (refactored 7 functions: delete_folder, delete_list, delete_task, delete_checklist, delete_checklist_item, delete_time_entry, delete_webhook)
 - [ ] JSON output formatter (15+ occurrences)
 - [ ] Model parsing helper (10+ occurrences)
 - [ ] Empty collection handler (15 occurrences)
@@ -44,6 +45,6 @@ This document tracks the progress of refactoring cucli.
 ## Metrics
 
 - Initial lines of code: 5632 (cli.py: 4083, api.py: 1549)
-- Lines removed through refactoring: 336 (error handling) + 84 (context manager helper, partial) + 276 (common output options) + 115 (table formatter, 10 functions) = 811
-- Lines added (helpers/utilities): 39 (error handling) + 15 (with_client helper) + 16 (common_output_options) + 97 (format_table helper) = 167
-- Net reduction: -644 (11.43%) - Reduced code duplication by creating @handle_api_errors, @common_output_options decorators, with_client helper, and format_table helper
+- Lines removed through refactoring: 336 (error handling) + 84 (context manager helper, partial) + 276 (common output options) + 115 (table formatter, 10 functions) + 42 (deletion confirmation, 7 functions) = 853
+- Lines added (helpers/utilities): 39 (error handling) + 15 (with_client helper) + 16 (common_output_options) + 97 (format_table helper) + 19 (confirm_deletion helper) = 186
+- Net reduction: -667 (11.85%) - Reduced code duplication by creating @handle_api_errors, @common_output_options decorators, with_client helper, format_table helper, and confirm_deletion helper
