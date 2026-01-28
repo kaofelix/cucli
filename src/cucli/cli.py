@@ -5,7 +5,7 @@ import json
 import click
 from cucli.api import ClickUpClient, with_client
 from cucli.decorators import common_output_options, handle_api_errors
-from cucli.helpers import confirm_deletion, format_table
+from cucli.helpers import confirm_deletion, format_table, parse_models_with_raw
 from cucli.models import (
     Checklist,
     ClickUpList,
@@ -34,11 +34,9 @@ def workspaces(format: str, raw: bool) -> None:
     """List your ClickUp workspaces."""
     data = with_client(lambda client: client.get_teams())
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    teams = parse_models_with_raw(data, "teams", Team, raw)
+    if teams is None:
         return
-
-    teams = [Team(**team) for team in data["teams"]]
 
     if format == "json":
         output = [{"id": t.id, "name": t.name, "color": t.color} for t in teams]
@@ -71,11 +69,9 @@ def spaces(team_id: str, format: str, raw: bool, archived: bool) -> None:
     """
     data = with_client(lambda client: client.get_spaces(team_id, archived=archived))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    spaces_list = parse_models_with_raw(data, "spaces", Space, raw)
+    if spaces_list is None:
         return
-
-    spaces_list = [Space(**space) for space in data["spaces"]]
 
     if format == "json":
         output = [
@@ -120,11 +116,9 @@ def folders(space_id: str, format: str, raw: bool, archived: bool) -> None:
     """
     data = with_client(lambda client: client.get_folders(space_id, archived=archived))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    folders_list = parse_models_with_raw(data, "folders", Folder, raw)
+    if folders_list is None:
         return
-
-    folders_list = [Folder(**folder) for folder in data["folders"]]
 
     if format == "json":
         output = [
@@ -352,11 +346,9 @@ def lists(folder_id: str, format: str, raw: bool, archived: bool) -> None:
     """
     data = with_client(lambda client: client.get_lists(folder_id, archived=archived))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    lists_list = parse_models_with_raw(data, "lists", ClickUpList, raw)
+    if lists_list is None:
         return
-
-    lists_list = [ClickUpList(**lst) for lst in data["lists"]]
 
     if format == "json":
         output = [
@@ -941,11 +933,9 @@ def task_comments(task_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_task_comments(task_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    comments = parse_models_with_raw(data, "comments", Comment, raw)
+    if comments is None:
         return
-
-    comments = [Comment(**comment) for comment in data["comments"]]
 
     if format == "json":
         output = [
@@ -1032,11 +1022,9 @@ def list_comments(list_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_list_comments(list_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    comments = parse_models_with_raw(data, "comments", Comment, raw)
+    if comments is None:
         return
-
-    comments = [Comment(**comment) for comment in data["comments"]]
 
     if format == "json":
         output = [
@@ -1345,11 +1333,9 @@ def task_members(task_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_task_members(task_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    members = parse_models_with_raw(data, "members", TaskMember, raw)
+    if members is None:
         return
-
-    members = [TaskMember(**member) for member in data["members"]]
 
     if format == "json":
         output = [
@@ -1385,11 +1371,9 @@ def list_members(list_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_list_members(list_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    members = parse_models_with_raw(data, "members", ListMember, raw)
+    if members is None:
         return
-
-    members = [ListMember(**member) for member in data["members"]]
 
     if format == "json":
         output = [
@@ -1425,11 +1409,9 @@ def tags(space_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_space_tags(space_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    tags_list = parse_models_with_raw(data, "tags", Tag, raw)
+    if tags_list is None:
         return
-
-    tags_list = [Tag(**tag) for tag in data["tags"]]
 
     if format == "json":
         output = [

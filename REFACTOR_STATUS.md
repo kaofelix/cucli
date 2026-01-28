@@ -12,6 +12,7 @@ This document tracks the progress of refactoring cucli.
 | Common output options decorator | 2026-01-28 | Created `@common_output_options` decorator to replace duplicate --format and --raw option definitions (applied to 46 commands) |
 | Generic table formatter | 2026-01-28 | Created `format_table()` helper in helpers.py to replace duplicate table formatting logic (refactored 15 functions: workspaces, spaces, folders, lists, tags, team_views, space_views, folder_views, list_views, tasks, task_comments, list_comments, task_members, list_members, time_entries, webhooks) |
 | Deletion confirmation helper | 2026-01-28 | Created `confirm_deletion()` helper in helpers.py to replace duplicate deletion confirmation logic (refactored 7 functions: delete_folder, delete_list, delete_task, delete_checklist, delete_checklist_item, delete_time_entry, delete_webhook) |
+| Model parsing helper | 2026-01-28 | Created `parse_models_with_raw()` helper in helpers.py to replace duplicate raw output checking and model parsing patterns (refactored 8 functions: workspaces, spaces, folders, lists, task_comments, list_comments, task_members, list_members, tags) |
 
 ## In Progress
 
@@ -31,7 +32,7 @@ This document tracks the progress of refactoring cucli.
 ### Medium Priority
 - [x] Deletion confirmation decorator (10 occurrences) - Added confirm_deletion() helper (refactored 7 functions: delete_folder, delete_list, delete_task, delete_checklist, delete_checklist_item, delete_time_entry, delete_webhook)
 - [ ] JSON output formatter (15+ occurrences)
-- [ ] Model parsing helper (10+ occurrences)
+- [x] Model parsing helper (10+ occurrences) - Added parse_models_with_raw() helper (refactored 8 functions: workspaces, spaces, folders, lists, task_comments, list_comments, task_members, list_members, tags)
 - [ ] Empty collection handler (15 occurrences)
 - [x] Params builder with bool conversion (10 occurrences) - Added _to_bool_str() helper
 
@@ -45,6 +46,6 @@ This document tracks the progress of refactoring cucli.
 ## Metrics
 
 - Initial lines of code: 5632 (cli.py: 4083, api.py: 1549)
-- Lines removed through refactoring: 336 (error handling) + 84 (context manager helper, partial) + 276 (common output options) + 115 (table formatter, 10 functions) + 42 (deletion confirmation, 7 functions) + 85 (table formatter, 6 additional functions) = 938
-- Lines added (helpers/utilities): 39 (error handling) + 15 (with_client helper) + 16 (common_output_options) + 97 (format_table helper) + 19 (confirm_deletion helper) = 186
-- Net reduction: -752 (13.35%) - Reduced code duplication by creating @handle_api_errors, @common_output_options decorators, with_client helper, format_table helper, and confirm_deletion helper
+- Lines removed through refactoring: 336 (error handling) + 84 (context manager helper, partial) + 276 (common output options) + 115 (table formatter, 10 functions) + 42 (deletion confirmation, 7 functions) + 85 (table formatter, 6 additional functions) + 18 (model parsing helper, 8 functions) = 956
+- Lines added (helpers/utilities): 39 (error handling) + 15 (with_client helper) + 16 (common_output_options) + 97 (format_table helper) + 19 (confirm_deletion helper) + 37 (parse_models_with_raw helper) = 223
+- Net reduction: -733 (13.02%) - Reduced code duplication by creating @handle_api_errors, @common_output_options decorators, with_client helper, format_table helper, confirm_deletion helper, and parse_models_with_raw helper

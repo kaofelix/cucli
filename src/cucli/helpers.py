@@ -1,8 +1,11 @@
 """Helper functions for cucli CLI commands."""
 
-from typing import Any
+import json
+from typing import Any, TypeVar
 
 import click
+
+T = TypeVar("T")
 
 
 def format_table(
@@ -139,3 +142,40 @@ def _get_value(item: Any, key: str) -> Any:
     if isinstance(item, dict):
         return item.get(key, "")
     return getattr(item, key, "")
+
+
+def parse_models_with_raw(
+    data: dict[str, Any],
+    key: str,
+    model_class: type[T],
+    raw: bool,
+) -> list[T] | None:
+    """Parse API response data into Pydantic models with raw JSON fallback.
+
+    This helper eliminates the repeated pattern of:
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
+        items = [Model(**item) for item in data["items"]]
+
+    Args:
+        data: The raw API response data.
+        key: The key in data that contains the list of items (e.g., "teams", "spaces").
+        model_class: The Pydantic model class to parse each item into.
+        raw: If True, output raw JSON and return None.
+
+    Returns:
+        List of parsed model instances if raw is False, None if raw is True.
+
+    Example:
+        teams = parse_models_with_raw(data, "teams", Team, raw)
+        if teams is None:
+            return
+        # Continue with teams processing...
+    """
+    if raw:
+        click.echo(json.dumps(data, indent=2))
+        return None
+
+    items_list = data.get(key, [])
+    return [model_class(**item) for item in items_list]
