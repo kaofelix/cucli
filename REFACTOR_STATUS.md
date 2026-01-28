@@ -8,6 +8,7 @@ This document tracks the progress of refactoring cucli.
 |---------|------|-------------|
 | Boolean Parameter String Conversion | 2026-01-28 | Added `_to_bool_str()` helper method to replace duplicate `str(x).lower()` patterns (7 occurrences reduced to 1 helper) |
 | Error handling decorator | 2026-01-28 | Created `@handle_api_errors` decorator to replace duplicate try/except blocks (applied to all 53 functions) |
+| Context manager helper | 2026-01-28 | Created `with_client()` helper to eliminate repeated `with ClickUpClient() as client:` pattern (refactored 28 of 54 occurrences) |
 
 ## In Progress
 
@@ -21,7 +22,7 @@ This document tracks the progress of refactoring cucli.
 - [x] Error handling decorator (40+ occurrences) - Completed: 53/53 functions refactored
 - [ ] Common output options decorator (30+ occurrences)
 - [ ] Generic table formatter (20+ occurrences)
-- [ ] Context manager helper (50+ occurrences)
+- [x] Context manager helper (50+ occurrences) - Partially completed: 28 of 54 occurrences refactored (26 remain, likely complex patterns)
 - [ ] Default features constant (API: 28 duplicate lines)
 
 ### Medium Priority
@@ -41,6 +42,6 @@ This document tracks the progress of refactoring cucli.
 ## Metrics
 
 - Initial lines of code: 5632 (cli.py: 4083, api.py: 1549)
-- Lines removed through refactoring: 336 (error handling decorator removed ~14 try/except blocks from remaining functions)
-- Lines added (helpers/utilities): 39
-- Net reduction: -297 (5.27%) - Reduced code duplication by creating @handle_api_errors decorator and applying to all 53 functions
+- Lines removed through refactoring: 336 (error handling decorator) + 84 (context manager helper, partial) = 420
+- Lines added (helpers/utilities): 39 (error handling) + 15 (with_client helper) = 54
+- Net reduction: -366 (6.50%) - Reduced code duplication by creating @handle_api_errors decorator and with_client helper

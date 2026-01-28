@@ -1,9 +1,28 @@
 """ClickUp API client."""
 
 import os
-from typing import Any
+from typing import Any, Callable
 
 import httpx
+
+
+def with_client(func: Callable[[Any], Any]) -> Any:
+    """Execute a function with a ClickUpClient instance.
+
+    This helper function eliminates the need for repeated
+    `with ClickUpClient() as client:` patterns in CLI commands.
+
+    Args:
+        func: A callable that takes a ClickUpClient as its only argument.
+
+    Returns:
+        The result of calling func with the client.
+
+    Example:
+        data = with_client(lambda client: client.get_teams())
+    """
+    with ClickUpClient() as client:
+        return func(client)
 
 
 class ClickUpClient:
