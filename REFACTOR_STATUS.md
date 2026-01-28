@@ -7,13 +7,13 @@ This document tracks the progress of refactoring cucli.
 | Pattern | Date | Description |
 |---------|------|-------------|
 | Boolean Parameter String Conversion | 2026-01-28 | Added `_to_bool_str()` helper method to replace duplicate `str(x).lower()` patterns (7 occurrences reduced to 1 helper) |
-| Error handling decorator | 2026-01-28 | Created `@handle_api_errors` decorator to replace duplicate try/except blocks (applied to 4 functions: spaces, folders, lists, create_list) |
+| Error handling decorator | 2026-01-28 | Created `@handle_api_errors` decorator to replace duplicate try/except blocks (applied to 20 functions) |
 
 ## In Progress
 
 | Pattern | Started | Notes |
 |---------|---------|-------|
-| Error handling decorator (continuing) | 2026-01-28 | Need to apply to remaining ~57 functions with error handling |
+| Error handling decorator (continuing) | 2026-01-28 | Need to apply to remaining ~40 functions with error handling |
 
 ## Planned Refactors (by priority)
 

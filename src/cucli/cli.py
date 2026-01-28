@@ -209,41 +209,32 @@ def folders(space_id: str, format: str, raw: bool, archived: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def create_folder(space_id: str, name: str, format: str, raw: bool) -> None:
     """Create a new folder in a space.
 
     SPACE_ID: The ID of the space to create the folder in.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.create_folder(space_id, name=name)
+    with ClickUpClient() as client:
+        data = client.create_folder(space_id, name=name)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            if format == "json":
-                output = {
-                    "id": data.get("id"),
-                    "name": data.get("name"),
-                    "space_id": data.get("space", {}).get("id"),
-                    "task_count": data.get("task_count"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:        {data.get('id')}")
-                click.echo(f"Name:      {data.get('name')}")
-                click.echo(f"Space ID:  {data.get('space', {}).get('id')}")
-                click.echo(f"Task Count: {data.get('task_count')}")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {
+                "id": data.get("id"),
+                "name": data.get("name"),
+                "space_id": data.get("space", {}).get("id"),
+                "task_count": data.get("task_count"),
+            }
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"ID:        {data.get('id')}")
+            click.echo(f"Name:      {data.get('name')}")
+            click.echo(f"Space ID:  {data.get('space', {}).get('id')}")
+            click.echo(f"Task Count: {data.get('task_count')}")
 
 
 @cli.command(name="folder")
@@ -255,41 +246,32 @@ def create_folder(space_id: str, name: str, format: str, raw: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def folder(folder_id: str, format: str, raw: bool) -> None:
     """Get details for a specific folder.
 
     FOLDER_ID: The ID of the folder to retrieve.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_folder(folder_id)
+    with ClickUpClient() as client:
+        data = client.get_folder(folder_id)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            if format == "json":
-                output = {
-                    "id": data.get("id"),
-                    "name": data.get("name"),
-                    "hidden": data.get("hidden"),
-                    "task_count": data.get("task_count"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:         {data.get('id')}")
-                click.echo(f"Name:       {data.get('name')}")
-                click.echo(f"Hidden:     {data.get('hidden')}")
-                click.echo(f"Task Count: {data.get('task_count')}")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {
+                "id": data.get("id"),
+                "name": data.get("name"),
+                "hidden": data.get("hidden"),
+                "task_count": data.get("task_count"),
+            }
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"ID:         {data.get('id')}")
+            click.echo(f"Name:       {data.get('name')}")
+            click.echo(f"Hidden:     {data.get('hidden')}")
+            click.echo(f"Task Count: {data.get('task_count')}")
 
 
 @cli.command(name="update-folder")
@@ -302,48 +284,40 @@ def folder(folder_id: str, format: str, raw: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def update_folder_cli(folder_id: str, name: str, format: str, raw: bool) -> None:
     """Update a folder.
 
     FOLDER_ID: The ID of the folder to update.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.update_folder(folder_id, name=name)
+    with ClickUpClient() as client:
+        data = client.update_folder(folder_id, name=name)
 
-            if raw:
-                if data:
-                    click.echo(json.dumps(data, indent=2))
-                else:
-                    click.echo("{}")
-                return
+        if raw:
+            if data:
+                click.echo(json.dumps(data, indent=2))
+            else:
+                click.echo("{}")
+            return
 
-            if not data:
-                click.echo("No updates provided.")
-                return
+        if not data:
+            click.echo("No updates provided.")
+            return
 
-            if format == "json":
-                output = {
-                    "id": data.get("id"),
-                    "name": data.get("name"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"Folder {folder_id} updated successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {
+                "id": data.get("id"),
+                "name": data.get("name"),
+            }
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"Folder {folder_id} updated successfully.")
 
 
 @cli.command(name="delete-folder")
 @click.argument("folder_id")
 @click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
+@handle_api_errors
 def delete_folder(folder_id: str, yes: bool) -> None:
     """Delete a folder.
 
@@ -354,19 +328,9 @@ def delete_folder(folder_id: str, yes: bool) -> None:
             click.echo("Deletion cancelled.")
             return
 
-    try:
-        with ClickUpClient() as client:
-            client.delete_folder(folder_id)
-            click.echo(f"Folder {folder_id} deleted successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+    with ClickUpClient() as client:
+        client.delete_folder(folder_id)
+        click.echo(f"Folder {folder_id} deleted successfully.")
 
 
 @cli.command(name="create-list")
@@ -519,53 +483,42 @@ def lists(folder_id: str, format: str, raw: bool, archived: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def get_list_cli(list_id: str, format: str, raw: bool) -> None:
     """Get details for a specific list.
 
     LIST_ID: The ID of list to retrieve.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_list(list_id)
+    with ClickUpClient() as client:
+        data = client.get_list(list_id)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            if format == "json":
-                output = {
-                    "id": data.get("id"),
-                    "name": data.get("name"),
-                    "status": data.get("status", {}).get("status")
-                    if data.get("status")
-                    else None,
-                    "priority": data.get("priority", {}).get("priority")
-                    if data.get("priority")
-                    else None,
-                    "task_count": data.get("task_count"),
-                    "archived": data.get("archived"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:         {data.get('id')}")
-                click.echo(f"Name:       {data.get('name')}")
-                if data.get("status"):
-                    click.echo(f"Status:     {data.get('status', {}).get('status')}")
-                if data.get("priority"):
-                    click.echo(
-                        f"Priority:   {data.get('priority', {}).get('priority')}"
-                    )
-                click.echo(f"Task Count: {data.get('task_count')}")
-                click.echo(f"Archived:   {data.get('archived')}")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {
+                "id": data.get("id"),
+                "name": data.get("name"),
+                "status": data.get("status", {}).get("status")
+                if data.get("status")
+                else None,
+                "priority": data.get("priority", {}).get("priority")
+                if data.get("priority")
+                else None,
+                "task_count": data.get("task_count"),
+                "archived": data.get("archived"),
+            }
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"ID:         {data.get('id')}")
+            click.echo(f"Name:       {data.get('name')}")
+            if data.get("status"):
+                click.echo(f"Status:     {data.get('status', {}).get('status')}")
+            if data.get("priority"):
+                click.echo(f"Priority:   {data.get('priority', {}).get('priority')}")
+            click.echo(f"Task Count: {data.get('task_count')}")
+            click.echo(f"Archived:   {data.get('archived')}")
 
 
 @cli.command(name="update-list")
@@ -594,6 +547,7 @@ def get_list_cli(list_id: str, format: str, raw: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def update_list_cli(
     list_id: str,
     name: str | None,
@@ -612,66 +566,57 @@ def update_list_cli(
 
     LIST_ID: The ID of list to update.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.update_list(
-                list_id,
-                name=name,
-                content=description,
-                markdown_content=markdown_description,
-                due_date=due_date,
-                due_date_time=due_date_time,
-                priority=priority,
-                assignee=assignee,
-                status=status,
-                unset_status=unset_status,
-            )
+    with ClickUpClient() as client:
+        data = client.update_list(
+            list_id,
+            name=name,
+            content=description,
+            markdown_content=markdown_description,
+            due_date=due_date,
+            due_date_time=due_date_time,
+            priority=priority,
+            assignee=assignee,
+            status=status,
+            unset_status=unset_status,
+        )
 
-            if raw:
-                if data:
-                    click.echo(json.dumps(data, indent=2))
-                else:
-                    click.echo("{}")
-                return
+        if raw:
+            if data:
+                click.echo(json.dumps(data, indent=2))
+            else:
+                click.echo("{}")
+            return
 
-            if not data:
-                click.echo("No updates provided.")
-                return
+        if not data:
+            click.echo("No updates provided.")
+            return
 
-            if format == "json":
-                output = {
-                    "id": data.get("id"),
-                    "name": data.get("name"),
-                    "status": data.get("status", {}).get("status")
-                    if data.get("status")
-                    else None,
-                    "priority": data.get("priority", {}).get("priority")
-                    if data.get("priority")
-                    else None,
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:      {data.get('id')}")
-                click.echo(f"Name:    {data.get('name')}")
-                if data.get("status"):
-                    click.echo(f"Status:  {data.get('status', {}).get('status')}")
-                if data.get("priority"):
-                    click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
-                click.echo("Updated successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {
+                "id": data.get("id"),
+                "name": data.get("name"),
+                "status": data.get("status", {}).get("status")
+                if data.get("status")
+                else None,
+                "priority": data.get("priority", {}).get("priority")
+                if data.get("priority")
+                else None,
+            }
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"ID:      {data.get('id')}")
+            click.echo(f"Name:    {data.get('name')}")
+            if data.get("status"):
+                click.echo(f"Status:  {data.get('status', {}).get('status')}")
+            if data.get("priority"):
+                click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
+            click.echo("Updated successfully.")
 
 
 @cli.command(name="delete-list")
 @click.argument("list_id")
 @click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
+@handle_api_errors
 def delete_list(list_id: str, yes: bool) -> None:
     """Delete a list.
 
@@ -682,19 +627,9 @@ def delete_list(list_id: str, yes: bool) -> None:
             click.echo("Deletion cancelled.")
             return
 
-    try:
-        with ClickUpClient() as client:
-            client.delete_list(list_id)
-            click.echo(f"List {list_id} deleted successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+    with ClickUpClient() as client:
+        client.delete_list(list_id)
+        click.echo(f"List {list_id} deleted successfully.")
 
 
 @cli.command(name="task")
@@ -707,84 +642,73 @@ def delete_list(list_id: str, yes: bool) -> None:
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
 @click.option("--md-only", is_flag=True, help="Output only the Markdown description.")
+@handle_api_errors
 def task(task_id: str, format: str, raw: bool, md_only: bool) -> None:
     """Get details for a specific task.
 
     TASK_ID: The ID of the task to retrieve.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_task(task_id)
+    with ClickUpClient() as client:
+        data = client.get_task(task_id)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            task = Task(**data)
+        task = Task(**data)
 
-            if md_only:
-                # Use markdown_description if available, otherwise fall back to description
-                desc = task.markdown_description or task.description
-                if desc:
-                    click.echo(desc)
-                else:
-                    click.echo("(No description)")
-                return
+        if md_only:
+            # Use markdown_description if available, otherwise fall back to description
+            desc = task.markdown_description or task.description
+            if desc:
+                click.echo(desc)
+            else:
+                click.echo("(No description)")
+            return
 
-            if format == "json":
-                output = {
-                    "id": task.id,
-                    "name": task.name,
-                    "description": task.description,
-                    "markdown_description": task.markdown_description,
-                    "status": task.status.get("status") if task.status else None,
-                    "priority": task.priority.get("priority")
-                    if task.priority
-                    else None,
-                    "assignees": [a.get("username") for a in task.assignees],
-                    "tags": [t.get("name") for t in task.tags],
-                    "due_date": task.due_date,
-                    "start_date": task.start_date,
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:       {task.id}")
-                click.echo(f"Name:     {task.name}")
-                if task.status:
-                    click.echo(f"Status:   {task.status.get('status')}")
-                if task.priority:
-                    click.echo(f"Priority: {task.priority.get('priority')}")
-                if task.assignees:
-                    click.echo(
-                        f"Assignees: {', '.join(a.get('username', '') for a in task.assignees)}"
-                    )
-                if task.tags:
-                    click.echo(
-                        f"Tags:     {', '.join(t.get('name', '') for t in task.tags)}"
-                    )
-                if task.due_date:
-                    click.echo(f"Due Date: {task.due_date}")
-                # Use markdown_description if available, otherwise fall back to description
-                desc = task.markdown_description or task.description
-                if desc:
-                    click.echo("\nDescription:")
-                    click.echo(desc)
-            elif format == "markdown":
-                # Use markdown_description if available, otherwise fall back to description
-                desc = task.markdown_description or task.description
-                if desc:
-                    click.echo(desc)
-                else:
-                    click.echo("(No description)")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {
+                "id": task.id,
+                "name": task.name,
+                "description": task.description,
+                "markdown_description": task.markdown_description,
+                "status": task.status.get("status") if task.status else None,
+                "priority": task.priority.get("priority") if task.priority else None,
+                "assignees": [a.get("username") for a in task.assignees],
+                "tags": [t.get("name") for t in task.tags],
+                "due_date": task.due_date,
+                "start_date": task.start_date,
+            }
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"ID:       {task.id}")
+            click.echo(f"Name:     {task.name}")
+            if task.status:
+                click.echo(f"Status:   {task.status.get('status')}")
+            if task.priority:
+                click.echo(f"Priority: {task.priority.get('priority')}")
+            if task.assignees:
+                click.echo(
+                    f"Assignees: {', '.join(a.get('username', '') for a in task.assignees)}"
+                )
+            if task.tags:
+                click.echo(
+                    f"Tags:     {', '.join(t.get('name', '') for t in task.tags)}"
+                )
+            if task.due_date:
+                click.echo(f"Due Date: {task.due_date}")
+            # Use markdown_description if available, otherwise fall back to description
+            desc = task.markdown_description or task.description
+            if desc:
+                click.echo("\nDescription:")
+                click.echo(desc)
+        elif format == "markdown":
+            # Use markdown_description if available, otherwise fall back to description
+            desc = task.markdown_description or task.description
+            if desc:
+                click.echo(desc)
+            else:
+                click.echo("(No description)")
 
 
 @cli.command(name="tasks")
@@ -811,6 +735,7 @@ def task(task_id: str, format: str, raw: bool, md_only: bool) -> None:
     "--assignee", multiple=True, help="Filter by assignee ID (can use multiple)."
 )
 @click.option("--tag", multiple=True, help="Filter by tag (can use multiple).")
+@handle_api_errors
 def tasks(
     team_id: str,
     format: str,
@@ -827,81 +752,67 @@ def tasks(
 
     TEAM_ID: The ID of the team/workspace.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_team_tasks(
-                team_id,
-                page=page,
-                include_markdown_description=True,
-                statuses=list(status) if status else None,
-                include_closed=include_closed,
-                space_ids=list(space_id) if space_id else None,
-                list_ids=list(list_id) if list_id else None,
-                assignees=list(assignee) if assignee else None,
-                tags=list(tag) if tag else None,
-            )
+    with ClickUpClient() as client:
+        data = client.get_team_tasks(
+            team_id,
+            page=page,
+            include_markdown_description=True,
+            statuses=list(status) if status else None,
+            include_closed=include_closed,
+            space_ids=list(space_id) if space_id else None,
+            list_ids=list(list_id) if list_id else None,
+            assignees=list(assignee) if assignee else None,
+            tags=list(tag) if tag else None,
+        )
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
+
+        tasks_list = data.get("tasks", [])
+
+        if format == "json":
+            output = []
+            for task_data in tasks_list:
+                task = Task(**task_data)
+                output.append(
+                    {
+                        "id": task.id,
+                        "name": task.name,
+                        "status": task.status.get("status") if task.status else None,
+                        "priority": task.priority.get("priority")
+                        if task.priority
+                        else None,
+                        "assignees": [a.get("username") for a in task.assignees],
+                        "tags": [t.get("name") for t in task.tags],
+                        "due_date": task.due_date,
+                        "url": task_data.get("url"),
+                    }
+                )
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            if not tasks_list:
+                click.echo("No tasks found.")
                 return
 
-            tasks_list = data.get("tasks", [])
+            # Calculate column widths
+            max_id = max(len(t.get("id", "")) for t in tasks_list)
+            max_name = max(len(t.get("name", "")) for t in tasks_list)
+            max_status = max(
+                len(str(t.get("status", {}).get("status", ""))) for t in tasks_list
+            )
 
-            if format == "json":
-                output = []
-                for task_data in tasks_list:
-                    task = Task(**task_data)
-                    output.append(
-                        {
-                            "id": task.id,
-                            "name": task.name,
-                            "status": task.status.get("status")
-                            if task.status
-                            else None,
-                            "priority": task.priority.get("priority")
-                            if task.priority
-                            else None,
-                            "assignees": [a.get("username") for a in task.assignees],
-                            "tags": [t.get("name") for t in task.tags],
-                            "due_date": task.due_date,
-                            "url": task_data.get("url"),
-                        }
-                    )
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                if not tasks_list:
-                    click.echo("No tasks found.")
-                    return
+            # Print header
+            click.echo(f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'STATUS'}")
+            click.echo("-" * (max_id + max_name + max_status + 6))
 
-                # Calculate column widths
-                max_id = max(len(t.get("id", "")) for t in tasks_list)
-                max_name = max(len(t.get("name", "")) for t in tasks_list)
-                max_status = max(
-                    len(str(t.get("status", {}).get("status", ""))) for t in tasks_list
-                )
-
-                # Print header
+            # Print rows
+            for task_data in tasks_list:
+                task = Task(**task_data)
+                status_val = task.status.get("status") if task.status else ""
                 click.echo(
-                    f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'STATUS'}"
+                    f"{task.id.ljust(max_id)}  {task.name.ljust(max_name)}  {status_val}"
                 )
-                click.echo("-" * (max_id + max_name + max_status + 6))
-
-                # Print rows
-                for task_data in tasks_list:
-                    task = Task(**task_data)
-                    status_val = task.status.get("status") if task.status else ""
-                    click.echo(
-                        f"{task.id.ljust(max_id)}  {task.name.ljust(max_name)}  {status_val}"
-                    )
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
 
 
 @cli.command(name="create-task")
@@ -946,6 +857,7 @@ def tasks(
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def create_task(
     list_id: str,
     name: str,
@@ -967,59 +879,49 @@ def create_task(
 
     LIST_ID: The ID of the list to create the task in.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.create_task(
-                list_id,
-                name=name,
-                description=description,
-                markdown_description=markdown_description,
-                status=status,
-                priority=priority,
-                assignees=list(assignee) if assignee else None,
-                tags=list(tag) if tag else None,
-                due_date=due_date,
-                start_date=start_date,
-                time_estimate=time_estimate,
-                points=points,
-                parent=parent,
-            )
+    with ClickUpClient() as client:
+        data = client.create_task(
+            list_id,
+            name=name,
+            description=description,
+            markdown_description=markdown_description,
+            status=status,
+            priority=priority,
+            assignees=list(assignee) if assignee else None,
+            tags=list(tag) if tag else None,
+            due_date=due_date,
+            start_date=start_date,
+            time_estimate=time_estimate,
+            points=points,
+            parent=parent,
+        )
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            if format == "json":
-                output = {
-                    "id": data.get("id"),
-                    "name": data.get("name"),
-                    "status": data.get("status", {}).get("status")
-                    if data.get("status")
-                    else None,
-                    "priority": data.get("priority", {}).get("priority")
-                    if data.get("priority")
-                    else None,
-                    "url": data.get("url"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:       {data.get('id')}")
-                click.echo(f"Name:     {data.get('name')}")
-                if data.get("status"):
-                    click.echo(f"Status:   {data.get('status', {}).get('status')}")
-                if data.get("priority"):
-                    click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
-                if data.get("url"):
-                    click.echo(f"URL:      {data.get('url')}")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {
+                "id": data.get("id"),
+                "name": data.get("name"),
+                "status": data.get("status", {}).get("status")
+                if data.get("status")
+                else None,
+                "priority": data.get("priority", {}).get("priority")
+                if data.get("priority")
+                else None,
+                "url": data.get("url"),
+            }
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"ID:       {data.get('id')}")
+            click.echo(f"Name:     {data.get('name')}")
+            if data.get("status"):
+                click.echo(f"Status:   {data.get('status', {}).get('status')}")
+            if data.get("priority"):
+                click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
+            if data.get("url"):
+                click.echo(f"URL:      {data.get('url')}")
 
 
 @cli.command(name="update-task")
@@ -1069,6 +971,7 @@ def create_task(
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def update_task(
     task_id: str,
     name: str | None,
@@ -1090,71 +993,62 @@ def update_task(
 
     TASK_ID: The ID of the task to update.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.update_task(
-                task_id,
-                name=name,
-                description=description,
-                markdown_description=markdown_description,
-                status=status,
-                priority=priority,
-                due_date=due_date,
-                start_date=start_date,
-                time_estimate=time_estimate,
-                points=points,
-                parent=parent,
-                assignees_add=list(assignee_add) if assignee_add else None,
-                assignees_remove=list(assignee_remove) if assignee_remove else None,
-            )
+    with ClickUpClient() as client:
+        data = client.update_task(
+            task_id,
+            name=name,
+            description=description,
+            markdown_description=markdown_description,
+            status=status,
+            priority=priority,
+            due_date=due_date,
+            start_date=start_date,
+            time_estimate=time_estimate,
+            points=points,
+            parent=parent,
+            assignees_add=list(assignee_add) if assignee_add else None,
+            assignees_remove=list(assignee_remove) if assignee_remove else None,
+        )
 
-            if raw:
-                if data:
-                    click.echo(json.dumps(data, indent=2))
-                else:
-                    click.echo("{}")
-                return
+        if raw:
+            if data:
+                click.echo(json.dumps(data, indent=2))
+            else:
+                click.echo("{}")
+            return
 
-            if not data:
-                click.echo("No updates provided.")
-                return
+        if not data:
+            click.echo("No updates provided.")
+            return
 
-            if format == "json":
-                output = {
-                    "id": data.get("id"),
-                    "name": data.get("name"),
-                    "status": data.get("status", {}).get("status")
-                    if data.get("status")
-                    else None,
-                    "priority": data.get("priority", {}).get("priority")
-                    if data.get("priority")
-                    else None,
-                    "url": data.get("url"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:       {data.get('id')}")
-                click.echo(f"Name:     {data.get('name')}")
-                if data.get("status"):
-                    click.echo(f"Status:   {data.get('status', {}).get('status')}")
-                if data.get("priority"):
-                    click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
-                if data.get("url"):
-                    click.echo(f"URL:      {data.get('url')}")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {
+                "id": data.get("id"),
+                "name": data.get("name"),
+                "status": data.get("status", {}).get("status")
+                if data.get("status")
+                else None,
+                "priority": data.get("priority", {}).get("priority")
+                if data.get("priority")
+                else None,
+                "url": data.get("url"),
+            }
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"ID:       {data.get('id')}")
+            click.echo(f"Name:     {data.get('name')}")
+            if data.get("status"):
+                click.echo(f"Status:   {data.get('status', {}).get('status')}")
+            if data.get("priority"):
+                click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
+            if data.get("url"):
+                click.echo(f"URL:      {data.get('url')}")
 
 
 @cli.command(name="delete-task")
 @click.argument("task_id")
 @click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
+@handle_api_errors
 def delete_task(task_id: str, yes: bool) -> None:
     """Delete a task.
 
@@ -1165,19 +1059,9 @@ def delete_task(task_id: str, yes: bool) -> None:
             click.echo("Deletion cancelled.")
             return
 
-    try:
-        with ClickUpClient() as client:
-            client.delete_task(task_id)
-            click.echo(f"Task {task_id} deleted successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+    with ClickUpClient() as client:
+        client.delete_task(task_id)
+        click.echo(f"Task {task_id} deleted successfully.")
 
 
 @cli.command(name="task-comments")
@@ -1189,26 +1073,20 @@ def delete_task(task_id: str, yes: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def task_comments(task_id: str, format: str, raw: bool) -> None:
     """List comments on a task.
 
     TASK_ID: The ID of the task to get comments from.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_task_comments(task_id)
+    with ClickUpClient() as client:
+        data = client.get_task_comments(task_id)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            comments = [Comment(**comment) for comment in data["comments"]]
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
+        comments = [Comment(**comment) for comment in data["comments"]]
 
     if not comments:
         click.echo("No comments found.")
@@ -1265,6 +1143,7 @@ def task_comments(task_id: str, format: str, raw: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def add_comment(
     task_id: str,
     text: str,
@@ -1277,34 +1156,24 @@ def add_comment(
 
     TASK_ID: The ID of the task to add a comment to.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.create_task_comment(
-                task_id, comment_text=text, assignee=assignee, notify_all=not no_notify
-            )
+    with ClickUpClient() as client:
+        data = client.create_task_comment(
+            task_id, comment_text=text, assignee=assignee, notify_all=not no_notify
+        )
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            if format == "json":
-                output = {
-                    "id": str(data.get("id")),
-                    "date": data.get("date"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:   {data.get('id')}")
-                click.echo(f"Date: {data.get('date')}")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {
+                "id": str(data.get("id")),
+                "date": data.get("date"),
+            }
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"ID:   {data.get('id')}")
+            click.echo(f"Date: {data.get('date')}")
 
 
 @cli.command(name="list-comments")
@@ -1316,26 +1185,20 @@ def add_comment(
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def list_comments(list_id: str, format: str, raw: bool) -> None:
     """List comments on a list.
 
     LIST_ID: The ID of the list to get comments from.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_list_comments(list_id)
+    with ClickUpClient() as client:
+        data = client.get_list_comments(list_id)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            comments = [Comment(**comment) for comment in data["comments"]]
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
+        comments = [Comment(**comment) for comment in data["comments"]]
 
     if not comments:
         click.echo("No comments found.")
@@ -1392,6 +1255,7 @@ def list_comments(list_id: str, format: str, raw: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def add_list_comment(
     list_id: str,
     text: str,
@@ -1404,34 +1268,24 @@ def add_list_comment(
 
     LIST_ID: The ID of the list to add a comment to.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.create_list_comment(
-                list_id, comment_text=text, assignee=assignee, notify_all=not no_notify
-            )
+    with ClickUpClient() as client:
+        data = client.create_list_comment(
+            list_id, comment_text=text, assignee=assignee, notify_all=not no_notify
+        )
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            if format == "json":
-                output = {
-                    "id": str(data.get("id")),
-                    "date": data.get("date"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:   {data.get('id')}")
-                click.echo(f"Date: {data.get('date')}")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {
+                "id": str(data.get("id")),
+                "date": data.get("date"),
+            }
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"ID:   {data.get('id')}")
+            click.echo(f"Date: {data.get('date')}")
 
 
 @cli.command(name="create-checklist")
