@@ -947,10 +947,6 @@ def task_comments(task_id: str, format: str, raw: bool) -> None:
 
     comments = [Comment(**comment) for comment in data["comments"]]
 
-    if not comments:
-        click.echo("No comments found.")
-        return
-
     if format == "json":
         output = [
             {
@@ -964,28 +960,24 @@ def task_comments(task_id: str, format: str, raw: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        # Calculate column widths
-        max_id = max(len(c.id) for c in comments)
-        max_user = max(len(c.user.username) for c in comments)
-
-        # Print header
-        click.echo(
-            f"{'ID'.ljust(max_id)}  {'USER'.ljust(max_user)}  {'TEXT'}  {'RESOLVED'}"
+        format_table(
+            comments,
+            [
+                {"header": "ID", "key": "id"},
+                {"header": "USER", "key": "user.username"},
+                {
+                    "header": "TEXT",
+                    "key": "comment_text",
+                    "get_value": lambda x: x[:30] + "..." if len(x) > 30 else x,
+                },
+                {
+                    "header": "RESOLVED",
+                    "key": "resolved",
+                    "get_value": lambda x: "Yes" if x else "No",
+                },
+            ],
+            empty_message="No comments found.",
         )
-        click.echo("-" * (max_id + max_user + 40))
-
-        # Print rows
-        for comment in comments:
-            resolved_str = "Yes" if comment.resolved else "No"
-            # Truncate comment text to 30 chars for display
-            text = (
-                comment.comment_text[:30] + "..."
-                if len(comment.comment_text) > 30
-                else comment.comment_text
-            )
-            click.echo(
-                f"{comment.id.ljust(max_id)}  {comment.user.username.ljust(max_user)}  {text.ljust(33)}  {resolved_str}"
-            )
 
 
 @cli.command(name="add-comment")
@@ -1046,10 +1038,6 @@ def list_comments(list_id: str, format: str, raw: bool) -> None:
 
     comments = [Comment(**comment) for comment in data["comments"]]
 
-    if not comments:
-        click.echo("No comments found.")
-        return
-
     if format == "json":
         output = [
             {
@@ -1063,28 +1051,24 @@ def list_comments(list_id: str, format: str, raw: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        # Calculate column widths
-        max_id = max(len(c.id) for c in comments)
-        max_user = max(len(c.user.username) for c in comments)
-
-        # Print header
-        click.echo(
-            f"{'ID'.ljust(max_id)}  {'USER'.ljust(max_user)}  {'TEXT'}  {'RESOLVED'}"
+        format_table(
+            comments,
+            [
+                {"header": "ID", "key": "id"},
+                {"header": "USER", "key": "user.username"},
+                {
+                    "header": "TEXT",
+                    "key": "comment_text",
+                    "get_value": lambda x: x[:30] + "..." if len(x) > 30 else x,
+                },
+                {
+                    "header": "RESOLVED",
+                    "key": "resolved",
+                    "get_value": lambda x: "Yes" if x else "No",
+                },
+            ],
+            empty_message="No comments found.",
         )
-        click.echo("-" * (max_id + max_user + 40))
-
-        # Print rows
-        for comment in comments:
-            resolved_str = "Yes" if comment.resolved else "No"
-            # Truncate comment text to 30 chars for display
-            text = (
-                comment.comment_text[:30] + "..."
-                if len(comment.comment_text) > 30
-                else comment.comment_text
-            )
-            click.echo(
-                f"{comment.id.ljust(max_id)}  {comment.user.username.ljust(max_user)}  {text.ljust(33)}  {resolved_str}"
-            )
 
 
 @cli.command(name="add-list-comment")
@@ -1367,10 +1351,6 @@ def task_members(task_id: str, format: str, raw: bool) -> None:
 
     members = [TaskMember(**member) for member in data["members"]]
 
-    if not members:
-        click.echo("No members found.")
-        return
-
     if format == "json":
         output = [
             {
@@ -1383,20 +1363,15 @@ def task_members(task_id: str, format: str, raw: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        # Calculate column widths
-        max_id = max(len(str(m.id)) for m in members)
-        max_user = max(len(m.username) for m in members)
-        max_email = max(len(m.email) for m in members)
-
-        # Print header
-        click.echo(f"{'ID'.ljust(max_id)}  {'USERNAME'.ljust(max_user)}  {'EMAIL'}")
-        click.echo("-" * (max_id + max_user + max_email + 6))
-
-        # Print rows
-        for member in members:
-            click.echo(
-                f"{str(member.id).ljust(max_id)}  {member.username.ljust(max_user)}  {member.email}"
-            )
+        format_table(
+            members,
+            [
+                {"header": "ID", "key": "id", "get_value": str},
+                {"header": "USERNAME", "key": "username"},
+                {"header": "EMAIL", "key": "email"},
+            ],
+            empty_message="No members found.",
+        )
 
 
 @cli.command(name="list-members")
@@ -1416,10 +1391,6 @@ def list_members(list_id: str, format: str, raw: bool) -> None:
 
     members = [ListMember(**member) for member in data["members"]]
 
-    if not members:
-        click.echo("No members found.")
-        return
-
     if format == "json":
         output = [
             {
@@ -1432,20 +1403,15 @@ def list_members(list_id: str, format: str, raw: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        # Calculate column widths
-        max_id = max(len(str(m.id)) for m in members)
-        max_user = max(len(m.username) for m in members)
-        max_email = max(len(m.email) for m in members)
-
-        # Print header
-        click.echo(f"{'ID'.ljust(max_id)}  {'USERNAME'.ljust(max_user)}  {'EMAIL'}")
-        click.echo("-" * (max_id + max_user + max_email + 6))
-
-        # Print rows
-        for member in members:
-            click.echo(
-                f"{str(member.id).ljust(max_id)}  {member.username.ljust(max_user)}  {member.email}"
-            )
+        format_table(
+            members,
+            [
+                {"header": "ID", "key": "id", "get_value": str},
+                {"header": "USERNAME", "key": "username"},
+                {"header": "EMAIL", "key": "email"},
+            ],
+            empty_message="No members found.",
+        )
 
 
 @cli.command(name="tags")
@@ -1799,28 +1765,24 @@ def time_entries(
                 )
             click.echo(json.dumps(output, indent=2))
         elif format == "table":
-            # Calculate column widths
-            max_id = max(len(str(e.get("id", ""))) for e in entries)
-            max_desc = max(len(e.get("description", "")[:30]) for e in entries)
-
-            # Print header
-            click.echo(
-                f"{'ID'.ljust(max_id)}  {'DESCRIPTION'.ljust(max_desc)}  {'DURATION'}"
+            format_table(
+                entries,
+                [
+                    {"header": "ID", "key": "id", "get_value": str},
+                    {
+                        "header": "DESCRIPTION",
+                        "key": "description",
+                        "get_value": lambda x: x[:30] + "..."
+                        if x and len(x) > 30
+                        else x or "",
+                    },
+                    {
+                        "header": "DURATION",
+                        "key": "duration",
+                        "get_value": lambda x: f"{x / 3600000:.2f}h" if x else "0h",
+                    },
+                ],
             )
-            click.echo("-" * (max_id + max_desc + 20))
-
-            # Print rows
-            for entry in entries:
-                desc = (
-                    entry.get("description", "")[:30] + "..."
-                    if len(entry.get("description", "")) > 30
-                    else entry.get("description", "")
-                )
-                duration_ms = entry.get("duration", 0)
-                duration_str = f"{duration_ms / 3600000:.2f}h" if duration_ms else "0h"
-                click.echo(
-                    f"{str(entry.get('id', '')).ljust(max_id)}  {desc.ljust(max_desc)}  {duration_str}"
-                )
 
 
 @cli.command(name="create-time-entry")
@@ -2541,30 +2503,15 @@ def webhooks(team_id: str, format: str, raw: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        if not webhooks_list:
-            click.echo("No webhooks found.")
-            return
-
-        # Calculate column widths
-        max_id = max(len(w.get("id", "")) for w in webhooks_list)
-        max_endpoint = max(len(w.get("endpoint", "")) for w in webhooks_list)
-        max_health = max(
-            len(w.get("health", {}).get("status", "")) for w in webhooks_list
+        format_table(
+            webhooks_list,
+            [
+                {"header": "ID", "key": "id"},
+                {"header": "ENDPOINT", "key": "endpoint"},
+                {"header": "HEALTH", "key": "health.status"},
+            ],
+            empty_message="No webhooks found.",
         )
-
-        # Print header
-        click.echo(
-            f"{'ID'.ljust(max_id)}  {'ENDPOINT'.ljust(max_endpoint)}  {'HEALTH'}"
-        )
-        click.echo("-" * (max_id + max_endpoint + max_health + 8))
-
-        # Print rows
-        for webhook in webhooks_list:
-            click.echo(
-                f"{webhook.get('id', '').ljust(max_id)}  "
-                f"{webhook.get('endpoint', '').ljust(max_endpoint)}  "
-                f"{webhook.get('health', {}).get('status', '')}"
-            )
 
 
 @cli.command(name="create-webhook")
