@@ -1,0 +1,121 @@
+"""Helper functions for cucli CLI commands."""
+
+from typing import Any
+
+import click
+
+
+def format_table(
+    data: list[Any],
+    columns: list[dict[str, Any]],
+    empty_message: str = "No items found.",
+) -> None:
+    """Format and display a table of data.
+
+    This function handles common table formatting logic including:
+    - Empty collection handling
+    - Dynamic column width calculation
+    - Header and separator printing
+    - Row formatting with value transformation
+
+    Args:
+        data: List of data items to display.
+        columns: List of column definitions. Each column is a dict with:
+            - header: Column header text.
+            - key: Attribute key or item key to extract value.
+            - get_value: Optional callable to transform the value.
+            - width: Optional fixed width (if not specified, calculated dynamically).
+        empty_message: Message to display if data is empty.
+
+    Example:
+        format_table(
+            teams,
+            [
+                {"header": "ID", "key": "id"},
+                {"header": "NAME", "key": "name"},
+                {"header": "COLOR", "key": "color"},
+            ],
+            empty_message="No workspaces found.",
+        )
+
+    Example with value transformation:
+        format_table(
+            lists,
+            [
+                {"header": "ID", "key": "id"},
+                {"header": "NAME", "key": "name"},
+                {"header": "TASKS", "key": "task_count", "get_value": str},
+                {"header": "ARCHIVED", "key": "archived", "get_value": lambda x: "Yes" if x else "No"},
+            ],
+            empty_message="No lists found.",
+        )
+
+    Example with fixed width:
+        format_table(
+            tags,
+            [
+                {"header": "NAME", "key": "name"},
+                {"header": "FG COLOR", "key": "tag_fg", "width": 10},
+                {"header": "BG COLOR", "key": "tag_bg"},
+            ],
+            empty_message="No tags found.",
+        )
+    """
+    if not data:
+        click.echo(empty_message)
+        return
+
+    # Calculate column widths
+    col_widths = []
+    for col in columns:
+        if "width" in col:
+            col_widths.append(col["width"])
+        else:
+            # Calculate width based on header and all values
+            header_len = len(col["header"])
+            if "get_value" in col:
+                max_value_len = max(
+                    len(str(col["get_value"](_get_value(item, col["key"]))))
+                    for item in data
+                )
+            else:
+                max_value_len = max(
+                    len(str(_get_value(item, col["key"]))) for item in data
+                )
+            col_widths.append(max(header_len, max_value_len))
+
+    # Print header
+    header_parts = []
+    for col, width in zip(columns, col_widths):
+        header_parts.append(col["header"].ljust(width))
+    click.echo("  ".join(header_parts))
+
+    # Calculate separator line length (sum of widths + spaces between)
+    separator_len = sum(col_widths) + (2 * (len(columns) - 1))
+    click.echo("-" * separator_len)
+
+    # Print rows
+    for item in data:
+        row_parts = []
+        for col, width in zip(columns, col_widths):
+            if "get_value" in col:
+                value = col["get_value"](_get_value(item, col["key"]))
+            else:
+                value = _get_value(item, col["key"])
+            row_parts.append(str(value).ljust(width))
+        click.echo("  ".join(row_parts))
+
+
+def _get_value(item: Any, key: str) -> Any:
+    """Get a value from an item by key (supports both dict and object access).
+
+    Args:
+        item: The data item (dict or object).
+        key: The key or attribute name.
+
+    Returns:
+        The value at the given key/attribute.
+    """
+    if isinstance(item, dict):
+        return item.get(key, "")
+    return getattr(item, key, "")

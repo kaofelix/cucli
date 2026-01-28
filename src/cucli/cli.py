@@ -5,6 +5,7 @@ import json
 import click
 from cucli.api import ClickUpClient, with_client
 from cucli.decorators import common_output_options, handle_api_errors
+from cucli.helpers import format_table
 from cucli.models import (
     Checklist,
     ClickUpList,
@@ -43,24 +44,15 @@ def workspaces(format: str, raw: bool) -> None:
         output = [{"id": t.id, "name": t.name, "color": t.color} for t in teams]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        if not teams:
-            click.echo("No workspaces found.")
-            return
-
-        # Calculate column widths
-        max_id = max(len(t.id) for t in teams)
-        max_name = max(len(t.name) for t in teams)
-        max_color = max(len(t.color) for t in teams)
-
-        # Print header
-        click.echo(f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'COLOR'}")
-        click.echo("-" * (max_id + max_name + max_color + 6))
-
-        # Print rows
-        for team in teams:
-            click.echo(
-                f"{team.id.ljust(max_id)}  {team.name.ljust(max_name)}  {team.color}"
-            )
+        format_table(
+            teams,
+            [
+                {"header": "ID", "key": "id"},
+                {"header": "NAME", "key": "name"},
+                {"header": "COLOR", "key": "color"},
+            ],
+            empty_message="No workspaces found.",
+        )
 
 
 @cli.command(name="spaces")
@@ -97,24 +89,19 @@ def spaces(team_id: str, format: str, raw: bool, archived: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        if not spaces_list:
-            click.echo("No spaces found.")
-            return
-
-        # Calculate column widths
-        max_id = max(len(s.id) for s in spaces_list)
-        max_name = max(len(s.name) for s in spaces_list)
-
-        # Print header
-        click.echo(f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'PRIVATE'}")
-        click.echo("-" * (max_id + max_name + 8))
-
-        # Print rows
-        for space in spaces_list:
-            private_str = "Yes" if space.private else "No"
-            click.echo(
-                f"{space.id.ljust(max_id)}  {space.name.ljust(max_name)}  {private_str}"
-            )
+        format_table(
+            spaces_list,
+            [
+                {"header": "ID", "key": "id"},
+                {"header": "NAME", "key": "name"},
+                {
+                    "header": "PRIVATE",
+                    "key": "private",
+                    "get_value": lambda x: "Yes" if x else "No",
+                },
+            ],
+            empty_message="No spaces found.",
+        )
 
 
 @cli.command(name="folders")
@@ -151,27 +138,20 @@ def folders(space_id: str, format: str, raw: bool, archived: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        if not folders_list:
-            click.echo("No folders found.")
-            return
-
-        # Calculate column widths
-        max_id = max(len(f.id) for f in folders_list)
-        max_name = max(len(f.name) for f in folders_list)
-        max_count = max(len(str(f.task_count)) for f in folders_list)
-
-        # Print header
-        click.echo(
-            f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TASKS'.ljust(max_count)}  {'HIDDEN'}"
+        format_table(
+            folders_list,
+            [
+                {"header": "ID", "key": "id"},
+                {"header": "NAME", "key": "name"},
+                {"header": "TASKS", "key": "task_count", "get_value": str},
+                {
+                    "header": "HIDDEN",
+                    "key": "hidden",
+                    "get_value": lambda x: "Yes" if x else "No",
+                },
+            ],
+            empty_message="No folders found.",
         )
-        click.echo("-" * (max_id + max_name + max_count + 12))
-
-        # Print rows
-        for folder in folders_list:
-            hidden_str = "Yes" if folder.hidden else "No"
-            click.echo(
-                f"{folder.id.ljust(max_id)}  {folder.name.ljust(max_name)}  {str(folder.task_count).ljust(max_count)}  {hidden_str}"
-            )
 
 
 @cli.command(name="create-folder")
@@ -392,27 +372,20 @@ def lists(folder_id: str, format: str, raw: bool, archived: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        if not lists_list:
-            click.echo("No lists found.")
-            return
-
-        # Calculate column widths
-        max_id = max(len(lst.id) for lst in lists_list)
-        max_name = max(len(lst.name) for lst in lists_list)
-        max_count = max(len(str(lst.task_count)) for lst in lists_list)
-
-        # Print header
-        click.echo(
-            f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TASKS'.ljust(max_count)}  {'ARCHIVED'}"
+        format_table(
+            lists_list,
+            [
+                {"header": "ID", "key": "id"},
+                {"header": "NAME", "key": "name"},
+                {"header": "TASKS", "key": "task_count", "get_value": str},
+                {
+                    "header": "ARCHIVED",
+                    "key": "archived",
+                    "get_value": lambda x: "Yes" if x else "No",
+                },
+            ],
+            empty_message="No lists found.",
         )
-        click.echo("-" * (max_id + max_name + max_count + 14))
-
-        # Print rows
-        for lst in lists_list:
-            archived_str = "Yes" if lst.archived else "No"
-            click.echo(
-                f"{lst.id.ljust(max_id)}  {lst.name.ljust(max_name)}  {str(lst.task_count).ljust(max_count)}  {archived_str}"
-            )
 
 
 @cli.command(name="list")
@@ -671,8 +644,8 @@ def tasks(
 
     TEAM_ID: The ID of the team/workspace.
     """
-    with ClickUpClient() as client:
-        data = client.get_team_tasks(
+    data = with_client(
+        lambda client: client.get_team_tasks(
             team_id,
             page=page,
             include_markdown_description=True,
@@ -683,55 +656,47 @@ def tasks(
             assignees=list(assignee) if assignee else None,
             tags=list(tag) if tag else None,
         )
+    )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
-            return
+    if raw:
+        click.echo(json.dumps(data, indent=2))
+        return
 
-        tasks_list = data.get("tasks", [])
+    tasks_list = data.get("tasks", [])
 
-        if format == "json":
-            output = []
-            for task_data in tasks_list:
-                task = Task(**task_data)
-                output.append(
-                    {
-                        "id": task.id,
-                        "name": task.name,
-                        "status": task.status.get("status") if task.status else None,
-                        "priority": task.priority.get("priority")
-                        if task.priority
-                        else None,
-                        "assignees": [a.get("username") for a in task.assignees],
-                        "tags": [t.get("name") for t in task.tags],
-                        "due_date": task.due_date,
-                        "url": task_data.get("url"),
-                    }
-                )
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            if not tasks_list:
-                click.echo("No tasks found.")
-                return
-
-            # Calculate column widths
-            max_id = max(len(t.get("id", "")) for t in tasks_list)
-            max_name = max(len(t.get("name", "")) for t in tasks_list)
-            max_status = max(
-                len(str(t.get("status", {}).get("status", ""))) for t in tasks_list
+    if format == "json":
+        output = []
+        for task_data in tasks_list:
+            task = Task(**task_data)
+            output.append(
+                {
+                    "id": task.id,
+                    "name": task.name,
+                    "status": task.status.get("status") if task.status else None,
+                    "priority": task.priority.get("priority")
+                    if task.priority
+                    else None,
+                    "assignees": [a.get("username") for a in task.assignees],
+                    "tags": [t.get("name") for t in task.tags],
+                    "due_date": task.due_date,
+                    "url": task_data.get("url"),
+                }
             )
-
-            # Print header
-            click.echo(f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'STATUS'}")
-            click.echo("-" * (max_id + max_name + max_status + 6))
-
-            # Print rows
-            for task_data in tasks_list:
-                task = Task(**task_data)
-                status_val = task.status.get("status") if task.status else ""
-                click.echo(
-                    f"{task.id.ljust(max_id)}  {task.name.ljust(max_name)}  {status_val}"
-                )
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        format_table(
+            tasks_list,
+            [
+                {"header": "ID", "key": "id"},
+                {"header": "NAME", "key": "name"},
+                {
+                    "header": "STATUS",
+                    "key": "status",
+                    "get_value": lambda x: x.get("status", "") if x else "",
+                },
+            ],
+            empty_message="No tasks found.",
+        )
 
 
 @cli.command(name="create-task")
@@ -1514,10 +1479,6 @@ def tags(space_id: str, format: str, raw: bool) -> None:
 
     tags_list = [Tag(**tag) for tag in data["tags"]]
 
-    if not tags_list:
-        click.echo("No tags found.")
-        return
-
     if format == "json":
         output = [
             {
@@ -1529,18 +1490,15 @@ def tags(space_id: str, format: str, raw: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        # Calculate column widths
-        max_name = max(len(t.name) for t in tags_list)
-
-        # Print header
-        click.echo(f"{'NAME'.ljust(max_name)}  {'FG COLOR'}  {'BG COLOR'}")
-        click.echo("-" * (max_name + 22))
-
-        # Print rows
-        for tag in tags_list:
-            click.echo(
-                f"{tag.name.ljust(max_name)}  {tag.tag_fg.ljust(10)}  {tag.tag_bg}"
-            )
+        format_table(
+            tags_list,
+            [
+                {"header": "NAME", "key": "name"},
+                {"header": "FG COLOR", "key": "tag_fg", "width": 10},
+                {"header": "BG COLOR", "key": "tag_bg"},
+            ],
+            empty_message="No tags found.",
+        )
 
 
 @cli.command(name="create-tag")
@@ -2408,24 +2366,15 @@ def team_views(team_id: str, format: str, raw: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        if not views_list:
-            click.echo("No views found.")
-            return
-
-        # Calculate column widths
-        max_id = max(len(str(view.get("id", ""))) for view in views_list)
-        max_name = max(len(view.get("name", "")) for view in views_list)
-        max_type = max(len(view.get("type", "")) for view in views_list)
-
-        # Print header
-        click.echo(f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TYPE'}")
-        click.echo("-" * (max_id + max_name + max_type + 6))
-
-        # Print rows
-        for view in views_list:
-            click.echo(
-                f"{str(view.get('id', '')).ljust(max_id)}  {view.get('name', '').ljust(max_name)}  {view.get('type', '')}"
-            )
+        format_table(
+            views_list,
+            [
+                {"header": "ID", "key": "id", "get_value": str},
+                {"header": "NAME", "key": "name"},
+                {"header": "TYPE", "key": "type"},
+            ],
+            empty_message="No views found.",
+        )
 
 
 @cli.command(name="space-views")
@@ -2456,24 +2405,15 @@ def space_views(space_id: str, format: str, raw: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        if not views_list:
-            click.echo("No views found.")
-            return
-
-        # Calculate column widths
-        max_id = max(len(str(view.get("id", ""))) for view in views_list)
-        max_name = max(len(view.get("name", "")) for view in views_list)
-        max_type = max(len(view.get("type", "")) for view in views_list)
-
-        # Print header
-        click.echo(f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TYPE'}")
-        click.echo("-" * (max_id + max_name + max_type + 6))
-
-        # Print rows
-        for view in views_list:
-            click.echo(
-                f"{str(view.get('id', '')).ljust(max_id)}  {view.get('name', '').ljust(max_name)}  {view.get('type', '')}"
-            )
+        format_table(
+            views_list,
+            [
+                {"header": "ID", "key": "id", "get_value": str},
+                {"header": "NAME", "key": "name"},
+                {"header": "TYPE", "key": "type"},
+            ],
+            empty_message="No views found.",
+        )
 
 
 @cli.command(name="folder-views")
@@ -2504,24 +2444,15 @@ def folder_views(folder_id: str, format: str, raw: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        if not views_list:
-            click.echo("No views found.")
-            return
-
-        # Calculate column widths
-        max_id = max(len(str(view.get("id", ""))) for view in views_list)
-        max_name = max(len(view.get("name", "")) for view in views_list)
-        max_type = max(len(view.get("type", "")) for view in views_list)
-
-        # Print header
-        click.echo(f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TYPE'}")
-        click.echo("-" * (max_id + max_name + max_type + 6))
-
-        # Print rows
-        for view in views_list:
-            click.echo(
-                f"{str(view.get('id', '')).ljust(max_id)}  {view.get('name', '').ljust(max_name)}  {view.get('type', '')}"
-            )
+        format_table(
+            views_list,
+            [
+                {"header": "ID", "key": "id", "get_value": str},
+                {"header": "NAME", "key": "name"},
+                {"header": "TYPE", "key": "type"},
+            ],
+            empty_message="No views found.",
+        )
 
 
 @cli.command(name="list-views")
@@ -2552,24 +2483,15 @@ def list_views(list_id: str, format: str, raw: bool) -> None:
         ]
         click.echo(json.dumps(output, indent=2))
     elif format == "table":
-        if not views_list:
-            click.echo("No views found.")
-            return
-
-        # Calculate column widths
-        max_id = max(len(str(view.get("id", ""))) for view in views_list)
-        max_name = max(len(view.get("name", "")) for view in views_list)
-        max_type = max(len(view.get("type", "")) for view in views_list)
-
-        # Print header
-        click.echo(f"{'ID'.ljust(max_id)}  {'NAME'.ljust(max_name)}  {'TYPE'}")
-        click.echo("-" * (max_id + max_name + max_type + 6))
-
-        # Print rows
-        for view in views_list:
-            click.echo(
-                f"{str(view.get('id', '')).ljust(max_id)}  {view.get('name', '').ljust(max_name)}  {view.get('type', '')}"
-            )
+        format_table(
+            views_list,
+            [
+                {"header": "ID", "key": "id", "get_value": str},
+                {"header": "NAME", "key": "name"},
+                {"header": "TYPE", "key": "type"},
+            ],
+            empty_message="No views found.",
+        )
 
 
 @cli.command(name="view")
