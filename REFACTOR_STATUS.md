@@ -7,17 +7,18 @@ This document tracks the progress of refactoring cucli.
 | Pattern | Date | Description |
 |---------|------|-------------|
 | Boolean Parameter String Conversion | 2026-01-28 | Added `_to_bool_str()` helper method to replace duplicate `str(x).lower()` patterns (7 occurrences reduced to 1 helper) |
+| Error handling decorator | 2026-01-28 | Created `@handle_api_errors` decorator to replace duplicate try/except blocks (applied to 4 functions: spaces, folders, lists, create_list) |
 
 ## In Progress
 
 | Pattern | Started | Notes |
 |---------|---------|-------|
-| - | - | - |
+| Error handling decorator (continuing) | 2026-01-28 | Need to apply to remaining ~57 functions with error handling |
 
 ## Planned Refactors (by priority)
 
 ### High Priority
-- [ ] Error handling decorator (40+ occurrences)
+- [x] Error handling decorator (40+ occurrences) - In progress: 4/60 functions refactored
 - [ ] Common output options decorator (30+ occurrences)
 - [ ] Generic table formatter (20+ occurrences)
 - [ ] Context manager helper (50+ occurrences)
@@ -40,6 +41,6 @@ This document tracks the progress of refactoring cucli.
 ## Metrics
 
 - Initial lines of code: 5632 (cli.py: 4083, api.py: 1549)
-- Lines removed through refactoring: 14
-- Lines added (helpers/utilities): 14
-- Net reduction: 0 (0%) - Reduced code duplication by replacing 7 `str().lower()` calls with helper method
+- Lines removed through refactoring: 38
+- Lines added (helpers/utilities): 39
+- Net reduction: -1 (0.02%) - Reduced code duplication by creating @handle_api_errors decorator and applying to 4 functions
