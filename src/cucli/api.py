@@ -9,6 +9,20 @@ import httpx
 class ClickUpClient:
     """Client for the ClickUp API."""
 
+    @staticmethod
+    def _to_bool_str(value: bool | None) -> str | None:
+        """Convert a boolean value to a lowercase string for API parameters.
+
+        Args:
+            value: The boolean value to convert.
+
+        Returns:
+            "true" or "false" as lowercase string, or None if value is None.
+        """
+        if value is None:
+            return None
+        return str(value).lower()
+
     def __init__(self, api_key: str | None = None) -> None:
         """Initialize the client.
 
@@ -51,7 +65,7 @@ class ClickUpClient:
         """
         params: dict[str, Any] = {}
         if archived is not None:
-            params["archived"] = str(archived).lower()
+            params["archived"] = self._to_bool_str(archived)
 
         response = self._client.get(
             f"{self.base_url}/team/{team_id}/space", params=params
@@ -73,7 +87,7 @@ class ClickUpClient:
         """
         params: dict[str, Any] = {}
         if archived is not None:
-            params["archived"] = str(archived).lower()
+            params["archived"] = self._to_bool_str(archived)
 
         response = self._client.get(
             f"{self.base_url}/space/{space_id}/folder", params=params
@@ -157,7 +171,7 @@ class ClickUpClient:
         """
         params: dict[str, Any] = {}
         if archived is not None:
-            params["archived"] = str(archived).lower()
+            params["archived"] = self._to_bool_str(archived)
 
         response = self._client.get(
             f"{self.base_url}/folder/{folder_id}/list", params=params
@@ -289,15 +303,15 @@ class ClickUpClient:
         if order_by is not None:
             params["order_by"] = order_by
         if reverse is not None:
-            params["reverse"] = str(reverse).lower()
+            params["reverse"] = self._to_bool_str(reverse)
         if subtasks is not None:
-            params["subtasks"] = str(subtasks).lower()
+            params["subtasks"] = self._to_bool_str(subtasks)
         if include_markdown_description is not None:
-            params["include_markdown_description"] = str(
+            params["include_markdown_description"] = self._to_bool_str(
                 include_markdown_description
-            ).lower()
+            )
         if include_closed is not None:
-            params["include_closed"] = str(include_closed).lower()
+            params["include_closed"] = self._to_bool_str(include_closed)
 
         if space_ids:
             params["space_ids[]"] = space_ids
@@ -1145,7 +1159,7 @@ class ClickUpClient:
         """
         params: dict[str, Any] = {}
         if include_completed is not None:
-            params["include_completed"] = str(include_completed).lower()
+            params["include_completed"] = self._to_bool_str(include_completed)
 
         response = self._client.get(
             f"{self.base_url}/team/{team_id}/goal", params=params
