@@ -34,13 +34,11 @@
 - [x] Task links (add, delete)
 - [x] Task attachments (create)
 - [x] Folder CLI commands (get, update, delete)
-- [x] List CLI commands (get, update, delete)
-- [x] Views (get team views, get space views, get folder views, get list views, get view details)
-
-## Completed
-- [x] Webhooks (create, list, update, delete)
 
 ## Planned
+- [ ] List CLI commands (get, update, delete)
+- [ ] Views (get team views, get space views, get folder views, get list views, get view details)
+- [ ] Webhooks (create, list, update, delete)
 - [ ] Space (update, delete)
 - [ ] Task time in status (bulk, single)
 - [ ] Move task
