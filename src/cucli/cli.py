@@ -3,7 +3,6 @@
 import json
 
 import click
-import httpx
 from cucli.api import ClickUpClient
 from cucli.decorators import handle_api_errors
 from cucli.models import (
@@ -2284,6 +2283,7 @@ def delete_time_entry(team_id: str, timer_id: str, yes: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def add_dependency(
     task_id: str,
     depends_on: str | None,
@@ -2311,43 +2311,33 @@ def add_dependency(
         )
         raise click.Abort()
 
-    try:
-        with ClickUpClient() as client:
-            data = client.add_dependency(
-                task_id,
-                depends_on=depends_on,
-                dependency_of=dependency_of,
-                custom_task_ids=custom_task_ids,
-                team_id=team_id,
-            )
+    with ClickUpClient() as client:
+        data = client.add_dependency(
+            task_id,
+            depends_on=depends_on,
+            dependency_of=dependency_of,
+            custom_task_ids=custom_task_ids,
+            team_id=team_id,
+        )
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            if format == "json":
-                output = {"task_id": task_id}
-                if depends_on:
-                    output["depends_on"] = depends_on
-                if dependency_of:
-                    output["dependency_of"] = dependency_of
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"Task ID:     {task_id}")
-                if depends_on:
-                    click.echo(f"Depends On:   {depends_on}")
-                if dependency_of:
-                    click.echo(f"Dependency Of: {dependency_of}")
-                click.echo("Dependency added successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {"task_id": task_id}
+            if depends_on:
+                output["depends_on"] = depends_on
+            if dependency_of:
+                output["dependency_of"] = dependency_of
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"Task ID:     {task_id}")
+            if depends_on:
+                click.echo(f"Depends On:   {depends_on}")
+            if dependency_of:
+                click.echo(f"Dependency Of: {dependency_of}")
+            click.echo("Dependency added successfully.")
 
 
 @cli.command(name="delete-dependency")
@@ -2375,6 +2365,7 @@ def add_dependency(
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def delete_dependency(
     task_id: str,
     depends_on: str | None,
@@ -2402,43 +2393,33 @@ def delete_dependency(
         )
         raise click.Abort()
 
-    try:
-        with ClickUpClient() as client:
-            data = client.delete_dependency(
-                task_id,
-                depends_on=depends_on,
-                dependency_of=dependency_of,
-                custom_task_ids=custom_task_ids,
-                team_id=team_id,
-            )
+    with ClickUpClient() as client:
+        data = client.delete_dependency(
+            task_id,
+            depends_on=depends_on,
+            dependency_of=dependency_of,
+            custom_task_ids=custom_task_ids,
+            team_id=team_id,
+        )
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            if format == "json":
-                output = {"task_id": task_id}
-                if depends_on:
-                    output["depends_on"] = depends_on
-                if dependency_of:
-                    output["dependency_of"] = dependency_of
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"Task ID:     {task_id}")
-                if depends_on:
-                    click.echo(f"Depends On:   {depends_on}")
-                if dependency_of:
-                    click.echo(f"Dependency Of: {dependency_of}")
-                click.echo("Dependency deleted successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {"task_id": task_id}
+            if depends_on:
+                output["depends_on"] = depends_on
+            if dependency_of:
+                output["dependency_of"] = dependency_of
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"Task ID:     {task_id}")
+            if depends_on:
+                click.echo(f"Depends On:   {depends_on}")
+            if dependency_of:
+                click.echo(f"Dependency Of: {dependency_of}")
+            click.echo("Dependency deleted successfully.")
 
 
 @cli.command(name="add-link")
@@ -2461,6 +2442,7 @@ def delete_dependency(
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def add_link(
     task_id: str,
     links_to: str | None,
@@ -2487,35 +2469,25 @@ def add_link(
         )
         raise click.Abort()
 
-    try:
-        with ClickUpClient() as client:
-            data = client.add_task_link(
-                task_id,
-                links_to=links_to,
-                custom_task_ids=custom_task_ids,
-                team_id=team_id,
-            )
+    with ClickUpClient() as client:
+        data = client.add_task_link(
+            task_id,
+            links_to=links_to,
+            custom_task_ids=custom_task_ids,
+            team_id=team_id,
+        )
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            if format == "json":
-                output = {"task_id": task_id, "links_to": links_to}
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"Task ID:   {task_id}")
-                click.echo(f"Links To:  {links_to}")
-                click.echo("Link added successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {"task_id": task_id, "links_to": links_to}
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"Task ID:   {task_id}")
+            click.echo(f"Links To:  {links_to}")
+            click.echo("Link added successfully.")
 
 
 @cli.command(name="delete-link")
@@ -2538,6 +2510,7 @@ def add_link(
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def delete_link(
     task_id: str,
     links_to: str | None,
@@ -2564,35 +2537,25 @@ def delete_link(
         )
         raise click.Abort()
 
-    try:
-        with ClickUpClient() as client:
-            data = client.delete_task_link(
-                task_id,
-                links_to=links_to,
-                custom_task_ids=custom_task_ids,
-                team_id=team_id,
-            )
+    with ClickUpClient() as client:
+        data = client.delete_task_link(
+            task_id,
+            links_to=links_to,
+            custom_task_ids=custom_task_ids,
+            team_id=team_id,
+        )
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            if format == "json":
-                output = {"task_id": task_id, "links_to": links_to}
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"Task ID:   {task_id}")
-                click.echo(f"Links To:  {links_to}")
-                click.echo("Link deleted successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {"task_id": task_id, "links_to": links_to}
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"Task ID:   {task_id}")
+            click.echo(f"Links To:  {links_to}")
+            click.echo("Link deleted successfully.")
 
 
 @cli.command(name="create-attachment")
@@ -2616,6 +2579,7 @@ def delete_link(
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def create_attachment(
     task_id: str,
     file_path: str,
@@ -2635,42 +2599,32 @@ def create_attachment(
         )
         raise click.Abort()
 
-    try:
-        with ClickUpClient() as client:
-            data = client.create_task_attachment(
-                task_id,
-                attachment_path=file_path,
-                custom_task_ids=custom_task_ids,
-                team_id=team_id,
-            )
+    with ClickUpClient() as client:
+        data = client.create_task_attachment(
+            task_id,
+            attachment_path=file_path,
+            custom_task_ids=custom_task_ids,
+            team_id=team_id,
+        )
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            if format == "json":
-                output = {
-                    "id": data.get("id"),
-                    "title": data.get("title"),
-                    "url": data.get("url"),
-                    "extension": data.get("extension"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:         {data.get('id')}")
-                click.echo(f"Title:      {data.get('title')}")
-                click.echo(f"Extension:  {data.get('extension')}")
-                click.echo(f"URL:        {data.get('url')}")
-                click.echo("\nAttachment uploaded successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        if format == "json":
+            output = {
+                "id": data.get("id"),
+                "title": data.get("title"),
+                "url": data.get("url"),
+                "extension": data.get("extension"),
+            }
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"ID:         {data.get('id')}")
+            click.echo(f"Title:      {data.get('title')}")
+            click.echo(f"Extension:  {data.get('extension')}")
+            click.echo(f"URL:        {data.get('url')}")
+            click.echo("\nAttachment uploaded successfully.")
 
 
 @cli.command(name="team-views")
@@ -2682,26 +2636,20 @@ def create_attachment(
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def team_views(team_id: str, format: str, raw: bool) -> None:
     """List views in a workspace (team).
 
     TEAM_ID: The ID of team/workspace.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_team_views(team_id)
+    with ClickUpClient() as client:
+        data = client.get_team_views(team_id)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            views_list = data.get("views", [])
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
+        views_list = data.get("views", [])
 
     if format == "json":
         output = [
@@ -2743,26 +2691,20 @@ def team_views(team_id: str, format: str, raw: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def space_views(space_id: str, format: str, raw: bool) -> None:
     """List views in a space.
 
     SPACE_ID: The ID of space.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_space_views(space_id)
+    with ClickUpClient() as client:
+        data = client.get_space_views(space_id)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            views_list = data.get("views", [])
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
+        views_list = data.get("views", [])
 
     if format == "json":
         output = [
@@ -2804,26 +2746,20 @@ def space_views(space_id: str, format: str, raw: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def folder_views(folder_id: str, format: str, raw: bool) -> None:
     """List views in a folder.
 
     FOLDER_ID: The ID of folder.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_folder_views(folder_id)
+    with ClickUpClient() as client:
+        data = client.get_folder_views(folder_id)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            views_list = data.get("views", [])
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
+        views_list = data.get("views", [])
 
     if format == "json":
         output = [
@@ -2865,26 +2801,20 @@ def folder_views(folder_id: str, format: str, raw: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def list_views(list_id: str, format: str, raw: bool) -> None:
     """List views in a list.
 
     LIST_ID: The ID of list.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_list_views(list_id)
+    with ClickUpClient() as client:
+        data = client.get_list_views(list_id)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            views_list = data.get("views", [])
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
+        views_list = data.get("views", [])
 
     if format == "json":
         output = [
@@ -2926,47 +2856,38 @@ def list_views(list_id: str, format: str, raw: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def view(view_id: str, format: str, raw: bool) -> None:
     """Get details for a specific view.
 
     VIEW_ID: The ID of the view to retrieve.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_view(view_id)
+    with ClickUpClient() as client:
+        data = client.get_view(view_id)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            view_data = data.get(
-                "view", data
-            )  # Some responses have view wrapped, some don't
+        view_data = data.get(
+            "view", data
+        )  # Some responses have view wrapped, some don't
 
-            if format == "json":
-                output = {
-                    "id": view_data.get("id"),
-                    "name": view_data.get("name"),
-                    "type": view_data.get("type"),
-                    "parent": view_data.get("parent"),
-                }
-                click.echo(json.dumps(output, indent=2))
-            elif format == "table":
-                click.echo(f"ID:     {view_data.get('id')}")
-                click.echo(f"Name:   {view_data.get('name')}")
-                click.echo(f"Type:   {view_data.get('type')}")
-                parent = view_data.get("parent")
-                if parent:
-                    click.echo(f"Parent: {parent}")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+    if format == "json":
+        output = {
+            "id": view_data.get("id"),
+            "name": view_data.get("name"),
+            "type": view_data.get("type"),
+            "parent": view_data.get("parent"),
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"ID:     {view_data.get('id')}")
+        click.echo(f"Name:   {view_data.get('name')}")
+        click.echo(f"Type:   {view_data.get('type')}")
+        parent = view_data.get("parent")
+        if parent:
+            click.echo(f"Parent: {parent}")
 
 
 @cli.command(name="webhooks")
@@ -2978,26 +2899,20 @@ def view(view_id: str, format: str, raw: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def webhooks(team_id: str, format: str, raw: bool) -> None:
     """List webhooks in a workspace.
 
     TEAM_ID: The ID of the team/workspace.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.get_webhooks(team_id)
+    with ClickUpClient() as client:
+        data = client.get_webhooks(team_id)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            webhooks_list = data.get("webhooks", [])
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
+        webhooks_list = data.get("webhooks", [])
 
     if format == "json":
         output = [
@@ -3056,6 +2971,7 @@ def webhooks(team_id: str, format: str, raw: bool) -> None:
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def create_webhook(
     team_id: str,
     endpoint: str,
@@ -3073,24 +2989,14 @@ def create_webhook(
 
     events = list(event)
 
-    try:
-        with ClickUpClient() as client:
-            data = client.create_webhook(team_id, endpoint=endpoint, events=events)
+    with ClickUpClient() as client:
+        data = client.create_webhook(team_id, endpoint=endpoint, events=events)
 
-            if raw:
-                click.echo(json.dumps(data, indent=2))
-                return
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
 
-            webhook = data.get("webhook", data)
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        webhook = data.get("webhook", data)
 
     if format == "json":
         output = {
@@ -3120,6 +3026,7 @@ def create_webhook(
     help="Output format.",
 )
 @click.option("--raw", is_flag=True, help="Output raw JSON without model validation.")
+@handle_api_errors
 def update_webhook_cli(
     webhook_id: str,
     endpoint: str | None,
@@ -3132,36 +3039,26 @@ def update_webhook_cli(
 
     WEBHOOK_ID: The ID of the webhook to update.
     """
-    try:
-        with ClickUpClient() as client:
-            data = client.update_webhook(
-                webhook_id,
-                endpoint=endpoint,
-                events=event,
-                status=status,
-            )
+    with ClickUpClient() as client:
+        data = client.update_webhook(
+            webhook_id,
+            endpoint=endpoint,
+            events=event,
+            status=status,
+        )
 
-            if raw:
-                if data:
-                    click.echo(json.dumps(data, indent=2))
-                else:
-                    click.echo("{}")
-                return
+        if raw:
+            if data:
+                click.echo(json.dumps(data, indent=2))
+            else:
+                click.echo("{}")
+            return
 
-            if not data:
-                click.echo("No updates provided.")
-                return
+        if not data:
+            click.echo("No updates provided.")
+            return
 
-            webhook = data.get("webhook", data)
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+        webhook = data.get("webhook", data)
 
     if format == "json":
         output = {
@@ -3182,6 +3079,7 @@ def update_webhook_cli(
 @cli.command(name="delete-webhook")
 @click.argument("webhook_id")
 @click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
+@handle_api_errors
 def delete_webhook(webhook_id: str, yes: bool) -> None:
     """Delete a webhook.
 
@@ -3192,19 +3090,9 @@ def delete_webhook(webhook_id: str, yes: bool) -> None:
             click.echo("Deletion cancelled.")
             return
 
-    try:
-        with ClickUpClient() as client:
-            client.delete_webhook(webhook_id)
-            click.echo(f"Webhook {webhook_id} deleted successfully.")
-    except httpx.HTTPStatusError as e:
-        click.echo(f"HTTP Error: {e.response.status_code} - {e}", err=True)
-        raise click.Abort()
-    except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"Unexpected error: {e}", err=True)
-        raise click.Abort()
+    with ClickUpClient() as client:
+        client.delete_webhook(webhook_id)
+        click.echo(f"Webhook {webhook_id} deleted successfully.")
 
 
 def main() -> None:
