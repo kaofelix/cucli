@@ -4,11 +4,12 @@ Our goal is to produce a working CLI client for the clickup API
 - Prioritize what you think a user would be most likely to want to do in clickup as the next feature
 - Track progress in TODO.md with simple items per endpoint / functionality. No details
 - Use TDD to implement new features: always write a test first, then implement
-- If you need data in clickup for testing, you can create it with curl using CLICKUP_API_KEY as the key
+- Work on ONE feature, finish it, test it, commit, update your progress, and STOP
+- Read CLICKUP_API_KEY from the environment as the key, it's available. You don't need to read and hardcode in your requests
 - The environment is pointing to a test ClickUp Workspace, it's ok to make changes for testing scenario and cassette recording
 - Only use VCR for a few happy test integration scenarios
 - NEVER manually create VCR cassettes
-- NEVER delete VCR cassette folders. When you need to overwrite existing cassetes, use: `pytest --record-mode=rewrite`
+- If you need to overwrite existing cassetes, use: `pytest --record-mode=rewrite`. Do not delete them, just run your test with `pytest --record-mode=rewrite` to overwrite them
 - If test files grow too large, break them down into smaller files
 - Document the new added commands
 - If the documentation grows too large, break it down into smaller files
