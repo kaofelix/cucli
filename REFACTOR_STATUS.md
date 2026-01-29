@@ -15,6 +15,7 @@ This document tracks the progress of refactoring cucli.
 | Model parsing helper | 2026-01-28 | Created `parse_models_with_raw()` helper in helpers.py to replace duplicate raw output checking and model parsing patterns (refactored 8 functions: workspaces, spaces, folders, lists, task_comments, list_comments, task_members, list_members, tags) |
 | Team ID validation helper | 2026-01-29 | Created `validate_team_id_for_custom_tasks()` helper in helpers.py to replace duplicate team_id validation for custom_task_ids pattern (refactored 5 functions: add_dependency, delete_dependency, add_link, delete_link, create_attachment) |
 | Raw JSON output helper | 2026-01-29 | Created `handle_raw_output()` helper in helpers.py to replace duplicate raw JSON output patterns (refactored 27 functions: create_folder, folder, update_folder_cli, create_list, get_list_cli, task, create_task, update_task, create_checklist, create_checklist_item, update_checklist, update_checklist_item, create_tag, add_tag, remove_tag, running_time_entry, start_time_entry, stop_time_entry, create_time_entry, update_time_entry, tasks, add_comment, add_list_comment, time_entries, add_dependency, delete_dependency, add_link, delete_link, create_attachment, team_views, space_views, folder_views, list_views, view, webhooks, create_webhook, update_webhook_cli) |
+| 204 response handler | 2026-01-29 | Created `_delete_with_204_handling()` helper method in api.py to replace duplicate 204 No Content response handling (refactored 2 functions: delete_folder, delete_task) |
 
 ## In Progress
 
@@ -43,11 +44,11 @@ This document tracks the progress of refactoring cucli.
 - [x] Comments output formatter (2 occurrences) - Completed: task_comments, list_comments refactored with format_table
 - [x] Members output formatter (2 occurrences) - Completed: task_members, list_members refactored with format_table
 - [x] Time entry formatter (4 occurrences) - Completed: time_entries refactored with format_table
-- [ ] 204 response handler (5 occurrences)
+- [x] 204 response handler (2 occurrences) - Added _delete_with_204_handling() helper (refactored 2 functions: delete_folder, delete_task)
 
 ## Metrics
 
 - Initial lines of code: 5632 (cli.py: 4083, api.py: 1549)
-- Lines removed through refactoring: 336 (error handling) + 84 (context manager helper, partial) + 276 (common output options) + 115 (table formatter, 10 functions) + 42 (deletion confirmation, 7 functions) + 85 (table formatter, 6 additional functions) + 18 (model parsing helper, 8 functions) + 20 (team ID validation, 5 functions) + 81 (raw output helper, 27 functions) = 1057
-- Lines added (helpers/utilities): 39 (error handling) + 15 (with_client helper) + 16 (common_output_options) + 97 (format_table helper) + 19 (confirm_deletion helper) + 37 (parse_models_with_raw helper) + 22 (validate_team_id_for_custom_tasks helper) + 20 (handle_raw_output helper) = 265
-- Net reduction: -792 (14.06%) - Reduced code duplication by creating @handle_api_errors, @common_output_options decorators, with_client helper, format_table helper, confirm_deletion helper, parse_models_with_raw helper, validate_team_id_for_custom_tasks helper, and handle_raw_output helper
+- Lines removed through refactoring: 336 (error handling) + 84 (context manager helper, partial) + 276 (common output options) + 115 (table formatter, 10 functions) + 42 (deletion confirmation, 7 functions) + 85 (table formatter, 6 additional functions) + 18 (model parsing helper, 8 functions) + 20 (team ID validation, 5 functions) + 81 (raw output helper, 27 functions) + 6 (204 response handler, 2 functions) = 1063
+- Lines added (helpers/utilities): 39 (error handling) + 15 (with_client helper) + 16 (common_output_options) + 97 (format_table helper) + 19 (confirm_deletion helper) + 37 (parse_models_with_raw helper) + 22 (validate_team_id_for_custom_tasks helper) + 20 (handle_raw_output helper) + 20 (_delete_with_204_handling helper) = 285
+- Net reduction: -778 (13.81%) - Reduced code duplication by creating @handle_api_errors, @common_output_options decorators, with_client helper, format_table helper, confirm_deletion helper, parse_models_with_raw helper, validate_team_id_for_custom_tasks helper, handle_raw_output helper, and _delete_with_204_handling helper

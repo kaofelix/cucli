@@ -8,6 +8,7 @@ from cucli.decorators import common_output_options, handle_api_errors
 from cucli.helpers import (
     confirm_deletion,
     format_table,
+    handle_empty_collection,
     handle_raw_output,
     parse_models_with_raw,
     validate_team_id_for_custom_tasks,
@@ -1691,11 +1692,7 @@ def time_entries(
 
         entries = data.get("data", [])
 
-        if not entries:
-            if format == "json":
-                click.echo(json.dumps([]))
-            else:
-                click.echo("No time entries found.")
+        if handle_empty_collection(entries, format, "No time entries found."):
             return
 
         if format == "json":

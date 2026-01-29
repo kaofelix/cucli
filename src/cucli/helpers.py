@@ -241,3 +241,42 @@ def handle_raw_output(data: dict[str, Any] | None, raw: bool) -> bool:
             click.echo("{}")
         return True
     return False
+
+
+def handle_empty_collection(
+    items: list[Any],
+    format: str,
+    empty_message: str = "No items found.",
+) -> bool:
+    """Handle empty collection output for API responses.
+
+    This helper eliminates the repeated pattern of:
+        if not items:
+            if format == "json":
+                click.echo(json.dumps([]))
+            else:
+                click.echo("No items found.")
+            return
+
+    Args:
+        items: The collection of items to check.
+        format: The output format ("json" or "table").
+        empty_message: The message to display for table format when empty.
+
+    Returns:
+        True if collection was empty and output was handled (function should return),
+        False otherwise.
+
+    Example:
+        entries = data.get("data", [])
+        if handle_empty_collection(entries, format, "No time entries found."):
+            return
+        # Continue with entries processing...
+    """
+    if not items:
+        if format == "json":
+            click.echo(json.dumps([]))
+        else:
+            click.echo(empty_message)
+        return True
+    return False
