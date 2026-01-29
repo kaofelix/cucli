@@ -17,6 +17,8 @@ This document tracks the progress of refactoring cucli.
 | Raw JSON output helper | 2026-01-29 | Created `handle_raw_output()` helper in helpers.py to replace duplicate raw JSON output patterns (refactored 27 functions: create_folder, folder, update_folder_cli, create_list, get_list_cli, task, create_task, update_task, create_checklist, create_checklist_item, update_checklist, update_checklist_item, create_tag, add_tag, remove_tag, running_time_entry, start_time_entry, stop_time_entry, create_time_entry, update_time_entry, tasks, add_comment, add_list_comment, time_entries, add_dependency, delete_dependency, add_link, delete_link, create_attachment, team_views, space_views, folder_views, list_views, view, webhooks, create_webhook, update_webhook_cli) |
 | 204 response handler | 2026-01-29 | Created `_delete_with_204_handling()` helper method in api.py to replace duplicate 204 No Content response handling (refactored 2 functions: delete_folder, delete_task) |
 | Empty collection handler | 2026-01-29 | Created `handle_empty_collection()` helper in helpers.py to replace duplicate empty collection output patterns (refactored 1 function: time_entries) |
+| Context manager helper (delete commands) | 2026-01-29 | Refactored 6 delete commands to use `with_client()` helper: delete_folder, delete_list, delete_task, delete_checklist, delete_checklist_item, delete_time_entry, delete_webhook (now 35 of 54 occurrences refactored) |
+| Context manager helper (remaining commands) | 2026-01-29 | Refactored remaining 18 commands to use `with_client()` helper: create_list, update_list_cli, create_task, update_task, add_comment, add_list_comment, update_checklist_item, create_tag, start_time_entry, time_entries, create_time_entry, update_time_entry, add_dependency, delete_dependency, add_link, delete_link, create_attachment, update_webhook_cli (now all 53 occurrences refactored) |
 
 ## In Progress
 
@@ -30,7 +32,7 @@ This document tracks the progress of refactoring cucli.
 - [x] Error handling decorator (40+ occurrences) - Completed: 53/53 functions refactored
 - [x] Common output options decorator (30+ occurrences) - Completed: 46/46 commands refactored
 - [x] Generic table formatter (20+ occurrences) - Completed: 16/20+ functions refactored (workspaces, spaces, folders, lists, tags, team_views, space_views, folder_views, list_views, tasks, task_comments, list_comments, task_members, list_members, time_entries, webhooks)
-- [x] Context manager helper (50+ occurrences) - Partially completed: 29 of 54 occurrences refactored (25 remain, likely complex patterns)
+- [x] Context manager helper (50+ occurrences) - Completed: all 53 occurrences refactored
 - [ ] Default features constant (API: 28 duplicate lines)
 
 ### Medium Priority
@@ -50,6 +52,6 @@ This document tracks the progress of refactoring cucli.
 ## Metrics
 
 - Initial lines of code: 5632 (cli.py: 4083, api.py: 1549)
-- Lines removed through refactoring: 336 (error handling) + 84 (context manager helper, partial) + 276 (common output options) + 115 (table formatter, 10 functions) + 42 (deletion confirmation, 7 functions) + 85 (table formatter, 6 additional functions) + 18 (model parsing helper, 8 functions) + 20 (team ID validation, 5 functions) + 81 (raw output helper, 27 functions) + 6 (204 response handler, 2 functions) + 5 (empty collection handler, 1 function) = 1068
+- Lines removed through refactoring: 336 (error handling) + 84 (context manager helper, partial) + 276 (common output options) + 115 (table formatter, 10 functions) + 42 (deletion confirmation, 7 functions) + 85 (table formatter, 6 additional functions) + 18 (model parsing helper, 8 functions) + 20 (team ID validation, 5 functions) + 81 (raw output helper, 27 functions) + 6 (204 response handler, 2 functions) + 5 (empty collection handler, 1 function) + 12 (context manager helper, 6 delete commands) + 36 (context manager helper, remaining 18 commands) = 1116
 - Lines added (helpers/utilities): 39 (error handling) + 15 (with_client helper) + 16 (common_output_options) + 97 (format_table helper) + 19 (confirm_deletion helper) + 37 (parse_models_with_raw helper) + 22 (validate_team_id_for_custom_tasks helper) + 20 (handle_raw_output helper) + 20 (_delete_with_204_handling helper) + 19 (handle_empty_collection helper) = 304
-- Net reduction: -764 (13.56%) - Reduced code duplication by creating @handle_api_errors, @common_output_options decorators, with_client helper, format_table helper, confirm_deletion helper, parse_models_with_raw helper, validate_team_id_for_custom_tasks helper, handle_raw_output helper, _delete_with_204_handling helper, and handle_empty_collection helper
+- Net reduction: -812 (14.42%) - Reduced code duplication by creating @handle_api_errors, @common_output_options decorators, with_client helper, format_table helper, confirm_deletion helper, parse_models_with_raw helper, validate_team_id_for_custom_tasks helper, handle_raw_output helper, _delete_with_204_handling helper, and handle_empty_collection helper

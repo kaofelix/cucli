@@ -3,7 +3,7 @@
 import json
 
 import click
-from cucli.api import ClickUpClient, with_client
+from cucli.api import with_client
 from cucli.decorators import common_output_options, handle_api_errors
 from cucli.helpers import (
     confirm_deletion,
@@ -296,8 +296,8 @@ def create_list(
 
     FOLDER_ID: The ID of the folder to create the list in.
     """
-    with ClickUpClient() as client:
-        data = client.create_list(
+    data = with_client(
+        lambda client: client.create_list(
             folder_id,
             name=name,
             content=description,
@@ -308,25 +308,26 @@ def create_list(
             assignee=assignee,
             status=status,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if format == "json":
-            output = {
-                "id": data.get("id"),
-                "name": data.get("name"),
-                "folder_id": data.get("folder", {}).get("id"),
-                "space_id": data.get("space", {}).get("id"),
-                "task_count": data.get("task_count"),
-            }
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"ID:         {data.get('id')}")
-            click.echo(f"Name:       {data.get('name')}")
-            click.echo(f"Folder ID:  {data.get('folder', {}).get('id')}")
-            click.echo(f"Space ID:   {data.get('space', {}).get('id')}")
-            click.echo(f"Task Count: {data.get('task_count')}")
+    if format == "json":
+        output = {
+            "id": data.get("id"),
+            "name": data.get("name"),
+            "folder_id": data.get("folder", {}).get("id"),
+            "space_id": data.get("space", {}).get("id"),
+            "task_count": data.get("task_count"),
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"ID:         {data.get('id')}")
+        click.echo(f"Name:       {data.get('name')}")
+        click.echo(f"Folder ID:  {data.get('folder', {}).get('id')}")
+        click.echo(f"Space ID:   {data.get('space', {}).get('id')}")
+        click.echo(f"Task Count: {data.get('task_count')}")
 
 
 @cli.command(name="lists")
@@ -455,8 +456,8 @@ def update_list_cli(
 
     LIST_ID: The ID of list to update.
     """
-    with ClickUpClient() as client:
-        data = client.update_list(
+    data = with_client(
+        lambda client: client.update_list(
             list_id,
             name=name,
             content=description,
@@ -468,34 +469,35 @@ def update_list_cli(
             status=status,
             unset_status=unset_status,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if not data:
-            click.echo("No updates provided.")
-            return
+    if not data:
+        click.echo("No updates provided.")
+        return
 
-        if format == "json":
-            output = {
-                "id": data.get("id"),
-                "name": data.get("name"),
-                "status": data.get("status", {}).get("status")
-                if data.get("status")
-                else None,
-                "priority": data.get("priority", {}).get("priority")
-                if data.get("priority")
-                else None,
-            }
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"ID:      {data.get('id')}")
-            click.echo(f"Name:    {data.get('name')}")
-            if data.get("status"):
-                click.echo(f"Status:  {data.get('status', {}).get('status')}")
-            if data.get("priority"):
-                click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
-            click.echo("Updated successfully.")
+    if format == "json":
+        output = {
+            "id": data.get("id"),
+            "name": data.get("name"),
+            "status": data.get("status", {}).get("status")
+            if data.get("status")
+            else None,
+            "priority": data.get("priority", {}).get("priority")
+            if data.get("priority")
+            else None,
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"ID:      {data.get('id')}")
+        click.echo(f"Name:    {data.get('name')}")
+        if data.get("status"):
+            click.echo(f"Status:  {data.get('status', {}).get('status')}")
+        if data.get("priority"):
+            click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
+        click.echo("Updated successfully.")
 
 
 @cli.command(name="delete-list")
@@ -736,8 +738,8 @@ def create_task(
 
     LIST_ID: The ID of the list to create the task in.
     """
-    with ClickUpClient() as client:
-        data = client.create_task(
+    data = with_client(
+        lambda client: client.create_task(
             list_id,
             name=name,
             description=description,
@@ -752,32 +754,33 @@ def create_task(
             points=points,
             parent=parent,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if format == "json":
-            output = {
-                "id": data.get("id"),
-                "name": data.get("name"),
-                "status": data.get("status", {}).get("status")
-                if data.get("status")
-                else None,
-                "priority": data.get("priority", {}).get("priority")
-                if data.get("priority")
-                else None,
-                "url": data.get("url"),
-            }
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"ID:       {data.get('id')}")
-            click.echo(f"Name:     {data.get('name')}")
-            if data.get("status"):
-                click.echo(f"Status:   {data.get('status', {}).get('status')}")
-            if data.get("priority"):
-                click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
-            if data.get("url"):
-                click.echo(f"URL:      {data.get('url')}")
+    if format == "json":
+        output = {
+            "id": data.get("id"),
+            "name": data.get("name"),
+            "status": data.get("status", {}).get("status")
+            if data.get("status")
+            else None,
+            "priority": data.get("priority", {}).get("priority")
+            if data.get("priority")
+            else None,
+            "url": data.get("url"),
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"ID:       {data.get('id')}")
+        click.echo(f"Name:     {data.get('name')}")
+        if data.get("status"):
+            click.echo(f"Status:   {data.get('status', {}).get('status')}")
+        if data.get("priority"):
+            click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
+        if data.get("url"):
+            click.echo(f"URL:      {data.get('url')}")
 
 
 @cli.command(name="update-task")
@@ -843,8 +846,8 @@ def update_task(
 
     TASK_ID: The ID of the task to update.
     """
-    with ClickUpClient() as client:
-        data = client.update_task(
+    data = with_client(
+        lambda client: client.update_task(
             task_id,
             name=name,
             description=description,
@@ -859,36 +862,37 @@ def update_task(
             assignees_add=list(assignee_add) if assignee_add else None,
             assignees_remove=list(assignee_remove) if assignee_remove else None,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if not data:
-            click.echo("No updates provided.")
-            return
+    if not data:
+        click.echo("No updates provided.")
+        return
 
-        if format == "json":
-            output = {
-                "id": data.get("id"),
-                "name": data.get("name"),
-                "status": data.get("status", {}).get("status")
-                if data.get("status")
-                else None,
-                "priority": data.get("priority", {}).get("priority")
-                if data.get("priority")
-                else None,
-                "url": data.get("url"),
-            }
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"ID:       {data.get('id')}")
-            click.echo(f"Name:     {data.get('name')}")
-            if data.get("status"):
-                click.echo(f"Status:   {data.get('status', {}).get('status')}")
-            if data.get("priority"):
-                click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
-            if data.get("url"):
-                click.echo(f"URL:      {data.get('url')}")
+    if format == "json":
+        output = {
+            "id": data.get("id"),
+            "name": data.get("name"),
+            "status": data.get("status", {}).get("status")
+            if data.get("status")
+            else None,
+            "priority": data.get("priority", {}).get("priority")
+            if data.get("priority")
+            else None,
+            "url": data.get("url"),
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"ID:       {data.get('id')}")
+        click.echo(f"Name:     {data.get('name')}")
+        if data.get("status"):
+            click.echo(f"Status:   {data.get('status', {}).get('status')}")
+        if data.get("priority"):
+            click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
+        if data.get("url"):
+            click.echo(f"URL:      {data.get('url')}")
 
 
 @cli.command(name="delete-task")
@@ -976,23 +980,24 @@ def add_comment(
 
     TASK_ID: The ID of the task to add a comment to.
     """
-    with ClickUpClient() as client:
-        data = client.create_task_comment(
+    data = with_client(
+        lambda client: client.create_task_comment(
             task_id, comment_text=text, assignee=assignee, notify_all=not no_notify
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if format == "json":
-            output = {
-                "id": str(data.get("id")),
-                "date": data.get("date"),
-            }
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"ID:   {data.get('id')}")
-            click.echo(f"Date: {data.get('date')}")
+    if format == "json":
+        output = {
+            "id": str(data.get("id")),
+            "date": data.get("date"),
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"ID:   {data.get('id')}")
+        click.echo(f"Date: {data.get('date')}")
 
 
 @cli.command(name="list-comments")
@@ -1064,23 +1069,24 @@ def add_list_comment(
 
     LIST_ID: The ID of the list to add a comment to.
     """
-    with ClickUpClient() as client:
-        data = client.create_list_comment(
+    data = with_client(
+        lambda client: client.create_list_comment(
             list_id, comment_text=text, assignee=assignee, notify_all=not no_notify
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if format == "json":
-            output = {
-                "id": str(data.get("id")),
-                "date": data.get("date"),
-            }
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"ID:   {data.get('id')}")
-            click.echo(f"Date: {data.get('date')}")
+    if format == "json":
+        output = {
+            "id": str(data.get("id")),
+            "date": data.get("date"),
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"ID:   {data.get('id')}")
+        click.echo(f"Date: {data.get('date')}")
 
 
 @cli.command(name="create-checklist")
@@ -1221,8 +1227,8 @@ def update_checklist_item(
     CHECKLIST_ID: The ID of the checklist.
     CHECKLIST_ITEM_ID: The ID of the checklist item to update.
     """
-    with ClickUpClient() as client:
-        data = client.update_checklist_item(
+    data = with_client(
+        lambda client: client.update_checklist_item(
             checklist_id,
             checklist_item_id,
             name=name,
@@ -1230,31 +1236,32 @@ def update_checklist_item(
             resolved=resolved,
             parent=parent,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if not data:
-            click.echo("No updates provided.")
-            return
+    if not data:
+        click.echo("No updates provided.")
+        return
 
-        checklist = Checklist(**data["checklist"])
+    checklist = Checklist(**data["checklist"])
 
-        if format == "json":
-            output = {
-                "id": checklist.id,
-                "task_id": checklist.task_id,
-                "name": checklist.name,
-                "resolved": checklist.resolved,
-                "unresolved": checklist.unresolved,
-            }
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"ID:         {checklist.id}")
-            click.echo(f"Task ID:    {checklist.task_id}")
-            click.echo(f"Name:       {checklist.name}")
-            click.echo(f"Resolved:    {checklist.resolved}")
-            click.echo(f"Unresolved:  {checklist.unresolved}")
+    if format == "json":
+        output = {
+            "id": checklist.id,
+            "task_id": checklist.task_id,
+            "name": checklist.name,
+            "resolved": checklist.resolved,
+            "unresolved": checklist.unresolved,
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"ID:         {checklist.id}")
+        click.echo(f"Task ID:    {checklist.task_id}")
+        click.echo(f"Name:       {checklist.name}")
+        click.echo(f"Resolved:    {checklist.resolved}")
+        click.echo(f"Unresolved:  {checklist.unresolved}")
 
 
 @cli.command(name="delete-checklist")
@@ -1430,25 +1437,26 @@ def create_tag(
 
     SPACE_ID: The ID of the space to create the tag in.
     """
-    with ClickUpClient() as client:
-        data = client.create_space_tag(
+    data = with_client(
+        lambda client: client.create_space_tag(
             space_id, name=name, tag_fg=fg_color, tag_bg=bg_color
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if format == "json":
-            output = {
-                "name": name,
-                "foreground_color": fg_color,
-                "background_color": bg_color,
-            }
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"Name:        {name}")
-            click.echo(f"FG Color:     {fg_color}")
-            click.echo(f"BG Color:     {bg_color}")
+    if format == "json":
+        output = {
+            "name": name,
+            "foreground_color": fg_color,
+            "background_color": bg_color,
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"Name:        {name}")
+        click.echo(f"FG Color:     {fg_color}")
+        click.echo(f"BG Color:     {bg_color}")
 
 
 @cli.command(name="add-tag")
@@ -1566,34 +1574,33 @@ def start_time_entry(
 
     TEAM_ID: The ID of the team/workspace.
     """
-    with ClickUpClient() as client:
-        data = client.start_time_entry(
+    data = with_client(
+        lambda client: client.start_time_entry(
             team_id, task_id=task_id, description=description, billable=billable
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        entry = data.get("data", {})
+    entry = data.get("data", {})
 
-        if format == "json":
-            output = {
-                "id": entry.get("id"),
-                "wid": entry.get("wid"),
-                "start": entry.get("start"),
-                "duration": entry.get("duration"),
-                "description": entry.get("description"),
-                "task_id": entry.get("task", {}).get("id")
-                if entry.get("task")
-                else None,
-            }
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"ID:          {entry.get('id')}")
-            click.echo(f"Start:       {entry.get('start')}")
-            click.echo(f"Duration:    {entry.get('duration')}")
-            if entry.get("description"):
-                click.echo(f"Description: {entry.get('description')}")
+    if format == "json":
+        output = {
+            "id": entry.get("id"),
+            "wid": entry.get("wid"),
+            "start": entry.get("start"),
+            "duration": entry.get("duration"),
+            "description": entry.get("description"),
+            "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"ID:          {entry.get('id')}")
+        click.echo(f"Start:       {entry.get('start')}")
+        click.echo(f"Duration:    {entry.get('duration')}")
+        if entry.get("description"):
+            click.echo(f"Description: {entry.get('description')}")
             if entry.get("task"):
                 click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
             click.echo("Timer started successfully.")
@@ -1671,8 +1678,8 @@ def time_entries(
 
     TEAM_ID: The ID of the team/workspace.
     """
-    with ClickUpClient() as client:
-        data = client.get_time_entries(
+    data = with_client(
+        lambda client: client.get_time_entries(
             team_id,
             start_date=start_date,
             end_date=end_date,
@@ -1683,50 +1690,51 @@ def time_entries(
             task_id=task_id,
             is_billable=billable if billable else None,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        entries = data.get("data", [])
+    entries = data.get("data", [])
 
-        if handle_empty_collection(entries, format, "No time entries found."):
-            return
+    if handle_empty_collection(entries, format, "No time entries found."):
+        return
 
-        if format == "json":
-            output = []
-            for entry in entries:
-                output.append(
-                    {
-                        "id": entry.get("id"),
-                        "wid": entry.get("wid"),
-                        "start": entry.get("start"),
-                        "duration": entry.get("duration"),
-                        "description": entry.get("description"),
-                        "task_id": entry.get("task", {}).get("id")
-                        if entry.get("task")
-                        else None,
-                    }
-                )
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            format_table(
-                entries,
-                [
-                    {"header": "ID", "key": "id", "get_value": str},
-                    {
-                        "header": "DESCRIPTION",
-                        "key": "description",
-                        "get_value": lambda x: x[:30] + "..."
-                        if x and len(x) > 30
-                        else x or "",
-                    },
-                    {
-                        "header": "DURATION",
-                        "key": "duration",
-                        "get_value": lambda x: f"{x / 3600000:.2f}h" if x else "0h",
-                    },
-                ],
+    if format == "json":
+        output = []
+        for entry in entries:
+            output.append(
+                {
+                    "id": entry.get("id"),
+                    "wid": entry.get("wid"),
+                    "start": entry.get("start"),
+                    "duration": entry.get("duration"),
+                    "description": entry.get("description"),
+                    "task_id": entry.get("task", {}).get("id")
+                    if entry.get("task")
+                    else None,
+                }
             )
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        format_table(
+            entries,
+            [
+                {"header": "ID", "key": "id", "get_value": str},
+                {
+                    "header": "DESCRIPTION",
+                    "key": "description",
+                    "get_value": lambda x: x[:30] + "..."
+                    if x and len(x) > 30
+                    else x or "",
+                },
+                {
+                    "header": "DURATION",
+                    "key": "duration",
+                    "get_value": lambda x: f"{x / 3600000:.2f}h" if x else "0h",
+                },
+            ],
+        )
 
 
 @cli.command(name="create-time-entry")
@@ -1759,8 +1767,8 @@ def create_time_entry(
 
     TEAM_ID: The ID of the team/workspace.
     """
-    with ClickUpClient() as client:
-        data = client.create_time_entry(
+    data = with_client(
+        lambda client: client.create_time_entry(
             team_id,
             start=start,
             duration=duration,
@@ -1768,30 +1776,29 @@ def create_time_entry(
             task_id=task_id,
             billable=billable,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        entry = data.get("data", {})
+    entry = data.get("data", {})
 
-        if format == "json":
-            output = {
-                "id": entry.get("id"),
-                "wid": entry.get("wid"),
-                "start": entry.get("start"),
-                "duration": entry.get("duration"),
-                "description": entry.get("description"),
-                "task_id": entry.get("task", {}).get("id")
-                if entry.get("task")
-                else None,
-            }
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"ID:          {entry.get('id')}")
-            click.echo(f"Start:       {entry.get('start')}")
-            click.echo(f"Duration:    {entry.get('duration')}")
-            if entry.get("description"):
-                click.echo(f"Description: {entry.get('description')}")
+    if format == "json":
+        output = {
+            "id": entry.get("id"),
+            "wid": entry.get("wid"),
+            "start": entry.get("start"),
+            "duration": entry.get("duration"),
+            "description": entry.get("description"),
+            "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"ID:          {entry.get('id')}")
+        click.echo(f"Start:       {entry.get('start')}")
+        click.echo(f"Duration:    {entry.get('duration')}")
+        if entry.get("description"):
+            click.echo(f"Description: {entry.get('description')}")
             if entry.get("task"):
                 click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
             click.echo("Time entry created successfully.")
@@ -1824,8 +1831,8 @@ def update_time_entry(
     TEAM_ID: The ID of the team/workspace.
     TIMER_ID: The ID of the time entry to update.
     """
-    with ClickUpClient() as client:
-        data = client.update_time_entry(
+    data = with_client(
+        lambda client: client.update_time_entry(
             team_id,
             timer_id,
             description=description,
@@ -1835,34 +1842,33 @@ def update_time_entry(
             task_id=task_id,
             billable=billable if billable else None,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        entry = data.get("data", {})
+    entry = data.get("data", {})
 
-        if format == "json":
-            output = {
-                "id": entry.get("id"),
-                "wid": entry.get("wid"),
-                "start": entry.get("start"),
-                "duration": entry.get("duration"),
-                "description": entry.get("description"),
-                "task_id": entry.get("task", {}).get("id")
-                if entry.get("task")
-                else None,
-                "billable": entry.get("billable"),
-            }
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"ID:          {entry.get('id')}")
-            click.echo(f"Start:       {entry.get('start')}")
-            click.echo(f"Duration:    {entry.get('duration')}")
-            if entry.get("description"):
-                click.echo(f"Description: {entry.get('description')}")
-            if entry.get("task"):
-                click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
-            click.echo("Time entry updated successfully.")
+    if format == "json":
+        output = {
+            "id": entry.get("id"),
+            "wid": entry.get("wid"),
+            "start": entry.get("start"),
+            "duration": entry.get("duration"),
+            "description": entry.get("description"),
+            "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+            "billable": entry.get("billable"),
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"ID:          {entry.get('id')}")
+        click.echo(f"Start:       {entry.get('start')}")
+        click.echo(f"Duration:    {entry.get('duration')}")
+        if entry.get("description"):
+            click.echo(f"Description: {entry.get('description')}")
+        if entry.get("task"):
+            click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
+        click.echo("Time entry updated successfully.")
 
 
 @cli.command(name="delete-time-entry")
@@ -1925,32 +1931,33 @@ def add_dependency(
 
     validate_team_id_for_custom_tasks(custom_task_ids, team_id)
 
-    with ClickUpClient() as client:
-        data = client.add_dependency(
+    data = with_client(
+        lambda client: client.add_dependency(
             task_id,
             depends_on=depends_on,
             dependency_of=dependency_of,
             custom_task_ids=custom_task_ids,
             team_id=team_id,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if format == "json":
-            output = {"task_id": task_id}
-            if depends_on:
-                output["depends_on"] = depends_on
-            if dependency_of:
-                output["dependency_of"] = dependency_of
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"Task ID:     {task_id}")
-            if depends_on:
-                click.echo(f"Depends On:   {depends_on}")
-            if dependency_of:
-                click.echo(f"Dependency Of: {dependency_of}")
-            click.echo("Dependency added successfully.")
+    if format == "json":
+        output = {"task_id": task_id}
+        if depends_on:
+            output["depends_on"] = depends_on
+        if dependency_of:
+            output["dependency_of"] = dependency_of
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"Task ID:     {task_id}")
+        if depends_on:
+            click.echo(f"Depends On:   {depends_on}")
+        if dependency_of:
+            click.echo(f"Dependency Of: {dependency_of}")
+        click.echo("Dependency added successfully.")
 
 
 @cli.command(name="delete-dependency")
@@ -1995,32 +2002,33 @@ def delete_dependency(
 
     validate_team_id_for_custom_tasks(custom_task_ids, team_id)
 
-    with ClickUpClient() as client:
-        data = client.delete_dependency(
+    data = with_client(
+        lambda client: client.delete_dependency(
             task_id,
             depends_on=depends_on,
             dependency_of=dependency_of,
             custom_task_ids=custom_task_ids,
             team_id=team_id,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if format == "json":
-            output = {"task_id": task_id}
-            if depends_on:
-                output["depends_on"] = depends_on
-            if dependency_of:
-                output["dependency_of"] = dependency_of
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"Task ID:     {task_id}")
-            if depends_on:
-                click.echo(f"Depends On:   {depends_on}")
-            if dependency_of:
-                click.echo(f"Dependency Of: {dependency_of}")
-            click.echo("Dependency deleted successfully.")
+    if format == "json":
+        output = {"task_id": task_id}
+        if depends_on:
+            output["depends_on"] = depends_on
+        if dependency_of:
+            output["dependency_of"] = dependency_of
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"Task ID:     {task_id}")
+        if depends_on:
+            click.echo(f"Depends On:   {depends_on}")
+        if dependency_of:
+            click.echo(f"Dependency Of: {dependency_of}")
+        click.echo("Dependency deleted successfully.")
 
 
 @cli.command(name="add-link")
@@ -2059,24 +2067,25 @@ def add_link(
 
     validate_team_id_for_custom_tasks(custom_task_ids, team_id)
 
-    with ClickUpClient() as client:
-        data = client.add_task_link(
+    data = with_client(
+        lambda client: client.add_task_link(
             task_id,
             links_to=links_to,
             custom_task_ids=custom_task_ids,
             team_id=team_id,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if format == "json":
-            output = {"task_id": task_id, "links_to": links_to}
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"Task ID:   {task_id}")
-            click.echo(f"Links To:  {links_to}")
-            click.echo("Link added successfully.")
+    if format == "json":
+        output = {"task_id": task_id, "links_to": links_to}
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"Task ID:   {task_id}")
+        click.echo(f"Links To:  {links_to}")
+        click.echo("Link added successfully.")
 
 
 @cli.command(name="delete-link")
@@ -2115,24 +2124,25 @@ def delete_link(
 
     validate_team_id_for_custom_tasks(custom_task_ids, team_id)
 
-    with ClickUpClient() as client:
-        data = client.delete_task_link(
+    data = with_client(
+        lambda client: client.delete_task_link(
             task_id,
             links_to=links_to,
             custom_task_ids=custom_task_ids,
             team_id=team_id,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if format == "json":
-            output = {"task_id": task_id, "links_to": links_to}
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"Task ID:   {task_id}")
-            click.echo(f"Links To:  {links_to}")
-            click.echo("Link deleted successfully.")
+    if format == "json":
+        output = {"task_id": task_id, "links_to": links_to}
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"Task ID:   {task_id}")
+        click.echo(f"Links To:  {links_to}")
+        click.echo("Link deleted successfully.")
 
 
 @cli.command(name="create-attachment")
@@ -2165,31 +2175,32 @@ def create_attachment(
     """
     validate_team_id_for_custom_tasks(custom_task_ids, team_id)
 
-    with ClickUpClient() as client:
-        data = client.create_task_attachment(
+    data = with_client(
+        lambda client: client.create_task_attachment(
             task_id,
             attachment_path=file_path,
             custom_task_ids=custom_task_ids,
             team_id=team_id,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if format == "json":
-            output = {
-                "id": data.get("id"),
-                "title": data.get("title"),
-                "url": data.get("url"),
-                "extension": data.get("extension"),
-            }
-            click.echo(json.dumps(output, indent=2))
-        elif format == "table":
-            click.echo(f"ID:         {data.get('id')}")
-            click.echo(f"Title:      {data.get('title')}")
-            click.echo(f"Extension:  {data.get('extension')}")
-            click.echo(f"URL:        {data.get('url')}")
-            click.echo("\nAttachment uploaded successfully.")
+    if format == "json":
+        output = {
+            "id": data.get("id"),
+            "title": data.get("title"),
+            "url": data.get("url"),
+            "extension": data.get("extension"),
+        }
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        click.echo(f"ID:         {data.get('id')}")
+        click.echo(f"Title:      {data.get('title')}")
+        click.echo(f"Extension:  {data.get('extension')}")
+        click.echo(f"URL:        {data.get('url')}")
+        click.echo("\nAttachment uploaded successfully.")
 
 
 @cli.command(name="team-views")
@@ -2491,22 +2502,23 @@ def update_webhook_cli(
 
     WEBHOOK_ID: The ID of the webhook to update.
     """
-    with ClickUpClient() as client:
-        data = client.update_webhook(
+    data = with_client(
+        lambda client: client.update_webhook(
             webhook_id,
             endpoint=endpoint,
             events=event,
             status=status,
         )
+    )
 
-        if handle_raw_output(data, raw):
-            return
+    if handle_raw_output(data, raw):
+        return
 
-        if not data:
-            click.echo("No updates provided.")
-            return
+    if not data:
+        click.echo("No updates provided.")
+        return
 
-        webhook = data.get("webhook", data)
+    webhook = data.get("webhook", data)
 
     if format == "json":
         output = {
