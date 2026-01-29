@@ -456,29 +456,21 @@ class ClickUpClient:
             The response from the /list/{list_id}/task endpoint.
         """
         data: dict[str, Any] = {"name": name}
-
-        if description is not None:
-            data["description"] = description
-        if markdown_description is not None:
-            data["markdown_content"] = markdown_description
-        if status is not None:
-            data["status"] = status
-        if priority is not None:
-            data["priority"] = priority
-        if assignees:
-            data["assignees"] = assignees
-        if tags:
-            data["tags"] = tags
-        if due_date is not None:
-            data["due_date"] = due_date
-        if start_date is not None:
-            data["start_date"] = start_date
-        if time_estimate is not None:
-            data["time_estimate"] = time_estimate
-        if points is not None:
-            data["points"] = points
-        if parent is not None:
-            data["parent"] = parent
+        data.update(
+            self._build_data_dict(
+                description=description,
+                markdown_content=markdown_description,
+                status=status,
+                priority=priority,
+                assignees=assignees if assignees else None,
+                tags=tags if tags else None,
+                due_date=due_date,
+                start_date=start_date,
+                time_estimate=time_estimate,
+                points=points,
+                parent=parent,
+            )
+        )
 
         response = self._client.post(f"{self.base_url}/list/{list_id}/task", json=data)
         response.raise_for_status()
@@ -577,12 +569,7 @@ class ClickUpClient:
         Returns:
             The response from the /task/{task_id}/comment endpoint.
         """
-        params: dict[str, Any] = {}
-
-        if start is not None:
-            params["start"] = start
-        if start_id is not None:
-            params["start_id"] = start_id
+        params = self._build_data_dict(start=start, start_id=start_id)
 
         response = self._client.get(
             f"{self.base_url}/task/{task_id}/comment", params=params
@@ -613,9 +600,7 @@ class ClickUpClient:
             "comment_text": comment_text,
             "notify_all": notify_all,
         }
-
-        if assignee is not None:
-            data["assignee"] = assignee
+        data.update(self._build_data_dict(assignee=assignee))
 
         response = self._client.post(
             f"{self.base_url}/task/{task_id}/comment", json=data
@@ -640,12 +625,7 @@ class ClickUpClient:
         Returns:
             The response from the /list/{list_id}/comment endpoint.
         """
-        params: dict[str, Any] = {}
-
-        if start is not None:
-            params["start"] = start
-        if start_id is not None:
-            params["start_id"] = start_id
+        params = self._build_data_dict(start=start, start_id=start_id)
 
         response = self._client.get(
             f"{self.base_url}/list/{list_id}/comment", params=params
@@ -720,9 +700,7 @@ class ClickUpClient:
             The response from the /checklist/{checklist_id}/checklist_item endpoint.
         """
         data: dict[str, Any] = {"name": name}
-
-        if assignee is not None:
-            data["assignee"] = assignee
+        data.update(self._build_data_dict(assignee=assignee))
 
         response = self._client.post(
             f"{self.base_url}/checklist/{checklist_id}/checklist_item", json=data
@@ -979,13 +957,13 @@ class ClickUpClient:
         data: dict[str, Any] = {
             "billable": billable,
         }
-
-        if task_id is not None:
-            data["tid"] = task_id
-        if description is not None:
-            data["description"] = description
-        if tags is not None:
-            data["tags"] = tags
+        data.update(
+            self._build_data_dict(
+                tid=task_id,
+                description=description,
+                tags=tags,
+            )
+        )
 
         response = self._client.post(
             f"{self.base_url}/team/{team_id}/time_entries/start", json=data
@@ -1108,13 +1086,13 @@ class ClickUpClient:
             "duration": duration,
             "billable": billable,
         }
-
-        if task_id is not None:
-            data["tid"] = task_id
-        if description is not None:
-            data["description"] = description
-        if tags is not None:
-            data["tags"] = tags
+        data.update(
+            self._build_data_dict(
+                tid=task_id,
+                description=description,
+                tags=tags,
+            )
+        )
 
         response = self._client.post(
             f"{self.base_url}/team/{team_id}/time_entries", json=data
@@ -1262,9 +1240,7 @@ class ClickUpClient:
             "owners": owners if owners is not None else [],
             "color": color,
         }
-
-        if start_date is not None:
-            data["start_date"] = start_date
+        data.update(self._build_data_dict(start_date=start_date))
 
         response = self._client.post(f"{self.base_url}/team/{team_id}/goal", json=data)
         response.raise_for_status()
