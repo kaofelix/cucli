@@ -42,6 +42,37 @@ class ClickUpClient:
             return None
         return str(value).lower()
 
+    def _delete_with_204_handling(
+        self, url: str, *, headers: dict[str, str] | None = None
+    ) -> dict[str, Any] | None:
+        """Perform a DELETE request with special handling for 204 No Content responses.
+
+        This helper eliminates the repeated pattern of:
+            response = self._client.delete(url)
+            if response.status_code == 204:
+                return None
+            response.raise_for_status()
+            return response.json()
+
+        Args:
+            url: The full URL to send the DELETE request to.
+            headers: Optional headers to include in the request.
+
+        Returns:
+            None (204 No Content) or response dict.
+
+        Example:
+            result = self._delete_with_204_handling(f"{self.base_url}/folder/{folder_id}")
+        """
+        kwargs = {}
+        if headers:
+            kwargs["headers"] = headers
+        response = self._client.delete(url, **kwargs)
+        if response.status_code == 204:
+            return None
+        response.raise_for_status()
+        return response.json()
+
     def __init__(self, api_key: str | None = None) -> None:
         """Initialize the client.
 
@@ -170,11 +201,7 @@ class ClickUpClient:
         Returns:
             None (204 No Content) or response dict.
         """
-        response = self._client.delete(f"{self.base_url}/folder/{folder_id}")
-        if response.status_code == 204:
-            return None
-        response.raise_for_status()
-        return response.json()
+        return self._delete_with_204_handling(f"{self.base_url}/folder/{folder_id}")
 
     def get_lists(
         self, folder_id: str, *, archived: bool | None = None
@@ -514,11 +541,7 @@ class ClickUpClient:
         Returns:
             None (204 No Content) or response dict.
         """
-        response = self._client.delete(f"{self.base_url}/task/{task_id}")
-        if response.status_code == 204:
-            return None
-        response.raise_for_status()
-        return response.json()
+        return self._delete_with_204_handling(f"{self.base_url}/task/{task_id}")
 
     def get_task_comments(
         self,
