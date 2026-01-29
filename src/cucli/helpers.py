@@ -179,3 +179,35 @@ def parse_models_with_raw(
 
     items_list = data.get(key, [])
     return [model_class(**item) for item in items_list]
+
+
+def validate_team_id_for_custom_tasks(
+    custom_task_ids: bool,
+    team_id: str | int | None,
+) -> None:
+    """Validate that team_id is provided when using custom_task_ids.
+
+    This helper eliminates the repeated pattern of:
+        if custom_task_ids and not team_id:
+            click.echo(
+                "Error: --team-id is required when using --custom-task-ids.",
+                err=True,
+            )
+            raise click.Abort()
+
+    Args:
+        custom_task_ids: Whether custom task IDs are being used.
+        team_id: The team/workspace ID.
+
+    Raises:
+        click.Abort: If validation fails.
+
+    Example:
+        validate_team_id_for_custom_tasks(custom_task_ids, team_id)
+    """
+    if custom_task_ids and not team_id:
+        click.echo(
+            "Error: --team-id is required when using --custom-task-ids.",
+            err=True,
+        )
+        raise click.Abort()

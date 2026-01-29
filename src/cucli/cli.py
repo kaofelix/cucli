@@ -5,7 +5,12 @@ import json
 import click
 from cucli.api import ClickUpClient, with_client
 from cucli.decorators import common_output_options, handle_api_errors
-from cucli.helpers import confirm_deletion, format_table, parse_models_with_raw
+from cucli.helpers import (
+    confirm_deletion,
+    format_table,
+    parse_models_with_raw,
+    validate_team_id_for_custom_tasks,
+)
 from cucli.models import (
     Checklist,
     ClickUpList,
@@ -1967,12 +1972,7 @@ def add_dependency(
         )
         raise click.Abort()
 
-    if custom_task_ids and not team_id:
-        click.echo(
-            "Error: --team-id is required when using --custom-task-ids.",
-            err=True,
-        )
-        raise click.Abort()
+    validate_team_id_for_custom_tasks(custom_task_ids, team_id)
 
     with ClickUpClient() as client:
         data = client.add_dependency(
@@ -2043,12 +2043,7 @@ def delete_dependency(
         )
         raise click.Abort()
 
-    if custom_task_ids and not team_id:
-        click.echo(
-            "Error: --team-id is required when using --custom-task-ids.",
-            err=True,
-        )
-        raise click.Abort()
+    validate_team_id_for_custom_tasks(custom_task_ids, team_id)
 
     with ClickUpClient() as client:
         data = client.delete_dependency(
@@ -2113,12 +2108,7 @@ def add_link(
         )
         raise click.Abort()
 
-    if custom_task_ids and not team_id:
-        click.echo(
-            "Error: --team-id is required when using --custom-task-ids.",
-            err=True,
-        )
-        raise click.Abort()
+    validate_team_id_for_custom_tasks(custom_task_ids, team_id)
 
     with ClickUpClient() as client:
         data = client.add_task_link(
@@ -2175,12 +2165,7 @@ def delete_link(
         )
         raise click.Abort()
 
-    if custom_task_ids and not team_id:
-        click.echo(
-            "Error: --team-id is required when using --custom-task-ids.",
-            err=True,
-        )
-        raise click.Abort()
+    validate_team_id_for_custom_tasks(custom_task_ids, team_id)
 
     with ClickUpClient() as client:
         data = client.delete_task_link(
@@ -2231,12 +2216,7 @@ def create_attachment(
 
     TASK_ID: The task ID to attach the file to.
     """
-    if custom_task_ids and not team_id:
-        click.echo(
-            "Error: --team-id is required when using --custom-task-ids.",
-            err=True,
-        )
-        raise click.Abort()
+    validate_team_id_for_custom_tasks(custom_task_ids, team_id)
 
     with ClickUpClient() as client:
         data = client.create_task_attachment(
