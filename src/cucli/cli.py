@@ -7,6 +7,8 @@ from cucli.api import with_client
 from cucli.decorators import common_output_options, handle_api_errors
 from cucli.helpers import (
     confirm_deletion,
+    format_list_output,
+    format_single_output,
     format_table,
     format_time_entry_json,
     format_time_entry_table,
@@ -47,19 +49,16 @@ def workspaces(format: str, raw: bool) -> None:
     if teams is None:
         return
 
-    if format == "json":
-        output = [{"id": t.id, "name": t.name, "color": t.color} for t in teams]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            teams,
-            [
-                {"header": "ID", "key": "id"},
-                {"header": "NAME", "key": "name"},
-                {"header": "COLOR", "key": "color"},
-            ],
-            empty_message="No workspaces found.",
-        )
+    format_list_output(
+        teams,
+        format,
+        [
+            {"header": "ID", "key": "id"},
+            {"header": "NAME", "key": "name"},
+            {"header": "COLOR", "key": "color"},
+        ],
+        empty_message="No workspaces found.",
+    )
 
 
 @cli.command(name="spaces")
@@ -82,31 +81,29 @@ def spaces(team_id: str, format: str, raw: bool, archived: bool) -> None:
     if spaces_list is None:
         return
 
-    if format == "json":
-        output = [
+    format_list_output(
+        spaces_list,
+        format,
+        [
+            {"header": "ID", "key": "id"},
+            {"header": "NAME", "key": "name"},
+            {
+                "header": "PRIVATE",
+                "key": "private",
+                "get_value": lambda x: "Yes" if x else "No",
+            },
+        ],
+        json_formatter=lambda spaces: [
             {
                 "id": s.id,
                 "name": s.name,
                 "private": s.private,
                 "archived": s.archived,
             }
-            for s in spaces_list
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            spaces_list,
-            [
-                {"header": "ID", "key": "id"},
-                {"header": "NAME", "key": "name"},
-                {
-                    "header": "PRIVATE",
-                    "key": "private",
-                    "get_value": lambda x: "Yes" if x else "No",
-                },
-            ],
-            empty_message="No spaces found.",
-        )
+            for s in spaces
+        ],
+        empty_message="No spaces found.",
+    )
 
 
 @cli.command(name="folders")
@@ -129,32 +126,21 @@ def folders(space_id: str, format: str, raw: bool, archived: bool) -> None:
     if folders_list is None:
         return
 
-    if format == "json":
-        output = [
+    format_list_output(
+        folders_list,
+        format,
+        [
+            {"header": "ID", "key": "id"},
+            {"header": "NAME", "key": "name"},
+            {"header": "TASKS", "key": "task_count", "get_value": str},
             {
-                "id": f.id,
-                "name": f.name,
-                "hidden": f.hidden,
-                "task_count": f.task_count,
-            }
-            for f in folders_list
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            folders_list,
-            [
-                {"header": "ID", "key": "id"},
-                {"header": "NAME", "key": "name"},
-                {"header": "TASKS", "key": "task_count", "get_value": str},
-                {
-                    "header": "HIDDEN",
-                    "key": "hidden",
-                    "get_value": lambda x: "Yes" if x else "No",
-                },
-            ],
-            empty_message="No folders found.",
-        )
+                "header": "HIDDEN",
+                "key": "hidden",
+                "get_value": lambda x: "Yes" if x else "No",
+            },
+        ],
+        empty_message="No folders found.",
+    )
 
 
 @cli.command(name="create-folder")
@@ -352,32 +338,21 @@ def lists(folder_id: str, format: str, raw: bool, archived: bool) -> None:
     if lists_list is None:
         return
 
-    if format == "json":
-        output = [
+    format_list_output(
+        lists_list,
+        format,
+        [
+            {"header": "ID", "key": "id"},
+            {"header": "NAME", "key": "name"},
+            {"header": "TASKS", "key": "task_count", "get_value": str},
             {
-                "id": lst.id,
-                "name": lst.name,
-                "archived": lst.archived,
-                "task_count": str(lst.task_count),
-            }
-            for lst in lists_list
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            lists_list,
-            [
-                {"header": "ID", "key": "id"},
-                {"header": "NAME", "key": "name"},
-                {"header": "TASKS", "key": "task_count", "get_value": str},
-                {
-                    "header": "ARCHIVED",
-                    "key": "archived",
-                    "get_value": lambda x: "Yes" if x else "No",
-                },
-            ],
-            empty_message="No lists found.",
-        )
+                "header": "ARCHIVED",
+                "key": "archived",
+                "get_value": lambda x: "Yes" if x else "No",
+            },
+        ],
+        empty_message="No lists found.",
+    )
 
 
 @cli.command(name="list")
@@ -647,39 +622,39 @@ def tasks(
 
     tasks_list = data.get("tasks", [])
 
-    if format == "json":
-        output = []
-        for task_data in tasks_list:
-            task = Task(**task_data)
-            output.append(
-                {
-                    "id": task.id,
-                    "name": task.name,
-                    "status": task.status.get("status") if task.status else None,
-                    "priority": task.priority.get("priority")
-                    if task.priority
-                    else None,
-                    "assignees": [a.get("username") for a in task.assignees],
-                    "tags": [t.get("name") for t in task.tags],
-                    "due_date": task.due_date,
-                    "url": task_data.get("url"),
-                }
-            )
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            tasks_list,
-            [
-                {"header": "ID", "key": "id"},
-                {"header": "NAME", "key": "name"},
-                {
-                    "header": "STATUS",
-                    "key": "status",
-                    "get_value": lambda x: x.get("status", "") if x else "",
-                },
-            ],
-            empty_message="No tasks found.",
-        )
+    format_list_output(
+        tasks_list,
+        format,
+        [
+            {"header": "ID", "key": "id"},
+            {"header": "NAME", "key": "name"},
+            {
+                "header": "STATUS",
+                "key": "status",
+                "get_value": lambda x: x.get("status", "") if x else "",
+            },
+        ],
+        json_formatter=lambda tasks_data: [
+            {
+                "id": task_data.get("id"),
+                "name": task_data.get("name"),
+                "status": task_data.get("status", {}).get("status")
+                if task_data.get("status")
+                else None,
+                "priority": task_data.get("priority", {}).get("priority")
+                if task_data.get("priority")
+                else None,
+                "assignees": [
+                    a.get("username") for a in task_data.get("assignees", [])
+                ],
+                "tags": [t.get("name") for t in task_data.get("tags", [])],
+                "due_date": task_data.get("due_date"),
+                "url": task_data.get("url"),
+            }
+            for task_data in tasks_data
+        ],
+        empty_message="No tasks found.",
+    )
 
 
 @cli.command(name="create-task")
@@ -928,8 +903,24 @@ def task_comments(task_id: str, format: str, raw: bool) -> None:
     if comments is None:
         return
 
-    if format == "json":
-        output = [
+    format_list_output(
+        comments,
+        format,
+        [
+            {"header": "ID", "key": "id"},
+            {"header": "USER", "key": "user.username"},
+            {
+                "header": "TEXT",
+                "key": "comment_text",
+                "get_value": lambda x: x[:30] + "..." if len(x) > 30 else x,
+            },
+            {
+                "header": "RESOLVED",
+                "key": "resolved",
+                "get_value": lambda x: "Yes" if x else "No",
+            },
+        ],
+        json_formatter=lambda comments: [
             {
                 "id": c.id,
                 "text": c.comment_text,
@@ -938,27 +929,9 @@ def task_comments(task_id: str, format: str, raw: bool) -> None:
                 "date": c.date,
             }
             for c in comments
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            comments,
-            [
-                {"header": "ID", "key": "id"},
-                {"header": "USER", "key": "user.username"},
-                {
-                    "header": "TEXT",
-                    "key": "comment_text",
-                    "get_value": lambda x: x[:30] + "..." if len(x) > 30 else x,
-                },
-                {
-                    "header": "RESOLVED",
-                    "key": "resolved",
-                    "get_value": lambda x: "Yes" if x else "No",
-                },
-            ],
-            empty_message="No comments found.",
-        )
+        ],
+        empty_message="No comments found.",
+    )
 
 
 @cli.command(name="add-comment")
@@ -1017,8 +990,24 @@ def list_comments(list_id: str, format: str, raw: bool) -> None:
     if comments is None:
         return
 
-    if format == "json":
-        output = [
+    format_list_output(
+        comments,
+        format,
+        [
+            {"header": "ID", "key": "id"},
+            {"header": "USER", "key": "user.username"},
+            {
+                "header": "TEXT",
+                "key": "comment_text",
+                "get_value": lambda x: x[:30] + "..." if len(x) > 30 else x,
+            },
+            {
+                "header": "RESOLVED",
+                "key": "resolved",
+                "get_value": lambda x: "Yes" if x else "No",
+            },
+        ],
+        json_formatter=lambda comments: [
             {
                 "id": c.id,
                 "text": c.comment_text,
@@ -1027,27 +1016,9 @@ def list_comments(list_id: str, format: str, raw: bool) -> None:
                 "date": c.date,
             }
             for c in comments
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            comments,
-            [
-                {"header": "ID", "key": "id"},
-                {"header": "USER", "key": "user.username"},
-                {
-                    "header": "TEXT",
-                    "key": "comment_text",
-                    "get_value": lambda x: x[:30] + "..." if len(x) > 30 else x,
-                },
-                {
-                    "header": "RESOLVED",
-                    "key": "resolved",
-                    "get_value": lambda x: "Yes" if x else "No",
-                },
-            ],
-            empty_message="No comments found.",
-        )
+        ],
+        empty_message="No comments found.",
+    )
 
 
 @cli.command(name="add-list-comment")
@@ -1319,27 +1290,16 @@ def task_members(task_id: str, format: str, raw: bool) -> None:
     if members is None:
         return
 
-    if format == "json":
-        output = [
-            {
-                "id": m.id,
-                "username": m.username,
-                "email": m.email,
-                "initials": m.initials,
-            }
-            for m in members
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            members,
-            [
-                {"header": "ID", "key": "id", "get_value": str},
-                {"header": "USERNAME", "key": "username"},
-                {"header": "EMAIL", "key": "email"},
-            ],
-            empty_message="No members found.",
-        )
+    format_list_output(
+        members,
+        format,
+        [
+            {"header": "ID", "key": "id", "get_value": str},
+            {"header": "USERNAME", "key": "username"},
+            {"header": "EMAIL", "key": "email"},
+        ],
+        empty_message="No members found.",
+    )
 
 
 @cli.command(name="list-members")
@@ -1357,27 +1317,16 @@ def list_members(list_id: str, format: str, raw: bool) -> None:
     if members is None:
         return
 
-    if format == "json":
-        output = [
-            {
-                "id": m.id,
-                "username": m.username,
-                "email": m.email,
-                "initials": m.initials,
-            }
-            for m in members
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            members,
-            [
-                {"header": "ID", "key": "id", "get_value": str},
-                {"header": "USERNAME", "key": "username"},
-                {"header": "EMAIL", "key": "email"},
-            ],
-            empty_message="No members found.",
-        )
+    format_list_output(
+        members,
+        format,
+        [
+            {"header": "ID", "key": "id", "get_value": str},
+            {"header": "USERNAME", "key": "username"},
+            {"header": "EMAIL", "key": "email"},
+        ],
+        empty_message="No members found.",
+    )
 
 
 @cli.command(name="tags")
@@ -1395,26 +1344,24 @@ def tags(space_id: str, format: str, raw: bool) -> None:
     if tags_list is None:
         return
 
-    if format == "json":
-        output = [
+    format_list_output(
+        tags_list,
+        format,
+        [
+            {"header": "NAME", "key": "name"},
+            {"header": "FG COLOR", "key": "tag_fg", "width": 10},
+            {"header": "BG COLOR", "key": "tag_bg"},
+        ],
+        json_formatter=lambda tags_list: [
             {
                 "name": t.name,
                 "foreground_color": t.tag_fg,
                 "background_color": t.tag_bg,
             }
             for t in tags_list
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            tags_list,
-            [
-                {"header": "NAME", "key": "name"},
-                {"header": "FG COLOR", "key": "tag_fg", "width": 10},
-                {"header": "BG COLOR", "key": "tag_bg"},
-            ],
-            empty_message="No tags found.",
-        )
+        ],
+        empty_message="No tags found.",
+    )
 
 
 @cli.command(name="create-tag")
@@ -2159,26 +2106,16 @@ def team_views(team_id: str, format: str, raw: bool) -> None:
 
     views_list = data.get("views", [])
 
-    if format == "json":
-        output = [
-            {
-                "id": view.get("id"),
-                "name": view.get("name"),
-                "type": view.get("type"),
-            }
-            for view in views_list
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            views_list,
-            [
-                {"header": "ID", "key": "id", "get_value": str},
-                {"header": "NAME", "key": "name"},
-                {"header": "TYPE", "key": "type"},
-            ],
-            empty_message="No views found.",
-        )
+    format_list_output(
+        views_list,
+        format,
+        [
+            {"header": "ID", "key": "id", "get_value": str},
+            {"header": "NAME", "key": "name"},
+            {"header": "TYPE", "key": "type"},
+        ],
+        empty_message="No views found.",
+    )
 
 
 @cli.command(name="space-views")
@@ -2197,26 +2134,16 @@ def space_views(space_id: str, format: str, raw: bool) -> None:
 
     views_list = data.get("views", [])
 
-    if format == "json":
-        output = [
-            {
-                "id": view.get("id"),
-                "name": view.get("name"),
-                "type": view.get("type"),
-            }
-            for view in views_list
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            views_list,
-            [
-                {"header": "ID", "key": "id", "get_value": str},
-                {"header": "NAME", "key": "name"},
-                {"header": "TYPE", "key": "type"},
-            ],
-            empty_message="No views found.",
-        )
+    format_list_output(
+        views_list,
+        format,
+        [
+            {"header": "ID", "key": "id", "get_value": str},
+            {"header": "NAME", "key": "name"},
+            {"header": "TYPE", "key": "type"},
+        ],
+        empty_message="No views found.",
+    )
 
 
 @cli.command(name="folder-views")
@@ -2235,26 +2162,16 @@ def folder_views(folder_id: str, format: str, raw: bool) -> None:
 
     views_list = data.get("views", [])
 
-    if format == "json":
-        output = [
-            {
-                "id": view.get("id"),
-                "name": view.get("name"),
-                "type": view.get("type"),
-            }
-            for view in views_list
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            views_list,
-            [
-                {"header": "ID", "key": "id", "get_value": str},
-                {"header": "NAME", "key": "name"},
-                {"header": "TYPE", "key": "type"},
-            ],
-            empty_message="No views found.",
-        )
+    format_list_output(
+        views_list,
+        format,
+        [
+            {"header": "ID", "key": "id", "get_value": str},
+            {"header": "NAME", "key": "name"},
+            {"header": "TYPE", "key": "type"},
+        ],
+        empty_message="No views found.",
+    )
 
 
 @cli.command(name="list-views")
@@ -2273,26 +2190,16 @@ def list_views(list_id: str, format: str, raw: bool) -> None:
 
     views_list = data.get("views", [])
 
-    if format == "json":
-        output = [
-            {
-                "id": view.get("id"),
-                "name": view.get("name"),
-                "type": view.get("type"),
-            }
-            for view in views_list
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            views_list,
-            [
-                {"header": "ID", "key": "id", "get_value": str},
-                {"header": "NAME", "key": "name"},
-                {"header": "TYPE", "key": "type"},
-            ],
-            empty_message="No views found.",
-        )
+    format_list_output(
+        views_list,
+        format,
+        [
+            {"header": "ID", "key": "id", "get_value": str},
+            {"header": "NAME", "key": "name"},
+            {"header": "TYPE", "key": "type"},
+        ],
+        empty_message="No views found.",
+    )
 
 
 @cli.command(name="view")
@@ -2311,21 +2218,22 @@ def view(view_id: str, format: str, raw: bool) -> None:
 
     view_data = data.get("view", data)  # Some responses have view wrapped, some don't
 
-    if format == "json":
-        output = {
-            "id": view_data.get("id"),
-            "name": view_data.get("name"),
-            "type": view_data.get("type"),
-            "parent": view_data.get("parent"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:     {view_data.get('id')}")
-        click.echo(f"Name:   {view_data.get('name')}")
-        click.echo(f"Type:   {view_data.get('type')}")
-        parent = view_data.get("parent")
-        if parent:
-            click.echo(f"Parent: {parent}")
+    format_single_output(
+        view_data,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "name": d.get("name"),
+            "type": d.get("type"),
+            "parent": d.get("parent"),
+        },
+        table_formatter=lambda d: (
+            click.echo(f"ID:     {d.get('id')}"),
+            click.echo(f"Name:   {d.get('name')}"),
+            click.echo(f"Type:   {d.get('type')}"),
+            (lambda: d.get("parent") and click.echo(f"Parent: {d.get('parent')}"))(),
+        )[-1],
+    )
 
 
 @cli.command(name="webhooks")
@@ -2344,27 +2252,25 @@ def webhooks(team_id: str, format: str, raw: bool) -> None:
 
     webhooks_list = data.get("webhooks", [])
 
-    if format == "json":
-        output = [
+    format_list_output(
+        webhooks_list,
+        format,
+        [
+            {"header": "ID", "key": "id"},
+            {"header": "ENDPOINT", "key": "endpoint"},
+            {"header": "HEALTH", "key": "health.status"},
+        ],
+        json_formatter=lambda webhooks: [
             {
                 "id": w.get("id"),
                 "endpoint": w.get("endpoint"),
                 "events": len(w.get("events", [])),
                 "health": w.get("health", {}).get("status"),
             }
-            for w in webhooks_list
-        ]
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            webhooks_list,
-            [
-                {"header": "ID", "key": "id"},
-                {"header": "ENDPOINT", "key": "endpoint"},
-                {"header": "HEALTH", "key": "health.status"},
-            ],
-            empty_message="No webhooks found.",
-        )
+            for w in webhooks
+        ],
+        empty_message="No webhooks found.",
+    )
 
 
 @cli.command(name="create-webhook")

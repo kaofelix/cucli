@@ -1,7 +1,7 @@
 """Helper functions for cucli CLI commands."""
 
 import json
-from typing import Any, TypeVar
+from typing import Any, Callable, TypeVar
 
 import click
 
@@ -349,3 +349,122 @@ def format_time_entry_table(
         click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
     if success_message:
         click.echo(success_message)
+
+
+def format_list_output(
+    items: list[Any],
+    format: str,
+    columns: list[dict[str, Any]],
+    json_formatter: Callable[[list[Any]], list[dict[str, Any]]] | None = None,
+    empty_message: str = "No items found.",
+) -> None:
+    """Format and display a list of items in JSON or table format.
+
+    This helper eliminates the repeated pattern of:
+        if format == "json":
+            output = [{"id": item.id, "name": item.name, ...} for item in items]
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            format_table(items, columns, empty_message=...)
+
+    Args:
+        items: List of data items to display.
+        format: Output format ("json" or "table").
+        columns: List of column definitions for table format.
+        json_formatter: Optional callable that transforms items into JSON-serializable dicts.
+            If not provided, uses columns to build the output.
+        empty_message: Message to display if items is empty (for table format).
+
+    Example:
+        format_list_output(
+            teams,
+            format,
+            [
+                {"header": "ID", "key": "id"},
+                {"header": "NAME", "key": "name"},
+                {"header": "COLOR", "key": "color"},
+            ],
+            empty_message="No workspaces found.",
+        )
+
+    Example with custom JSON formatter:
+        format_list_output(
+            spaces_list,
+            format,
+            [
+                {"header": "ID", "key": "id"},
+                {"header": "NAME", "key": "name"},
+                {"header": "PRIVATE", "key": "private", "get_value": lambda x: "Yes" if x else "No"},
+            ],
+            json_formatter=lambda spaces: [
+                {"id": s.id, "name": s.name, "private": s.private} for s in spaces
+            ],
+            empty_message="No spaces found.",
+        )
+    """
+    if format == "json":
+        if json_formatter is not None:
+            output = json_formatter(items)
+        else:
+            # Build output from columns
+            output = []
+            for item in items:
+                item_dict = {}
+                for col in columns:
+                    value = _get_value(item, col["key"])
+                    if "get_value" in col:
+                        value = col["get_value"](value)
+                    item_dict[col["key"]] = value
+                output.append(item_dict)
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        format_table(items, columns, empty_message=empty_message)
+
+
+def format_single_output(
+    data: dict[str, Any],
+    format: str,
+    json_formatter: Callable[[dict[str, Any]], dict[str, Any]],
+    table_formatter: Callable[[dict[str, Any]], None],
+) -> None:
+    """Format and display a single item in JSON or table format.
+
+    This helper eliminates the repeated pattern of:
+        if format == "json":
+            output = {
+                "id": data.get("id"),
+                "name": data.get("name"),
+                ...
+            }
+            click.echo(json.dumps(output, indent=2))
+        elif format == "table":
+            click.echo(f"ID:   {data.get('id')}")
+            click.echo(f"Name: {data.get('name')}")
+
+    Args:
+        data: The data item to display.
+        format: Output format ("json" or "table").
+        json_formatter: Callable that transforms data into a JSON-serializable dict.
+        table_formatter: Callable that formats and displays data as a table.
+
+    Example:
+        format_single_output(
+            data,
+            format,
+            json_formatter=lambda d: {
+                "id": d.get("id"),
+                "name": d.get("name"),
+                "space_id": d.get("space", {}).get("id"),
+            },
+            table_formatter=lambda d: (
+                click.echo(f"ID:       {d.get('id')}"),
+                click.echo(f"Name:     {d.get('name')}"),
+                click.echo(f"Space ID: {d.get('space', {}).get('id')}"),
+            )[-1],  # Return the last expression
+        )
+    """
+    if format == "json":
+        output = json_formatter(data)
+        click.echo(json.dumps(output, indent=2))
+    elif format == "table":
+        table_formatter(data)
