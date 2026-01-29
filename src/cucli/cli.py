@@ -312,21 +312,24 @@ def create_list(
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {
-            "id": data.get("id"),
-            "name": data.get("name"),
-            "folder_id": data.get("folder", {}).get("id"),
-            "space_id": data.get("space", {}).get("id"),
-            "task_count": data.get("task_count"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:         {data.get('id')}")
-        click.echo(f"Name:       {data.get('name')}")
-        click.echo(f"Folder ID:  {data.get('folder', {}).get('id')}")
-        click.echo(f"Space ID:   {data.get('space', {}).get('id')}")
-        click.echo(f"Task Count: {data.get('task_count')}")
+    format_single_output(
+        data,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "name": d.get("name"),
+            "folder_id": d.get("folder", {}).get("id"),
+            "space_id": d.get("space", {}).get("id"),
+            "task_count": d.get("task_count"),
+        },
+        table_formatter=lambda d: (
+            click.echo(f"ID:         {d.get('id')}"),
+            click.echo(f"Name:       {d.get('name')}"),
+            click.echo(f"Folder ID:  {d.get('folder', {}).get('id')}"),
+            click.echo(f"Space ID:   {d.get('space', {}).get('id')}"),
+            click.echo(f"Task Count: {d.get('task_count')}"),
+        )[-1],
+    )
 
 
 @cli.command(name="lists")
