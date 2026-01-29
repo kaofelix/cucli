@@ -104,6 +104,73 @@ class ClickUpClient:
         """
         return {key: value for key, value in kwargs.items() if value is not None}
 
+    def _build_params(
+        self,
+        bool_params: list[str] | None = None,
+        list_params: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Build a params dictionary excluding None values.
+
+        This helper eliminates the repeated pattern of:
+            params: dict[str, Any] = {}
+            if field1 is not None:
+                params["field1"] = field1
+            if field2 is not None:
+                params["field2"] = self._to_bool_str(field2)
+            # ... many more if statements
+
+        Args:
+            bool_params: List of param names that should have boolean conversion.
+            list_params: List of param names that should have [] suffix added.
+            **kwargs: Field-value pairs to include in the params dict.
+
+        Returns:
+            A dict containing only the non-None values, with booleans converted
+            to strings and list params having [] suffix added.
+
+        Example:
+            params = self._build_params(
+                bool_params=["archived", "include_closed"],
+                archived=archived,
+                include_closed=include_closed,
+                page=page,
+            )
+            # Equivalent to:
+            # params = {}
+            # if archived is not None: params["archived"] = str(archived).lower()
+            # if include_closed is not None: params["include_closed"] = str(include_closed).lower()
+            # if page is not None: params["page"] = page
+
+        Example with list params:
+            params = self._build_params(
+                list_params=["space_ids", "list_ids"],
+                space_ids=space_ids,
+                list_ids=list_ids,
+            )
+            # Equivalent to:
+            # params = {}
+            # if space_ids: params["space_ids[]"] = space_ids
+            # if list_ids: params["list_ids[]"] = list_ids
+        """
+        params: dict[str, Any] = {}
+        bool_params = bool_params or []
+        list_params = list_params or []
+
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+
+            if key in bool_params:
+                params[key] = self._to_bool_str(value)
+            elif key in list_params:
+                if value:  # Only add if list is not empty
+                    params[f"{key}[]"] = value
+            else:
+                params[key] = value
+
+        return params
+
     def __init__(self, api_key: str | None = None) -> None:
         """Initialize the client.
 
@@ -144,9 +211,7 @@ class ClickUpClient:
         Returns:
             The response from the /team/{team_id}/space endpoint.
         """
-        params: dict[str, Any] = {}
-        if archived is not None:
-            params["archived"] = self._to_bool_str(archived)
+        params = self._build_params(bool_params=["archived"], archived=archived)
 
         response = self._client.get(
             f"{self.base_url}/team/{team_id}/space", params=params
@@ -166,9 +231,7 @@ class ClickUpClient:
         Returns:
             The response from the /space/{space_id}/folder endpoint.
         """
-        params: dict[str, Any] = {}
-        if archived is not None:
-            params["archived"] = self._to_bool_str(archived)
+        params = self._build_params(bool_params=["archived"], archived=archived)
 
         response = self._client.get(
             f"{self.base_url}/space/{space_id}/folder", params=params
@@ -246,9 +309,7 @@ class ClickUpClient:
         Returns:
             The response from the /folder/{folder_id}/list endpoint.
         """
-        params: dict[str, Any] = {}
-        if archived is not None:
-            params["archived"] = self._to_bool_str(archived)
+        params = self._build_params(bool_params=["archived"], archived=archived)
 
         response = self._client.get(
             f"{self.base_url}/folder/{folder_id}/list", params=params
@@ -369,48 +430,40 @@ class ClickUpClient:
         Returns:
             The response from the /team/{team_id}/task endpoint.
         """
-        params: dict[str, Any] = {}
-
-        if page is not None:
-            params["page"] = page
-        if order_by is not None:
-            params["order_by"] = order_by
-        if reverse is not None:
-            params["reverse"] = self._to_bool_str(reverse)
-        if subtasks is not None:
-            params["subtasks"] = self._to_bool_str(subtasks)
-        if include_markdown_description is not None:
-            params["include_markdown_description"] = self._to_bool_str(
-                include_markdown_description
-            )
-        if include_closed is not None:
-            params["include_closed"] = self._to_bool_str(include_closed)
-
-        if space_ids:
-            params["space_ids[]"] = space_ids
-        if project_ids:
-            params["project_ids[]"] = project_ids
-        if list_ids:
-            params["list_ids[]"] = list_ids
-        if statuses:
-            params["statuses[]"] = statuses
-        if assignees:
-            params["assignees[]"] = assignees
-        if tags:
-            params["tags[]"] = tags
-
-        if due_date_gt is not None:
-            params["due_date_gt"] = due_date_gt
-        if due_date_lt is not None:
-            params["due_date_lt"] = due_date_lt
-        if date_created_gt is not None:
-            params["date_created_gt"] = date_created_gt
-        if date_created_lt is not None:
-            params["date_created_lt"] = date_created_lt
-        if date_updated_gt is not None:
-            params["date_updated_gt"] = date_updated_gt
-        if date_updated_lt is not None:
-            params["date_updated_lt"] = date_updated_lt
+        params = self._build_params(
+            bool_params=[
+                "reverse",
+                "subtasks",
+                "include_markdown_description",
+                "include_closed",
+            ],
+            list_params=[
+                "space_ids",
+                "project_ids",
+                "list_ids",
+                "statuses",
+                "assignees",
+                "tags",
+            ],
+            page=page,
+            order_by=order_by,
+            reverse=reverse,
+            subtasks=subtasks,
+            include_markdown_description=include_markdown_description,
+            include_closed=include_closed,
+            space_ids=space_ids,
+            project_ids=project_ids,
+            list_ids=list_ids,
+            statuses=statuses,
+            assignees=assignees,
+            tags=tags,
+            due_date_gt=due_date_gt,
+            due_date_lt=due_date_lt,
+            date_created_gt=date_created_gt,
+            date_created_lt=date_created_lt,
+            date_updated_gt=date_updated_gt,
+            date_updated_lt=date_updated_lt,
+        )
 
         response = self._client.get(
             f"{self.base_url}/team/{team_id}/task", params=params
@@ -1182,9 +1235,9 @@ class ClickUpClient:
         Returns:
             The response from the /team/{team_id}/goal endpoint.
         """
-        params: dict[str, Any] = {}
-        if include_completed is not None:
-            params["include_completed"] = self._to_bool_str(include_completed)
+        params = self._build_params(
+            bool_params=["include_completed"], include_completed=include_completed
+        )
 
         response = self._client.get(
             f"{self.base_url}/team/{team_id}/goal", params=params
