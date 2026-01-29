@@ -983,15 +983,17 @@ def add_comment(
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {
-            "id": str(data.get("id")),
-            "date": data.get("date"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:   {data.get('id')}")
-        click.echo(f"Date: {data.get('date')}")
+    comment_data = {"id": str(data.get("id")), "date": data.get("date")}
+
+    format_single_output(
+        comment_data,
+        format,
+        json_formatter=lambda d: d,
+        table_formatter=lambda d: (
+            click.echo(f"ID:   {d.get('id')}"),
+            click.echo(f"Date: {d.get('date')}"),
+        )[-1],
+    )
 
 
 @cli.command(name="list-comments")
@@ -1070,15 +1072,17 @@ def add_list_comment(
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {
-            "id": str(data.get("id")),
-            "date": data.get("date"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:   {data.get('id')}")
-        click.echo(f"Date: {data.get('date')}")
+    comment_data = {"id": str(data.get("id")), "date": data.get("date")}
+
+    format_single_output(
+        comment_data,
+        format,
+        json_formatter=lambda d: d,
+        table_formatter=lambda d: (
+            click.echo(f"ID:   {d.get('id')}"),
+            click.echo(f"Date: {d.get('date')}"),
+        )[-1],
+    )
 
 
 @cli.command(name="create-checklist")
@@ -1427,17 +1431,22 @@ def create_tag(
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {
-            "name": name,
-            "foreground_color": fg_color,
-            "background_color": bg_color,
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"Name:        {name}")
-        click.echo(f"FG Color:     {fg_color}")
-        click.echo(f"BG Color:     {bg_color}")
+    tag_data = {
+        "name": name,
+        "foreground_color": fg_color,
+        "background_color": bg_color,
+    }
+
+    format_single_output(
+        tag_data,
+        format,
+        json_formatter=lambda d: d,
+        table_formatter=lambda d: (
+            click.echo(f"Name:        {d.get('name')}"),
+            click.echo(f"FG Color:     {d.get('foreground_color')}"),
+            click.echo(f"BG Color:     {d.get('background_color')}"),
+        )[-1],
+    )
 
 
 @cli.command(name="add-tag")
@@ -1456,16 +1465,18 @@ def add_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {
-            "task_id": task_id,
-            "tag": tag_name,
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"Task ID:  {task_id}")
-        click.echo(f"Tag:      {tag_name}")
-        click.echo("Tag added successfully.")
+    tag_data = {"task_id": task_id, "tag": tag_name}
+
+    format_single_output(
+        tag_data,
+        format,
+        json_formatter=lambda d: d,
+        table_formatter=lambda d: (
+            click.echo(f"Task ID:  {d.get('task_id')}"),
+            click.echo(f"Tag:      {d.get('tag')}"),
+            click.echo("Tag added successfully."),
+        )[-1],
+    )
 
 
 @cli.command(name="remove-tag")
@@ -1484,16 +1495,18 @@ def remove_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {
-            "task_id": task_id,
-            "tag": tag_name,
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"Task ID:  {task_id}")
-        click.echo(f"Tag:      {tag_name}")
-        click.echo("Tag removed successfully.")
+    tag_data = {"task_id": task_id, "tag": tag_name}
+
+    format_single_output(
+        tag_data,
+        format,
+        json_formatter=lambda d: d,
+        table_formatter=lambda d: (
+            click.echo(f"Task ID:  {d.get('task_id')}"),
+            click.echo(f"Tag:      {d.get('tag')}"),
+            click.echo("Tag removed successfully."),
+        )[-1],
+    )
 
 
 @cli.command(name="running-time-entry")
