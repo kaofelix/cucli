@@ -1876,20 +1876,26 @@ def add_dependency(
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {"task_id": task_id}
-        if depends_on:
-            output["depends_on"] = depends_on
-        if dependency_of:
-            output["dependency_of"] = dependency_of
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"Task ID:     {task_id}")
-        if depends_on:
-            click.echo(f"Depends On:   {depends_on}")
-        if dependency_of:
-            click.echo(f"Dependency Of: {dependency_of}")
+    dependency_data = {"task_id": task_id}
+    if depends_on:
+        dependency_data["depends_on"] = depends_on
+    if dependency_of:
+        dependency_data["dependency_of"] = dependency_of
+
+    def _format_table(d: dict[str, Any]) -> None:
+        click.echo(f"Task ID:     {d.get('task_id')}")
+        if d.get("depends_on"):
+            click.echo(f"Depends On:   {d.get('depends_on')}")
+        if d.get("dependency_of"):
+            click.echo(f"Dependency Of: {d.get('dependency_of')}")
         click.echo("Dependency added successfully.")
+
+    format_single_output(
+        dependency_data,
+        format,
+        json_formatter=lambda d: d,
+        table_formatter=_format_table,
+    )
 
 
 @cli.command(name="delete-dependency")
@@ -1947,20 +1953,26 @@ def delete_dependency(
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {"task_id": task_id}
-        if depends_on:
-            output["depends_on"] = depends_on
-        if dependency_of:
-            output["dependency_of"] = dependency_of
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"Task ID:     {task_id}")
-        if depends_on:
-            click.echo(f"Depends On:   {depends_on}")
-        if dependency_of:
-            click.echo(f"Dependency Of: {dependency_of}")
+    dependency_data = {"task_id": task_id}
+    if depends_on:
+        dependency_data["depends_on"] = depends_on
+    if dependency_of:
+        dependency_data["dependency_of"] = dependency_of
+
+    def _format_table(d: dict[str, Any]) -> None:
+        click.echo(f"Task ID:     {d.get('task_id')}")
+        if d.get("depends_on"):
+            click.echo(f"Depends On:   {d.get('depends_on')}")
+        if d.get("dependency_of"):
+            click.echo(f"Dependency Of: {d.get('dependency_of')}")
         click.echo("Dependency deleted successfully.")
+
+    format_single_output(
+        dependency_data,
+        format,
+        json_formatter=lambda d: d,
+        table_formatter=_format_table,
+    )
 
 
 @cli.command(name="add-link")
@@ -2011,13 +2023,18 @@ def add_link(
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {"task_id": task_id, "links_to": links_to}
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"Task ID:   {task_id}")
-        click.echo(f"Links To:  {links_to}")
-        click.echo("Link added successfully.")
+    link_data = {"task_id": task_id, "links_to": links_to}
+
+    format_single_output(
+        link_data,
+        format,
+        json_formatter=lambda d: d,
+        table_formatter=lambda d: (
+            click.echo(f"Task ID:   {d.get('task_id')}"),
+            click.echo(f"Links To:  {d.get('links_to')}"),
+            click.echo("Link added successfully."),
+        )[-1],
+    )
 
 
 @cli.command(name="delete-link")
@@ -2068,13 +2085,18 @@ def delete_link(
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {"task_id": task_id, "links_to": links_to}
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"Task ID:   {task_id}")
-        click.echo(f"Links To:  {links_to}")
-        click.echo("Link deleted successfully.")
+    link_data = {"task_id": task_id, "links_to": links_to}
+
+    format_single_output(
+        link_data,
+        format,
+        json_formatter=lambda d: d,
+        table_formatter=lambda d: (
+            click.echo(f"Task ID:   {d.get('task_id')}"),
+            click.echo(f"Links To:  {d.get('links_to')}"),
+            click.echo("Link deleted successfully."),
+        )[-1],
+    )
 
 
 @cli.command(name="create-attachment")
@@ -2119,20 +2141,25 @@ def create_attachment(
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {
-            "id": data.get("id"),
-            "title": data.get("title"),
-            "url": data.get("url"),
-            "extension": data.get("extension"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:         {data.get('id')}")
-        click.echo(f"Title:      {data.get('title')}")
-        click.echo(f"Extension:  {data.get('extension')}")
-        click.echo(f"URL:        {data.get('url')}")
-        click.echo("\nAttachment uploaded successfully.")
+    attachment_data = {
+        "id": data.get("id"),
+        "title": data.get("title"),
+        "url": data.get("url"),
+        "extension": data.get("extension"),
+    }
+
+    format_single_output(
+        attachment_data,
+        format,
+        json_formatter=lambda d: d,
+        table_formatter=lambda d: (
+            click.echo(f"ID:         {d.get('id')}"),
+            click.echo(f"Title:      {d.get('title')}"),
+            click.echo(f"Extension:  {d.get('extension')}"),
+            click.echo(f"URL:        {d.get('url')}"),
+            click.echo("\nAttachment uploaded successfully."),
+        )[-1],
+    )
 
 
 @cli.command(name="team-views")
@@ -2358,20 +2385,25 @@ def create_webhook(
 
     webhook = data.get("webhook", data)
 
-    if format == "json":
-        output = {
-            "id": webhook.get("id"),
-            "endpoint": webhook.get("endpoint"),
-            "events": webhook.get("events"),
-            "health": webhook.get("health", {}).get("status"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo("Webhook created successfully.")
-        click.echo(f"ID:       {webhook.get('id')}")
-        click.echo(f"Endpoint:  {webhook.get('endpoint')}")
-        click.echo(f"Events:   {len(webhook.get('events', []))} event(s)")
-        click.echo(f"Health:   {webhook.get('health', {}).get('status')}")
+    webhook_data = {
+        "id": webhook.get("id"),
+        "endpoint": webhook.get("endpoint"),
+        "events": webhook.get("events"),
+        "health": webhook.get("health", {}).get("status"),
+    }
+
+    format_single_output(
+        webhook_data,
+        format,
+        json_formatter=lambda d: d,
+        table_formatter=lambda d: (
+            click.echo("Webhook created successfully."),
+            click.echo(f"ID:       {d.get('id')}"),
+            click.echo(f"Endpoint:  {d.get('endpoint')}"),
+            click.echo(f"Events:   {len(d.get('events', []))} event(s)"),
+            click.echo(f"Health:   {d.get('health')}"),
+        )[-1],
+    )
 
 
 @cli.command(name="update-webhook")
@@ -2411,20 +2443,24 @@ def update_webhook_cli(
 
     webhook = data.get("webhook", data)
 
-    if format == "json":
-        output = {
-            "id": webhook.get("id"),
-            "endpoint": webhook.get("endpoint"),
-            "events": webhook.get("events"),
-            "health": webhook.get("health", {}).get("status"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
+    def _format_table(d: dict[str, Any]) -> None:
         click.echo("Webhook updated successfully.")
-        if webhook.get("endpoint"):
-            click.echo(f"Endpoint: {webhook.get('endpoint')}")
-        if webhook.get("events"):
-            click.echo(f"Events:   {len(webhook.get('events', []))} event(s)")
+        if d.get("endpoint"):
+            click.echo(f"Endpoint: {d.get('endpoint')}")
+        if d.get("events"):
+            click.echo(f"Events:   {len(d.get('events', []))} event(s)")
+
+    format_single_output(
+        webhook,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "endpoint": d.get("endpoint"),
+            "events": d.get("events"),
+            "health": d.get("health", {}).get("status"),
+        },
+        table_formatter=_format_table,
+    )
 
 
 @cli.command(name="delete-webhook")

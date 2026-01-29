@@ -24,6 +24,7 @@ This document tracks the progress of refactoring cucli.
 | JSON output helpers | 2026-01-29 | Created `format_list_output()` and `format_single_output()` helpers in helpers.py to replace duplicate JSON and table output transformation patterns (refactored 15 functions: workspaces, spaces, folders, lists, tasks, task_comments, list_comments, task_members, list_members, team_views, space_views, folder_views, list_views, webhooks, view) |
 | Single-item output helpers | 2026-01-29 | Applied `format_single_output()` helper to additional single-item commands (refactored 7 functions: create_folder, folder, update_folder_cli, get_list_cli, update_list_cli, create_task, update_task) |
 | Checklist output helpers | 2026-01-29 | Applied `format_single_output()` helper to checklist commands (refactored 4 functions: create_checklist, create_checklist_item, update_checklist, update_checklist_item) |
+| Tag and comment output helpers | 2026-01-29 | Applied `format_single_output()` helper to tag and comment commands (refactored 5 functions: create_tag, add_tag, remove_tag, add_comment, add_list_comment) |
 
 ## In Progress
 
