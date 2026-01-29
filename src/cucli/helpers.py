@@ -280,3 +280,72 @@ def handle_empty_collection(
             click.echo(empty_message)
         return True
     return False
+
+
+def format_time_entry_json(entry: dict[str, Any]) -> None:
+    """Format and display a single time entry as JSON.
+
+    This helper eliminates the repeated pattern of:
+        output = {
+            "id": entry.get("id"),
+            "wid": entry.get("wid"),
+            "start": entry.get("start"),
+            "duration": entry.get("duration"),
+            "description": entry.get("description"),
+            "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+        }
+        click.echo(json.dumps(output, indent=2))
+
+    Args:
+        entry: The time entry data from the API response (extracted from "data" key).
+
+    Example:
+        entry = data.get("data", {})
+        format_time_entry_json(entry)
+    """
+    output = {
+        "id": entry.get("id"),
+        "wid": entry.get("wid"),
+        "start": entry.get("start"),
+        "end": entry.get("end"),
+        "duration": entry.get("duration"),
+        "description": entry.get("description"),
+        "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
+        "billable": entry.get("billable"),
+    }
+    click.echo(json.dumps(output, indent=2))
+
+
+def format_time_entry_table(
+    entry: dict[str, Any], success_message: str | None = None
+) -> None:
+    """Format and display a single time entry as a table.
+
+    This helper eliminates the repeated pattern of:
+        click.echo(f"ID:          {entry.get('id')}")
+        click.echo(f"Start:       {entry.get('start')}")
+        click.echo(f"Duration:    {entry.get('duration')}")
+        if entry.get("description"):
+            click.echo(f"Description: {entry.get('description')}")
+        if entry.get("task"):
+            click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
+
+    Args:
+        entry: The time entry data from the API response (extracted from "data" key).
+        success_message: Optional success message to display at the end.
+
+    Example:
+        entry = data.get("data", {})
+        format_time_entry_table(entry, "Timer started successfully.")
+    """
+    click.echo(f"ID:          {entry.get('id')}")
+    click.echo(f"Start:       {entry.get('start')}")
+    if entry.get("end"):
+        click.echo(f"End:         {entry.get('end')}")
+    click.echo(f"Duration:    {entry.get('duration')}")
+    if entry.get("description"):
+        click.echo(f"Description: {entry.get('description')}")
+    if entry.get("task"):
+        click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
+    if success_message:
+        click.echo(success_message)

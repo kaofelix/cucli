@@ -8,6 +8,8 @@ from cucli.decorators import common_output_options, handle_api_errors
 from cucli.helpers import (
     confirm_deletion,
     format_table,
+    format_time_entry_json,
+    format_time_entry_table,
     handle_empty_collection,
     handle_raw_output,
     parse_models_with_raw,
@@ -1536,23 +1538,9 @@ def running_time_entry(team_id: str, format: str, raw: bool) -> None:
         return
 
     if format == "json":
-        output = {
-            "id": entry.get("id"),
-            "wid": entry.get("wid"),
-            "start": entry.get("start"),
-            "duration": entry.get("duration"),
-            "description": entry.get("description"),
-            "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
-        }
-        click.echo(json.dumps(output, indent=2))
+        format_time_entry_json(entry)
     elif format == "table":
-        click.echo(f"ID:          {entry.get('id')}")
-        click.echo(f"Start:       {entry.get('start')}")
-        click.echo(f"Duration:    {entry.get('duration')}")
-        if entry.get("description"):
-            click.echo(f"Description: {entry.get('description')}")
-        if entry.get("task"):
-            click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
+        format_time_entry_table(entry)
 
 
 @cli.command(name="start-time-entry")
@@ -1586,24 +1574,9 @@ def start_time_entry(
     entry = data.get("data", {})
 
     if format == "json":
-        output = {
-            "id": entry.get("id"),
-            "wid": entry.get("wid"),
-            "start": entry.get("start"),
-            "duration": entry.get("duration"),
-            "description": entry.get("description"),
-            "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
-        }
-        click.echo(json.dumps(output, indent=2))
+        format_time_entry_json(entry)
     elif format == "table":
-        click.echo(f"ID:          {entry.get('id')}")
-        click.echo(f"Start:       {entry.get('start')}")
-        click.echo(f"Duration:    {entry.get('duration')}")
-        if entry.get("description"):
-            click.echo(f"Description: {entry.get('description')}")
-            if entry.get("task"):
-                click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
-            click.echo("Timer started successfully.")
+        format_time_entry_table(entry, "Timer started successfully.")
 
 
 @cli.command(name="stop-time-entry")
@@ -1623,26 +1596,9 @@ def stop_time_entry(team_id: str, format: str, raw: bool) -> None:
     entry = data.get("data", {})
 
     if format == "json":
-        output = {
-            "id": entry.get("id"),
-            "wid": entry.get("wid"),
-            "start": entry.get("start"),
-            "end": entry.get("end"),
-            "duration": entry.get("duration"),
-            "description": entry.get("description"),
-            "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
-        }
-        click.echo(json.dumps(output, indent=2))
+        format_time_entry_json(entry)
     elif format == "table":
-        click.echo(f"ID:          {entry.get('id')}")
-        click.echo(f"Start:       {entry.get('start')}")
-        click.echo(f"End:         {entry.get('end')}")
-        click.echo(f"Duration:    {entry.get('duration')}")
-        if entry.get("description"):
-            click.echo(f"Description: {entry.get('description')}")
-        if entry.get("task"):
-            click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
-        click.echo("Timer stopped successfully.")
+        format_time_entry_table(entry, "Timer stopped successfully.")
 
 
 @cli.command(name="time-entries")
@@ -1850,25 +1806,9 @@ def update_time_entry(
     entry = data.get("data", {})
 
     if format == "json":
-        output = {
-            "id": entry.get("id"),
-            "wid": entry.get("wid"),
-            "start": entry.get("start"),
-            "duration": entry.get("duration"),
-            "description": entry.get("description"),
-            "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
-            "billable": entry.get("billable"),
-        }
-        click.echo(json.dumps(output, indent=2))
+        format_time_entry_json(entry)
     elif format == "table":
-        click.echo(f"ID:          {entry.get('id')}")
-        click.echo(f"Start:       {entry.get('start')}")
-        click.echo(f"Duration:    {entry.get('duration')}")
-        if entry.get("description"):
-            click.echo(f"Description: {entry.get('description')}")
-        if entry.get("task"):
-            click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
-        click.echo("Time entry updated successfully.")
+        format_time_entry_table(entry, "Time entry updated successfully.")
 
 
 @cli.command(name="delete-time-entry")
