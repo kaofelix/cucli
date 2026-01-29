@@ -255,9 +255,8 @@ def delete_folder(folder_id: str, yes: bool) -> None:
     if not confirm_deletion("folder", folder_id, yes):
         return
 
-    with ClickUpClient() as client:
-        client.delete_folder(folder_id)
-        click.echo(f"Folder {folder_id} deleted successfully.")
+    with_client(lambda client: client.delete_folder(folder_id))
+    click.echo(f"Folder {folder_id} deleted successfully.")
 
 
 @cli.command(name="create-list")
@@ -511,9 +510,8 @@ def delete_list(list_id: str, yes: bool) -> None:
     if not confirm_deletion("list", list_id, yes):
         return
 
-    with ClickUpClient() as client:
-        client.delete_list(list_id)
-        click.echo(f"List {list_id} deleted successfully.")
+    with_client(lambda client: client.delete_list(list_id))
+    click.echo(f"List {list_id} deleted successfully.")
 
 
 @cli.command(name="task")
@@ -905,9 +903,8 @@ def delete_task(task_id: str, yes: bool) -> None:
     if not confirm_deletion("task", task_id, yes):
         return
 
-    with ClickUpClient() as client:
-        client.delete_task(task_id)
-        click.echo(f"Task {task_id} deleted successfully.")
+    with_client(lambda client: client.delete_task(task_id))
+    click.echo(f"Task {task_id} deleted successfully.")
 
 
 @cli.command(name="task-comments")
@@ -1272,9 +1269,8 @@ def delete_checklist(checklist_id: str, yes: bool) -> None:
     if not confirm_deletion("checklist", checklist_id, yes):
         return
 
-    with ClickUpClient() as client:
-        client.delete_checklist(checklist_id)
-        click.echo(f"Checklist {checklist_id} deleted successfully.")
+    with_client(lambda client: client.delete_checklist(checklist_id))
+    click.echo(f"Checklist {checklist_id} deleted successfully.")
 
 
 @cli.command(name="delete-checklist-item")
@@ -1291,11 +1287,12 @@ def delete_checklist_item(checklist_id: str, checklist_item_id: str, yes: bool) 
     if not confirm_deletion("checklist item", checklist_item_id, yes):
         return
 
-    with ClickUpClient() as client:
-        client.delete_checklist_item(checklist_id, checklist_item_id)
-        click.echo(
-            f"Checklist item {checklist_item_id} deleted successfully from checklist {checklist_id}."
-        )
+    with_client(
+        lambda client: client.delete_checklist_item(checklist_id, checklist_item_id)
+    )
+    click.echo(
+        f"Checklist item {checklist_item_id} deleted successfully from checklist {checklist_id}."
+    )
 
 
 @cli.command(name="task-members")
@@ -1882,9 +1879,8 @@ def delete_time_entry(team_id: str, timer_id: str, yes: bool) -> None:
     if not confirm_deletion("time entry", timer_id, yes):
         return
 
-    with ClickUpClient() as client:
-        client.delete_time_entry(team_id, timer_id)
-        click.echo(f"Time entry {timer_id} deleted successfully.")
+    with_client(lambda client: client.delete_time_entry(team_id, timer_id))
+    click.echo(f"Time entry {timer_id} deleted successfully.")
 
 
 @cli.command(name="add-dependency")
@@ -2540,9 +2536,8 @@ def delete_webhook(webhook_id: str, yes: bool) -> None:
     if not confirm_deletion("webhook", webhook_id, yes):
         return
 
-    with ClickUpClient() as client:
-        client.delete_webhook(webhook_id)
-        click.echo(f"Webhook {webhook_id} deleted successfully.")
+    with_client(lambda client: client.delete_webhook(webhook_id))
+    click.echo(f"Webhook {webhook_id} deleted successfully.")
 
 
 def main() -> None:
