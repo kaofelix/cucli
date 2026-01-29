@@ -11,7 +11,6 @@ from cucli.helpers import (
     confirm_deletion,
     format_list_output,
     format_single_output,
-    format_table,
     format_time_entry_json,
     format_time_entry_table,
     handle_empty_collection,
@@ -1651,41 +1650,35 @@ def time_entries(
     if handle_empty_collection(entries, format, "No time entries found."):
         return
 
-    if format == "json":
-        output = []
-        for entry in entries:
-            output.append(
-                {
-                    "id": entry.get("id"),
-                    "wid": entry.get("wid"),
-                    "start": entry.get("start"),
-                    "duration": entry.get("duration"),
-                    "description": entry.get("description"),
-                    "task_id": entry.get("task", {}).get("id")
-                    if entry.get("task")
-                    else None,
-                }
-            )
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        format_table(
-            entries,
-            [
-                {"header": "ID", "key": "id", "get_value": str},
-                {
-                    "header": "DESCRIPTION",
-                    "key": "description",
-                    "get_value": lambda x: x[:30] + "..."
-                    if x and len(x) > 30
-                    else x or "",
-                },
-                {
-                    "header": "DURATION",
-                    "key": "duration",
-                    "get_value": lambda x: f"{x / 3600000:.2f}h" if x else "0h",
-                },
-            ],
-        )
+    format_list_output(
+        entries,
+        format,
+        [
+            {"header": "ID", "key": "id", "get_value": str},
+            {
+                "header": "DESCRIPTION",
+                "key": "description",
+                "get_value": lambda x: x[:30] + "..." if x and len(x) > 30 else x or "",
+            },
+            {
+                "header": "DURATION",
+                "key": "duration",
+                "get_value": lambda x: f"{x / 3600000:.2f}h" if x else "0h",
+            },
+        ],
+        json_formatter=lambda entries_list: [
+            {
+                "id": e.get("id"),
+                "wid": e.get("wid"),
+                "start": e.get("start"),
+                "duration": e.get("duration"),
+                "description": e.get("description"),
+                "task_id": e.get("task", {}).get("id") if e.get("task") else None,
+            }
+            for e in entries_list
+        ],
+        empty_message="No time entries found.",
+    )
 
 
 @cli.command(name="create-time-entry")
@@ -1735,24 +1728,9 @@ def create_time_entry(
     entry = data.get("data", {})
 
     if format == "json":
-        output = {
-            "id": entry.get("id"),
-            "wid": entry.get("wid"),
-            "start": entry.get("start"),
-            "duration": entry.get("duration"),
-            "description": entry.get("description"),
-            "task_id": entry.get("task", {}).get("id") if entry.get("task") else None,
-        }
-        click.echo(json.dumps(output, indent=2))
+        format_time_entry_json(entry)
     elif format == "table":
-        click.echo(f"ID:          {entry.get('id')}")
-        click.echo(f"Start:       {entry.get('start')}")
-        click.echo(f"Duration:    {entry.get('duration')}")
-        if entry.get("description"):
-            click.echo(f"Description: {entry.get('description')}")
-            if entry.get("task"):
-                click.echo(f"Task ID:     {entry.get('task', {}).get('id')}")
-            click.echo("Time entry created successfully.")
+        format_time_entry_table(entry, "Time entry created successfully.")
 
 
 @cli.command(name="update-time-entry")

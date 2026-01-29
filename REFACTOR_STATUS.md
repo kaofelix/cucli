@@ -28,6 +28,8 @@ This document tracks the progress of refactoring cucli.
 | Tag and comment output helpers | 2026-01-29 | Applied `format_single_output()` helper to tag and comment commands (refactored 5 functions: create_tag, add_tag, remove_tag, add_comment, add_list_comment) |
 | Dependency, link, attachment, webhook output helpers | 2026-01-29 | Applied `format_single_output()` helper to dependency, link, attachment, and webhook commands (refactored 7 functions: add_dependency, delete_dependency, add_link, delete_link, create_attachment, create_webhook, update_webhook_cli) |
 | create_list output helper | 2026-01-29 | Applied `format_single_output()` helper to create_list command |
+| Time entries output helper | 2026-01-29 | Applied `format_list_output()` helper to time_entries function to replace duplicate JSON output pattern |
+| Time entry create output helper | 2026-01-29 | Applied `format_time_entry_json()` and `format_time_entry_table()` helpers to create_time_entry function |
 
 ## In Progress
 
@@ -63,9 +65,9 @@ This document tracks the progress of refactoring cucli.
 ## Metrics
 
 - Initial lines of code: 5632 (cli.py: 4083, api.py: 1549)
-- Lines removed through refactoring: 336 (error handling) + 84 (context manager helper, partial) + 276 (common output options) + 115 (table formatter, 10 functions) + 42 (deletion confirmation, 7 functions) + 85 (table formatter, 6 additional functions) + 18 (model parsing helper, 8 functions) + 20 (team ID validation, 5 functions) + 81 (raw output helper, 27 functions) + 6 (204 response handler, 2 functions) + 5 (empty collection handler, 1 function) + 12 (context manager helper, 6 delete commands) + 36 (context manager helper, remaining 18 commands) + 24 (conditional data building helper, 6 functions) + 23 (conditional data building helper, 3 additional functions) + 24 (conditional data building helper, 8 additional functions) + 60 (time entry formatter, 5 functions) + 145 (JSON output helpers, 15 functions) + 36 (params building helper, 5 functions) = 1428
+- Lines removed through refactoring: 336 (error handling) + 84 (context manager helper, partial) + 276 (common output options) + 115 (table formatter, 10 functions) + 42 (deletion confirmation, 7 functions) + 85 (table formatter, 6 additional functions) + 18 (model parsing helper, 8 functions) + 20 (team ID validation, 5 functions) + 81 (raw output helper, 27 functions) + 6 (204 response handler, 2 functions) + 5 (empty collection handler, 1 function) + 12 (context manager helper, 6 delete commands) + 36 (context manager helper, remaining 18 commands) + 24 (conditional data building helper, 6 functions) + 23 (conditional data building helper, 3 additional functions) + 24 (conditional data building helper, 8 additional functions) + 60 (time entry formatter, 5 functions) + 145 (JSON output helpers, 15 functions) + 36 (params building helper, 5 functions) + 20 (time_entries JSON output) + 10 (create_time_entry output) = 1548
 - Lines added (helpers/utilities): 39 (error handling) + 15 (with_client helper) + 16 (common_output_options) + 97 (format_table helper) + 19 (confirm_deletion helper) + 37 (parse_models_with_raw helper) + 22 (validate_team_id_for_custom_tasks helper) + 20 (handle_raw_output helper) + 20 (_delete_with_204_handling helper) + 19 (handle_empty_collection helper) + 14 (_build_data_dict helper) + 48 (format_time_entry_json and format_time_entry_table helpers) + 74 (format_list_output and format_single_output helpers) + 46 (_build_params helper) = 486
-- Net reduction: -942 (16.73%) - Reduced code duplication by creating @handle_api_errors, @common_output_options decorators, with_client helper, format_table helper, confirm_deletion helper, parse_models_with_raw helper, validate_team_id_for_custom_tasks helper, handle_raw_output helper, _delete_with_204_handling helper, handle_empty_collection helper, _build_data_dict helper, _build_params helper, format_time_entry_json/format_time_entry_table helpers, and format_list_output/format_single_output helpers
+- Net reduction: -1062 (18.86%) - Reduced code duplication by creating @handle_api_errors, @common_output_options decorators, with_client helper, format_table helper, confirm_deletion helper, parse_models_with_raw helper, validate_team_id_for_custom_tasks helper, handle_raw_output helper, _delete_with_204_handling helper, handle_empty_collection helper, _build_data_dict helper, _build_params helper, format_time_entry_json/format_time_entry_table helpers, format_list_output/format_single_output helpers, and applying them to time_entries and create_time_entry functions
 
 ---
 
@@ -76,8 +78,8 @@ All refactoring patterns from REFACTORING_PATTERNS.md have been successfully com
 ### Summary
 - **Total patterns addressed**: 15+ patterns across CLI and API layers
 - **Files modified**: cli.py, api.py, decorators.py (new), helpers.py (new)
-- **Functions refactored**: 53+ command functions
-- **Net code reduction**: 942 lines (16.73% reduction)
+- **Functions refactored**: 55+ command functions
+- **Net code reduction**: 1062 lines (18.86% reduction)
 - **Test status**: All 248 tests passing (13 skipped due to API plan limitations)
 
 ### Key Achievements
