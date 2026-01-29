@@ -1,5 +1,7 @@
 """Click CLI for ClickUp."""
 
+from typing import Any
+
 import json
 
 import click
@@ -158,19 +160,22 @@ def create_folder(space_id: str, name: str, format: str, raw: bool) -> None:
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {
-            "id": data.get("id"),
-            "name": data.get("name"),
-            "space_id": data.get("space", {}).get("id"),
-            "task_count": data.get("task_count"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:        {data.get('id')}")
-        click.echo(f"Name:      {data.get('name')}")
-        click.echo(f"Space ID:  {data.get('space', {}).get('id')}")
-        click.echo(f"Task Count: {data.get('task_count')}")
+    format_single_output(
+        data,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "name": d.get("name"),
+            "space_id": d.get("space", {}).get("id"),
+            "task_count": d.get("task_count"),
+        },
+        table_formatter=lambda d: (
+            click.echo(f"ID:        {d.get('id')}"),
+            click.echo(f"Name:      {d.get('name')}"),
+            click.echo(f"Space ID:  {d.get('space', {}).get('id')}"),
+            click.echo(f"Task Count: {d.get('task_count')}"),
+        )[-1],
+    )
 
 
 @cli.command(name="folder")
@@ -187,19 +192,22 @@ def folder(folder_id: str, format: str, raw: bool) -> None:
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {
-            "id": data.get("id"),
-            "name": data.get("name"),
-            "hidden": data.get("hidden"),
-            "task_count": data.get("task_count"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:         {data.get('id')}")
-        click.echo(f"Name:       {data.get('name')}")
-        click.echo(f"Hidden:     {data.get('hidden')}")
-        click.echo(f"Task Count: {data.get('task_count')}")
+    format_single_output(
+        data,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "name": d.get("name"),
+            "hidden": d.get("hidden"),
+            "task_count": d.get("task_count"),
+        },
+        table_formatter=lambda d: (
+            click.echo(f"ID:         {d.get('id')}"),
+            click.echo(f"Name:       {d.get('name')}"),
+            click.echo(f"Hidden:     {d.get('hidden')}"),
+            click.echo(f"Task Count: {d.get('task_count')}"),
+        )[-1],
+    )
 
 
 @cli.command(name="update-folder")
@@ -221,14 +229,17 @@ def update_folder_cli(folder_id: str, name: str, format: str, raw: bool) -> None
         click.echo("No updates provided.")
         return
 
-    if format == "json":
-        output = {
-            "id": data.get("id"),
-            "name": data.get("name"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"Folder {folder_id} updated successfully.")
+    format_single_output(
+        data,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "name": d.get("name"),
+        },
+        table_formatter=lambda d: click.echo(
+            f"Folder {folder_id} updated successfully."
+        ),
+    )
 
 
 @cli.command(name="delete-folder")
@@ -369,29 +380,31 @@ def get_list_cli(list_id: str, format: str, raw: bool) -> None:
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {
-            "id": data.get("id"),
-            "name": data.get("name"),
-            "status": data.get("status", {}).get("status")
-            if data.get("status")
+    def _format_table(d: dict[str, Any]) -> None:
+        click.echo(f"ID:         {d.get('id')}")
+        click.echo(f"Name:       {d.get('name')}")
+        if d.get("status"):
+            click.echo(f"Status:     {d.get('status', {}).get('status')}")
+        if d.get("priority"):
+            click.echo(f"Priority:   {d.get('priority', {}).get('priority')}")
+        click.echo(f"Task Count: {d.get('task_count')}")
+        click.echo(f"Archived:   {d.get('archived')}")
+
+    format_single_output(
+        data,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "name": d.get("name"),
+            "status": d.get("status", {}).get("status") if d.get("status") else None,
+            "priority": d.get("priority", {}).get("priority")
+            if d.get("priority")
             else None,
-            "priority": data.get("priority", {}).get("priority")
-            if data.get("priority")
-            else None,
-            "task_count": data.get("task_count"),
-            "archived": data.get("archived"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:         {data.get('id')}")
-        click.echo(f"Name:       {data.get('name')}")
-        if data.get("status"):
-            click.echo(f"Status:     {data.get('status', {}).get('status')}")
-        if data.get("priority"):
-            click.echo(f"Priority:   {data.get('priority', {}).get('priority')}")
-        click.echo(f"Task Count: {data.get('task_count')}")
-        click.echo(f"Archived:   {data.get('archived')}")
+            "task_count": d.get("task_count"),
+            "archived": d.get("archived"),
+        },
+        table_formatter=_format_table,
+    )
 
 
 @cli.command(name="update-list")
@@ -455,26 +468,28 @@ def update_list_cli(
         click.echo("No updates provided.")
         return
 
-    if format == "json":
-        output = {
-            "id": data.get("id"),
-            "name": data.get("name"),
-            "status": data.get("status", {}).get("status")
-            if data.get("status")
-            else None,
-            "priority": data.get("priority", {}).get("priority")
-            if data.get("priority")
-            else None,
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:      {data.get('id')}")
-        click.echo(f"Name:    {data.get('name')}")
-        if data.get("status"):
-            click.echo(f"Status:  {data.get('status', {}).get('status')}")
-        if data.get("priority"):
-            click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
+    def _format_table(d: dict[str, Any]) -> None:
+        click.echo(f"ID:      {d.get('id')}")
+        click.echo(f"Name:    {d.get('name')}")
+        if d.get("status"):
+            click.echo(f"Status:  {d.get('status', {}).get('status')}")
+        if d.get("priority"):
+            click.echo(f"Priority: {d.get('priority', {}).get('priority')}")
         click.echo("Updated successfully.")
+
+    format_single_output(
+        data,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "name": d.get("name"),
+            "status": d.get("status", {}).get("status") if d.get("status") else None,
+            "priority": d.get("priority", {}).get("priority")
+            if d.get("priority")
+            else None,
+        },
+        table_formatter=_format_table,
+    )
 
 
 @cli.command(name="delete-list")
@@ -736,28 +751,30 @@ def create_task(
     if handle_raw_output(data, raw):
         return
 
-    if format == "json":
-        output = {
-            "id": data.get("id"),
-            "name": data.get("name"),
-            "status": data.get("status", {}).get("status")
-            if data.get("status")
+    def _format_table(d: dict[str, Any]) -> None:
+        click.echo(f"ID:       {d.get('id')}")
+        click.echo(f"Name:     {d.get('name')}")
+        if d.get("status"):
+            click.echo(f"Status:   {d.get('status', {}).get('status')}")
+        if d.get("priority"):
+            click.echo(f"Priority: {d.get('priority', {}).get('priority')}")
+        if d.get("url"):
+            click.echo(f"URL:      {d.get('url')}")
+
+    format_single_output(
+        data,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "name": d.get("name"),
+            "status": d.get("status", {}).get("status") if d.get("status") else None,
+            "priority": d.get("priority", {}).get("priority")
+            if d.get("priority")
             else None,
-            "priority": data.get("priority", {}).get("priority")
-            if data.get("priority")
-            else None,
-            "url": data.get("url"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:       {data.get('id')}")
-        click.echo(f"Name:     {data.get('name')}")
-        if data.get("status"):
-            click.echo(f"Status:   {data.get('status', {}).get('status')}")
-        if data.get("priority"):
-            click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
-        if data.get("url"):
-            click.echo(f"URL:      {data.get('url')}")
+            "url": d.get("url"),
+        },
+        table_formatter=_format_table,
+    )
 
 
 @cli.command(name="update-task")
@@ -848,28 +865,30 @@ def update_task(
         click.echo("No updates provided.")
         return
 
-    if format == "json":
-        output = {
-            "id": data.get("id"),
-            "name": data.get("name"),
-            "status": data.get("status", {}).get("status")
-            if data.get("status")
+    def _format_table(d: dict[str, Any]) -> None:
+        click.echo(f"ID:       {d.get('id')}")
+        click.echo(f"Name:     {d.get('name')}")
+        if d.get("status"):
+            click.echo(f"Status:   {d.get('status', {}).get('status')}")
+        if d.get("priority"):
+            click.echo(f"Priority: {d.get('priority', {}).get('priority')}")
+        if d.get("url"):
+            click.echo(f"URL:      {d.get('url')}")
+
+    format_single_output(
+        data,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "name": d.get("name"),
+            "status": d.get("status", {}).get("status") if d.get("status") else None,
+            "priority": d.get("priority", {}).get("priority")
+            if d.get("priority")
             else None,
-            "priority": data.get("priority", {}).get("priority")
-            if data.get("priority")
-            else None,
-            "url": data.get("url"),
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:       {data.get('id')}")
-        click.echo(f"Name:     {data.get('name')}")
-        if data.get("status"):
-            click.echo(f"Status:   {data.get('status', {}).get('status')}")
-        if data.get("priority"):
-            click.echo(f"Priority: {data.get('priority', {}).get('priority')}")
-        if data.get("url"):
-            click.echo(f"URL:      {data.get('url')}")
+            "url": d.get("url"),
+        },
+        table_formatter=_format_table,
+    )
 
 
 @cli.command(name="delete-task")

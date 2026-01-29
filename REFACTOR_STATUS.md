@@ -22,6 +22,7 @@ This document tracks the progress of refactoring cucli.
 | Conditional data building helper | 2026-01-29 | Created `_build_data_dict()` helper method in api.py to replace duplicate data dict building patterns (refactored 17 functions: update_checklist, update_checklist_item, add_dependency, delete_dependency, add_task_link, delete_task_link, create_list, update_task, update_time_entry, create_task, create_task_comment, create_checklist_item, create_time_entry, create_goal, get_task_comments, get_list_comments, start_time_entry) |
 | Time entry formatter helpers | 2026-01-29 | Created `format_time_entry_json()` and `format_time_entry_table()` helpers in helpers.py to replace duplicate time entry output patterns (refactored 5 functions: running_time_entry, start_time_entry, stop_time_entry, create_time_entry, update_time_entry) |
 | JSON output helpers | 2026-01-29 | Created `format_list_output()` and `format_single_output()` helpers in helpers.py to replace duplicate JSON and table output transformation patterns (refactored 15 functions: workspaces, spaces, folders, lists, tasks, task_comments, list_comments, task_members, list_members, team_views, space_views, folder_views, list_views, webhooks, view) |
+| Single-item output helpers | 2026-01-29 | Applied `format_single_output()` helper to additional single-item commands (refactored 7 functions: create_folder, folder, update_folder_cli, get_list_cli, update_list_cli, create_task, update_task) |
 
 ## In Progress
 
