@@ -26,6 +26,7 @@ This document tracks the progress of refactoring cucli.
 | Checklist output helpers | 2026-01-29 | Applied `format_single_output()` helper to checklist commands (refactored 4 functions: create_checklist, create_checklist_item, update_checklist, update_checklist_item) |
 | Tag and comment output helpers | 2026-01-29 | Applied `format_single_output()` helper to tag and comment commands (refactored 5 functions: create_tag, add_tag, remove_tag, add_comment, add_list_comment) |
 | Dependency, link, attachment, webhook output helpers | 2026-01-29 | Applied `format_single_output()` helper to dependency, link, attachment, and webhook commands (refactored 7 functions: add_dependency, delete_dependency, add_link, delete_link, create_attachment, create_webhook, update_webhook_cli) |
+| create_list output helper | 2026-01-29 | Applied `format_single_output()` helper to create_list command |
 
 ## In Progress
 
