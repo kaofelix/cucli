@@ -1098,21 +1098,24 @@ def create_checklist(task_id: str, name: str, format: str, raw: bool) -> None:
 
     checklist = Checklist(**data["checklist"])
 
-    if format == "json":
-        output = {
-            "id": checklist.id,
-            "task_id": checklist.task_id,
-            "name": checklist.name,
-            "resolved": checklist.resolved,
-            "unresolved": checklist.unresolved,
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:         {checklist.id}")
-        click.echo(f"Task ID:    {checklist.task_id}")
-        click.echo(f"Name:       {checklist.name}")
-        click.echo(f"Resolved:    {checklist.resolved}")
-        click.echo(f"Unresolved:  {checklist.unresolved}")
+    format_single_output(
+        checklist.__dict__,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "task_id": d.get("task_id"),
+            "name": d.get("name"),
+            "resolved": d.get("resolved"),
+            "unresolved": d.get("unresolved"),
+        },
+        table_formatter=lambda d: (
+            click.echo(f"ID:         {d.get('id')}"),
+            click.echo(f"Task ID:    {d.get('task_id')}"),
+            click.echo(f"Name:       {d.get('name')}"),
+            click.echo(f"Resolved:    {d.get('resolved')}"),
+            click.echo(f"Unresolved:  {d.get('unresolved')}"),
+        )[-1],
+    )
 
 
 @cli.command(name="create-checklist-item")
@@ -1139,21 +1142,24 @@ def create_checklist_item(
 
     checklist = Checklist(**data["checklist"])
 
-    if format == "json":
-        output = {
-            "id": checklist.id,
-            "task_id": checklist.task_id,
-            "name": checklist.name,
-            "resolved": checklist.resolved,
-            "unresolved": checklist.unresolved,
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:         {checklist.id}")
-        click.echo(f"Task ID:    {checklist.task_id}")
-        click.echo(f"Name:       {checklist.name}")
-        click.echo(f"Resolved:    {checklist.resolved}")
-        click.echo(f"Unresolved:  {checklist.unresolved}")
+    format_single_output(
+        checklist.__dict__,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "task_id": d.get("task_id"),
+            "name": d.get("name"),
+            "resolved": d.get("resolved"),
+            "unresolved": d.get("unresolved"),
+        },
+        table_formatter=lambda d: (
+            click.echo(f"ID:         {d.get('id')}"),
+            click.echo(f"Task ID:    {d.get('task_id')}"),
+            click.echo(f"Name:       {d.get('name')}"),
+            click.echo(f"Resolved:    {d.get('resolved')}"),
+            click.echo(f"Unresolved:  {d.get('unresolved')}"),
+        )[-1],
+    )
 
 
 @cli.command(name="update-checklist")
@@ -1186,10 +1192,14 @@ def update_checklist(
         click.echo("No updates provided.")
         return
 
-    if format == "json":
-        click.echo(json.dumps(data, indent=2))
-    elif format == "table":
-        click.echo(f"Checklist {checklist_id} updated successfully.")
+    format_single_output(
+        data,
+        format,
+        json_formatter=lambda d: d,
+        table_formatter=lambda d: click.echo(
+            f"Checklist {checklist_id} updated successfully."
+        ),
+    )
 
 
 @cli.command(name="update-checklist-item")
@@ -1239,21 +1249,24 @@ def update_checklist_item(
 
     checklist = Checklist(**data["checklist"])
 
-    if format == "json":
-        output = {
-            "id": checklist.id,
-            "task_id": checklist.task_id,
-            "name": checklist.name,
-            "resolved": checklist.resolved,
-            "unresolved": checklist.unresolved,
-        }
-        click.echo(json.dumps(output, indent=2))
-    elif format == "table":
-        click.echo(f"ID:         {checklist.id}")
-        click.echo(f"Task ID:    {checklist.task_id}")
-        click.echo(f"Name:       {checklist.name}")
-        click.echo(f"Resolved:    {checklist.resolved}")
-        click.echo(f"Unresolved:  {checklist.unresolved}")
+    format_single_output(
+        checklist.__dict__,
+        format,
+        json_formatter=lambda d: {
+            "id": d.get("id"),
+            "task_id": d.get("task_id"),
+            "name": d.get("name"),
+            "resolved": d.get("resolved"),
+            "unresolved": d.get("unresolved"),
+        },
+        table_formatter=lambda d: (
+            click.echo(f"ID:         {d.get('id')}"),
+            click.echo(f"Task ID:    {d.get('task_id')}"),
+            click.echo(f"Name:       {d.get('name')}"),
+            click.echo(f"Resolved:    {d.get('resolved')}"),
+            click.echo(f"Unresolved:  {d.get('unresolved')}"),
+        )[-1],
+    )
 
 
 @cli.command(name="delete-checklist")
