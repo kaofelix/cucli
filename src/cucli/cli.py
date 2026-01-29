@@ -8,6 +8,7 @@ from cucli.decorators import common_output_options, handle_api_errors
 from cucli.helpers import (
     confirm_deletion,
     format_table,
+    handle_raw_output,
     parse_models_with_raw,
     validate_team_id_for_custom_tasks,
 )
@@ -165,8 +166,7 @@ def create_folder(space_id: str, name: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.create_folder(space_id, name=name))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     if format == "json":
@@ -195,8 +195,7 @@ def folder(folder_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_folder(folder_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     if format == "json":
@@ -226,11 +225,7 @@ def update_folder_cli(folder_id: str, name: str, format: str, raw: bool) -> None
     """
     data = with_client(lambda client: client.update_folder(folder_id, name=name))
 
-    if raw:
-        if data:
-            click.echo(json.dumps(data, indent=2))
-        else:
-            click.echo("{}")
+    if handle_raw_output(data, raw):
         return
 
     if not data:
@@ -314,8 +309,7 @@ def create_list(
             status=status,
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         if format == "json":
@@ -394,8 +388,7 @@ def get_list_cli(list_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_list(list_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     if format == "json":
@@ -476,11 +469,7 @@ def update_list_cli(
             unset_status=unset_status,
         )
 
-        if raw:
-            if data:
-                click.echo(json.dumps(data, indent=2))
-            else:
-                click.echo("{}")
+        if handle_raw_output(data, raw):
             return
 
         if not data:
@@ -544,8 +533,7 @@ def task(task_id: str, format: str, raw: bool, md_only: bool) -> None:
     """
     data = with_client(lambda client: client.get_task(task_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     task = Task(**data)
@@ -651,8 +639,7 @@ def tasks(
         )
     )
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     tasks_list = data.get("tasks", [])
@@ -767,8 +754,7 @@ def create_task(
             parent=parent,
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         if format == "json":
@@ -875,11 +861,7 @@ def update_task(
             assignees_remove=list(assignee_remove) if assignee_remove else None,
         )
 
-        if raw:
-            if data:
-                click.echo(json.dumps(data, indent=2))
-            else:
-                click.echo("{}")
+        if handle_raw_output(data, raw):
             return
 
         if not data:
@@ -1001,8 +983,7 @@ def add_comment(
             task_id, comment_text=text, assignee=assignee, notify_all=not no_notify
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         if format == "json":
@@ -1090,8 +1071,7 @@ def add_list_comment(
             list_id, comment_text=text, assignee=assignee, notify_all=not no_notify
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         if format == "json":
@@ -1117,8 +1097,7 @@ def create_checklist(task_id: str, name: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.create_checklist(task_id, name=name))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     checklist = Checklist(**data["checklist"])
@@ -1159,8 +1138,7 @@ def create_checklist_item(
         )
     )
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     checklist = Checklist(**data["checklist"])
@@ -1205,11 +1183,7 @@ def update_checklist(
         )
     )
 
-    if raw:
-        if data:
-            click.echo(json.dumps(data, indent=2))
-        else:
-            click.echo("{}")
+    if handle_raw_output(data, raw):
         return
 
     if not data:
@@ -1259,11 +1233,7 @@ def update_checklist_item(
             parent=parent,
         )
 
-        if raw:
-            if data:
-                click.echo(json.dumps(data, indent=2))
-            else:
-                click.echo("{}")
+        if handle_raw_output(data, raw):
             return
 
         if not data:
@@ -1467,8 +1437,7 @@ def create_tag(
             space_id, name=name, tag_fg=fg_color, tag_bg=bg_color
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         if format == "json":
@@ -1497,8 +1466,7 @@ def add_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.add_tag_to_task(task_id, tag_name))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     if format == "json":
@@ -1526,8 +1494,7 @@ def remove_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.remove_tag_from_task(task_id, tag_name))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     if format == "json":
@@ -1553,8 +1520,7 @@ def running_time_entry(team_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_running_time_entry(team_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     entry = data.get("data", {})
@@ -1607,8 +1573,7 @@ def start_time_entry(
             team_id, task_id=task_id, description=description, billable=billable
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         entry = data.get("data", {})
@@ -1647,8 +1612,7 @@ def stop_time_entry(team_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.stop_time_entry(team_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     entry = data.get("data", {})
@@ -1722,8 +1686,7 @@ def time_entries(
             is_billable=billable if billable else None,
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         entries = data.get("data", [])
@@ -1812,8 +1775,7 @@ def create_time_entry(
             billable=billable,
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         entry = data.get("data", {})
@@ -1880,11 +1842,7 @@ def update_time_entry(
             billable=billable if billable else None,
         )
 
-        if raw:
-            if data:
-                click.echo(json.dumps(data, indent=2))
-            else:
-                click.echo("{}")
+        if handle_raw_output(data, raw):
             return
 
         entry = data.get("data", {})
@@ -1983,8 +1941,7 @@ def add_dependency(
             team_id=team_id,
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         if format == "json":
@@ -2054,8 +2011,7 @@ def delete_dependency(
             team_id=team_id,
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         if format == "json":
@@ -2118,8 +2074,7 @@ def add_link(
             team_id=team_id,
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         if format == "json":
@@ -2175,8 +2130,7 @@ def delete_link(
             team_id=team_id,
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         if format == "json":
@@ -2226,8 +2180,7 @@ def create_attachment(
             team_id=team_id,
         )
 
-        if raw:
-            click.echo(json.dumps(data, indent=2))
+        if handle_raw_output(data, raw):
             return
 
         if format == "json":
@@ -2257,8 +2210,7 @@ def team_views(team_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_team_views(team_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     views_list = data.get("views", [])
@@ -2296,8 +2248,7 @@ def space_views(space_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_space_views(space_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     views_list = data.get("views", [])
@@ -2335,8 +2286,7 @@ def folder_views(folder_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_folder_views(folder_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     views_list = data.get("views", [])
@@ -2374,8 +2324,7 @@ def list_views(list_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_list_views(list_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     views_list = data.get("views", [])
@@ -2413,8 +2362,7 @@ def view(view_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_view(view_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     view_data = data.get("view", data)  # Some responses have view wrapped, some don't
@@ -2447,8 +2395,7 @@ def webhooks(team_id: str, format: str, raw: bool) -> None:
     """
     data = with_client(lambda client: client.get_webhooks(team_id))
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     webhooks_list = data.get("webhooks", [])
@@ -2511,8 +2458,7 @@ def create_webhook(
         lambda client: client.create_webhook(team_id, endpoint=endpoint, events=events)
     )
 
-    if raw:
-        click.echo(json.dumps(data, indent=2))
+    if handle_raw_output(data, raw):
         return
 
     webhook = data.get("webhook", data)
@@ -2560,11 +2506,7 @@ def update_webhook_cli(
             status=status,
         )
 
-        if raw:
-            if data:
-                click.echo(json.dumps(data, indent=2))
-            else:
-                click.echo("{}")
+        if handle_raw_output(data, raw):
             return
 
         if not data:

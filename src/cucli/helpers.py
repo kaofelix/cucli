@@ -211,3 +211,33 @@ def validate_team_id_for_custom_tasks(
             err=True,
         )
         raise click.Abort()
+
+
+def handle_raw_output(data: dict[str, Any] | None, raw: bool) -> bool:
+    """Handle raw JSON output for API responses.
+
+    This helper eliminates the repeated pattern of:
+        if raw:
+            click.echo(json.dumps(data, indent=2))
+            return
+
+    Args:
+        data: The raw API response data (can be None or empty dict).
+        raw: If True, output raw JSON and return True.
+
+    Returns:
+        True if raw output was handled (function should return), False otherwise.
+
+    Example:
+        data = with_client(lambda client: client.get_folder(folder_id))
+        if handle_raw_output(data, raw):
+            return
+        # Continue with data processing...
+    """
+    if raw:
+        if data:
+            click.echo(json.dumps(data, indent=2))
+        else:
+            click.echo("{}")
+        return True
+    return False
