@@ -73,6 +73,37 @@ class ClickUpClient:
         response.raise_for_status()
         return response.json()
 
+    def _build_data_dict(self, **kwargs: Any) -> dict[str, Any]:
+        """Build a data dictionary excluding None values.
+
+        This helper eliminates the repeated pattern of:
+            data: dict[str, Any] = {}
+            if field1 is not None:
+                data["field1"] = field1
+            if field2 is not None:
+                data["field2"] = field2
+            # ... many more if statements
+
+        Args:
+            **kwargs: Field-value pairs to include in the data dict.
+
+        Returns:
+            A dict containing only the non-None values.
+
+        Example:
+            data = self._build_data_dict(name=name, description=description)
+            # Equivalent to:
+            # data = {}
+            # if name is not None: data["name"] = name
+            # if description is not None: data["description"] = description
+
+        Example with defaults:
+            # You can merge with default data:
+            data = {"default_field": "default_value"}
+            data.update(self._build_data_dict(name=name, description=description))
+        """
+        return {key: value for key, value in kwargs.items() if value is not None}
+
     def __init__(self, api_key: str | None = None) -> None:
         """Initialize the client.
 
@@ -730,12 +761,7 @@ class ClickUpClient:
         Returns:
             The response from the /checklist/{checklist_id} endpoint.
         """
-        data: dict[str, Any] = {}
-
-        if name is not None:
-            data["name"] = name
-        if position is not None:
-            data["position"] = position
+        data = self._build_data_dict(name=name, position=position)
 
         if data:
             response = self._client.put(
@@ -769,16 +795,12 @@ class ClickUpClient:
         Returns:
             The response from the /checklist/{checklist_id}/checklist_item/{checklist_item_id} endpoint.
         """
-        data: dict[str, Any] = {}
-
-        if name is not None:
-            data["name"] = name
-        if assignee is not None:
-            data["assignee"] = assignee
-        if resolved is not None:
-            data["resolved"] = resolved
-        if parent is not None:
-            data["parent"] = parent
+        data = self._build_data_dict(
+            name=name,
+            assignee=assignee,
+            resolved=resolved,
+            parent=parent,
+        )
 
         if data:
             response = self._client.put(
@@ -1430,17 +1452,12 @@ class ClickUpClient:
         if depends_on is None and dependency_of is None:
             raise ValueError("Either depends_on or dependency_of must be provided.")
 
-        data: dict[str, Any] = {}
-        if depends_on is not None:
-            data["depends_on"] = depends_on
-        if dependency_of is not None:
-            data["depedency_of"] = dependency_of
+        data = self._build_data_dict(depends_on=depends_on, dependency_of=dependency_of)
 
-        params: dict[str, Any] = {}
-        if custom_task_ids:
-            params["custom_task_ids"] = "true"
-        if team_id is not None:
-            params["team_id"] = team_id
+        params = self._build_data_dict(
+            custom_task_ids="true" if custom_task_ids else None,
+            team_id=team_id,
+        )
 
         response = self._client.post(
             f"{self.base_url}/task/{task_id}/dependency", params=params, json=data
@@ -1472,15 +1489,12 @@ class ClickUpClient:
         if depends_on is None and dependency_of is None:
             raise ValueError("Either depends_on or dependency_of must be provided.")
 
-        params: dict[str, Any] = {}
-        if depends_on is not None:
-            params["depends_on"] = depends_on
-        if dependency_of is not None:
-            params["dependency_of"] = dependency_of
-        if custom_task_ids:
-            params["custom_task_ids"] = "true"
-        if team_id is not None:
-            params["team_id"] = team_id
+        params = self._build_data_dict(
+            depends_on=depends_on,
+            dependency_of=dependency_of,
+            custom_task_ids="true" if custom_task_ids else None,
+            team_id=team_id,
+        )
 
         response = self._client.delete(
             f"{self.base_url}/task/{task_id}/dependency", params=params
@@ -1510,11 +1524,10 @@ class ClickUpClient:
         if links_to is None:
             raise ValueError("links_to must be provided.")
 
-        params: dict[str, Any] = {}
-        if custom_task_ids:
-            params["custom_task_ids"] = "true"
-        if team_id is not None:
-            params["team_id"] = team_id
+        params = self._build_data_dict(
+            custom_task_ids="true" if custom_task_ids else None,
+            team_id=team_id,
+        )
 
         response = self._client.post(
             f"{self.base_url}/task/{task_id}/link/{links_to}", params=params
@@ -1544,11 +1557,10 @@ class ClickUpClient:
         if links_to is None:
             raise ValueError("links_to must be provided.")
 
-        params: dict[str, Any] = {}
-        if custom_task_ids:
-            params["custom_task_ids"] = "true"
-        if team_id is not None:
-            params["team_id"] = team_id
+        params = self._build_data_dict(
+            custom_task_ids="true" if custom_task_ids else None,
+            team_id=team_id,
+        )
 
         response = self._client.delete(
             f"{self.base_url}/task/{task_id}/link/{links_to}", params=params
