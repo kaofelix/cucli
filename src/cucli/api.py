@@ -286,21 +286,17 @@ class ClickUpClient:
             The response from the /folder/{folder_id}/list endpoint.
         """
         data: dict[str, Any] = {"name": name}
-
-        if content is not None:
-            data["content"] = content
-        if markdown_content is not None:
-            data["markdown_content"] = markdown_content
-        if due_date is not None:
-            data["due_date"] = due_date
-        if due_date_time is not None:
-            data["due_date_time"] = due_date_time
-        if priority is not None:
-            data["priority"] = priority
-        if assignee is not None:
-            data["assignee"] = assignee
-        if status is not None:
-            data["status"] = status
+        data.update(
+            self._build_data_dict(
+                content=content,
+                markdown_content=markdown_content,
+                due_date=due_date,
+                due_date_time=due_date_time,
+                priority=priority,
+                assignee=assignee,
+                status=status,
+            )
+        )
 
         response = self._client.post(
             f"{self.base_url}/folder/{folder_id}/list", json=data
@@ -525,28 +521,18 @@ class ClickUpClient:
         Returns:
             The response from the /task/{task_id} endpoint.
         """
-        data: dict[str, Any] = {}
-
-        if name is not None:
-            data["name"] = name
-        if description is not None:
-            data["description"] = description
-        if markdown_description is not None:
-            data["markdown_content"] = markdown_description
-        if status is not None:
-            data["status"] = status
-        if priority is not None:
-            data["priority"] = priority
-        if due_date is not None:
-            data["due_date"] = due_date
-        if start_date is not None:
-            data["start_date"] = start_date
-        if time_estimate is not None:
-            data["time_estimate"] = time_estimate
-        if points is not None:
-            data["points"] = points
-        if parent is not None:
-            data["parent"] = parent
+        data: dict[str, Any] = self._build_data_dict(
+            name=name,
+            description=description,
+            markdown_content=markdown_description,
+            status=status,
+            priority=priority,
+            due_date=due_date,
+            start_date=start_date,
+            time_estimate=time_estimate,
+            points=points,
+            parent=parent,
+        )
 
         if assignees_add or assignees_remove:
             assignees_dict: dict[str, list[int]] = {}
@@ -1171,19 +1157,16 @@ class ClickUpClient:
             "tags": tags if tags is not None else [],
             "tid": task_id if task_id is not None else "",
         }
-
-        if description is not None:
-            data["description"] = description
-        if start is not None:
-            data["start"] = start
-        if end is not None:
-            data["end"] = end
-        if duration is not None:
-            data["duration"] = duration
-        if billable is not None:
-            data["billable"] = billable
-        if tag_action is not None:
-            data["tag_action"] = tag_action
+        data.update(
+            self._build_data_dict(
+                description=description,
+                start=start,
+                end=end,
+                duration=duration,
+                billable=billable,
+                tag_action=tag_action,
+            )
+        )
 
         response = self._client.put(
             f"{self.base_url}/team/{team_id}/time_entries/{timer_id}", json=data
