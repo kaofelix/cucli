@@ -45,81 +45,153 @@ All commands support different output formats:
 ### Workspaces & Spaces
 
 ```bash
-cucli workspaces                                             # List all workspaces
-cucli spaces <team_id>                                       # List spaces in a workspace
-cucli folders <space_id>                                     # List folders in a space
-cucli lists <folder_id>                                      # List lists in a folder
-cucli create-folder <space_id> --name "Folder Name"        # Create a folder
-cucli create-list <folder_id> --name "List Name"            # Create a list (supports --description, --markdown-description, --due-date, --due-date-time, --priority, --assignee, --status)
+# List all workspaces
+cucli workspaces
+
+# List spaces in a workspace
+cucli spaces <team_id>
+
+# List folders in a space
+cucli folders <space_id>
+
+# List lists in a folder
+cucli lists <folder_id>
+
+# Create a folder
+cucli create-folder <space_id> --name "Folder Name"
+
+# Create a list (supports --description, --markdown-description, --due-date, --due-date-time, --priority, --assignee, --status)
+cucli create-list <folder_id> --name "List Name"
 ```
 
 ### Tasks
 
 ```bash
-cucli task <task_id>                                        # Get task details (supports --md-only for description only)
-cucli tasks <team_id>                                        # List tasks (filters: --status, --space-id, --list-id, --assignee, --tag, --include-closed, --page)
-cucli create-task <list_id> --name "Task Name"               # Create a task (supports --description, --status, --priority, --assignee, --tag, --due-date, --start-date, --time-estimate, --points, --parent for subtasks)
-cucli update-task <task_id>                                  # Update task (fields: --name, --status, --priority, --description, --markdown-description, --due-date, --start-date, --time-estimate, --points, --assignee-add, --assignee-remove, --parent)
-cucli delete-task <task_id>                                  # Delete a task (prompts for confirmation unless --yes)
-cucli task-members <task_id>                                 # Get members with explicit access to a task
-cucli add-dependency <task_id>                               # Add dependency (use --depends-on <id> or --dependency-of <id>)
-cucli delete-dependency <task_id>                            # Remove dependency (use --depends-on <id> or --dependency-of <id>)
-cucli create-attachment <task_id> --file /path/to/file      # Upload a file as attachment
+# Get task details (supports --md-only for description only)
+cucli task <task_id>
+
+# List tasks (filters: --status, --space-id, --list-id, --assignee, --tag, --include-closed, --page)
+cucli tasks <team_id>
+
+# Create a task (supports --description, --status, --priority, --assignee, --tag, --due-date, --start-date, --time-estimate, --points, --parent for subtasks)
+cucli create-task <list_id> --name "Task Name"
+
+# Update task (fields: --name, --status, --priority, --description, --markdown-description, --due-date, --start-date, --time-estimate, --points, --assignee-add, --assignee-remove, --parent)
+cucli update-task <task_id>
+
+# Delete a task (prompts for confirmation unless --yes)
+cucli delete-task <task_id>
+
+# Get members with explicit access to a task
+cucli task-members <task_id>
+
+# Add dependency (use --depends-on <id> or --dependency-of <id>)
+cucli add-dependency <task_id>
+
+# Remove dependency (use --depends-on <id> or --dependency-of <id>)
+cucli delete-dependency <task_id>
+
+# Upload a file as attachment
+cucli create-attachment <task_id> --file /path/to/file
 ```
 
 ### Comments
 
 ```bash
-cucli task-comments <task_id>                                # Get comments on a task
-cucli add-comment <task_id> --text "Comment text"           # Add comment to task (supports --assignee, --no-notify)
-cucli list-comments <list_id>                                # Get comments on a list
-cucli add-list-comment <list_id> --text "Comment text"       # Add comment to list (supports --assignee, --no-notify)
+# Get comments on a task
+cucli task-comments <task_id>
+
+# Add comment to task (supports --assignee, --no-notify)
+cucli add-comment <task_id> --text "Comment text"
+
+# Get comments on a list
+cucli list-comments <list_id>
+
+# Add comment to list (supports --assignee, --no-notify)
+cucli add-list-comment <list_id> --text "Comment text"
 ```
 
 ### Checklists
 
 ```bash
-cucli create-checklist <task_id> --name "Checklist Name"                      # Create a checklist
-cucli create-checklist-item <checklist_id> --name "Item Name"                 # Create checklist item (supports --assignee)
-cucli update-checklist <checklist_id>                                         # Update checklist (--name, --position where 0 = top)
-cucli update-checklist-item <checklist_id> <checklist_item_id>                # Update checklist item (--name, --resolved, --assignee, --parent)
-cucli delete-checklist <checklist_id>                                         # Delete a checklist
-cucli delete-checklist-item <checklist_id> <checklist_item_id>               # Delete a checklist item
+# Create a checklist
+cucli create-checklist <task_id> --name "Checklist Name"
+
+# Create checklist item (supports --assignee)
+cucli create-checklist-item <checklist_id> --name "Item Name"
+
+# Update checklist (--name, --position where 0 = top)
+cucli update-checklist <checklist_id>
+
+# Update checklist item (--name, --resolved, --assignee, --parent)
+cucli update-checklist-item <checklist_id> <checklist_item_id>
+
+# Delete a checklist
+cucli delete-checklist <checklist_id>
+
+# Delete a checklist item
+cucli delete-checklist-item <checklist_id> <checklist_item_id>
 ```
 
 ### Lists
 
 ```bash
-cucli list-members <list_id>                                 # Get members with explicit access to a list
+# Get members with explicit access to a list
+cucli list-members <list_id>
 ```
 
 ### Tags
 
 ```bash
-cucli tags <space_id>                                        # List all tags in a space
-cucli create-tag <space_id> --name "Tag Name" --fg-color "#000000" --bg-color "#FFFFFF"  # Create a tag
-cucli add-tag <task_id> <tag_name>                           # Add a tag to a task
-cucli remove-tag <task_id> <tag_name>                        # Remove a tag from a task
+# List all tags in a space
+cucli tags <space_id>
+
+# Create a tag
+cucli create-tag <space_id> --name "Tag Name" --fg-color "#000000" --bg-color "#FFFFFF"
+
+# Add a tag to a task
+cucli add-tag <task_id> <tag_name>
+
+# Remove a tag from a task
+cucli remove-tag <task_id> <tag_name>
 ```
 
 ### Goals
 
 ```bash
-cucli goals <team_id>                                        # List goals in a workspace (supports --include-completed)
-cucli goal <goal_id>                                         # Get detailed information about a specific goal
-cucli create-goal <team_id> --name "Goal Name" --due-date <timestamp>         # Create a goal (supports --start-date, --description, --multiple-owners --owner <id>, --color)
-cucli update-goal <goal_id>                                   # Update goal (--name, --due-date, --description, --color, --add-owner, --remove-owner)
-cucli delete-goal <goal_id>                                   # Delete a goal
-cucli create-key-result <goal_id> --name "Key Result Name"    # Create a key result (--type: number|currency|boolean|percentage|automatic, --unit, --steps-start, --steps-end, --owner, --task, --list)
-cucli update-key-result <key_result_id>                       # Update key result (--steps-current, --note)
-cucli delete-key-result <key_result_id>                      # Delete a key result
+# List goals in a workspace (supports --include-completed)
+cucli goals <team_id>
+
+# Get detailed information about a specific goal
+cucli goal <goal_id>
+
+# Create a goal (supports --start-date, --description, --multiple-owners --owner <id>, --color)
+cucli create-goal <team_id> --name "Goal Name" --due-date <timestamp>
+
+# Update goal (--name, --due-date, --description, --color, --add-owner, --remove-owner)
+cucli update-goal <goal_id>
+
+# Delete a goal
+cucli delete-goal <goal_id>
+
+# Create a key result (--type: number|currency|boolean|percentage|automatic, --unit, --steps-start, --steps-end, --owner, --task, --list)
+cucli create-key-result <goal_id> --name "Key Result Name"
+
+# Update key result (--steps-current, --note)
+cucli update-key-result <key_result_id>
+
+# Delete a key result
+cucli delete-key-result <key_result_id>
 ```
 
 ### Help
 
 ```bash
-cucli --help                                                  # Show global help
-cucli <command> --help                                        # Show help for a specific command
+# Show global help
+cucli --help
+
+# Show help for a specific command
+cucli <command> --help
 ```
 
 ## Examples
