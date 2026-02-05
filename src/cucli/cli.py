@@ -6,6 +6,7 @@ import json
 
 import click
 from cucli.api import with_client
+from cucli.dangerous_mode import require_dangerous_mode
 from cucli.decorators import common_output_options, handle_api_errors
 from cucli.helpers import (
     confirm_deletion,
@@ -34,9 +35,17 @@ from cucli.models import (
 
 @click.group()
 @click.version_option()
-def cli() -> None:
+@click.option(
+    "--dangerous-mode",
+    is_flag=True,
+    envvar="CUCLI_DANGEROUS_MODE",
+    help="Enable dangerous operations (create, update, delete).",
+)
+@click.pass_context
+def cli(ctx: click.Context, dangerous_mode: bool) -> None:
     """cucli - ClickUp CLI."""
-    pass
+    # Store dangerous_mode flag in context for access by decorators
+    ctx.obj = {"dangerous_mode": dangerous_mode}
 
 
 @cli.command(name="workspaces")
@@ -149,6 +158,7 @@ def folders(space_id: str, format: str, raw: bool, archived: bool) -> None:
 @click.option("--name", required=True, help="Folder name (required).")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def create_folder(space_id: str, name: str, format: str, raw: bool) -> None:
     """Create a new folder in a space.
 
@@ -214,6 +224,7 @@ def folder(folder_id: str, format: str, raw: bool) -> None:
 @click.option("--name", required=True, help="New folder name (required).")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def update_folder_cli(folder_id: str, name: str, format: str, raw: bool) -> None:
     """Update a folder.
 
@@ -245,6 +256,7 @@ def update_folder_cli(folder_id: str, name: str, format: str, raw: bool) -> None
 @click.argument("folder_id")
 @click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
 @handle_api_errors
+@require_dangerous_mode
 def delete_folder(folder_id: str, yes: bool) -> None:
     """Delete a folder.
 
@@ -277,6 +289,7 @@ def delete_folder(folder_id: str, yes: bool) -> None:
 @click.option("--status", help="List status (color).")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def create_list(
     folder_id: str,
     name: str,
@@ -430,6 +443,7 @@ def get_list_cli(list_id: str, format: str, raw: bool) -> None:
 @click.option("--unset-status", is_flag=True, help="Remove list status (color).")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def update_list_cli(
     list_id: str,
     name: str | None,
@@ -498,6 +512,7 @@ def update_list_cli(
 @click.argument("list_id")
 @click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
 @handle_api_errors
+@require_dangerous_mode
 def delete_list(list_id: str, yes: bool) -> None:
     """Delete a list.
 
@@ -711,6 +726,7 @@ def tasks(
 @click.option("--parent", help="Parent task ID (for subtasks).")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def create_task(
     list_id: str,
     name: str,
@@ -821,6 +837,7 @@ def create_task(
 )
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def update_task(
     task_id: str,
     name: str | None,
@@ -897,6 +914,7 @@ def update_task(
 @click.argument("task_id")
 @click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
 @handle_api_errors
+@require_dangerous_mode
 def delete_task(task_id: str, yes: bool) -> None:
     """Delete a task.
 
@@ -964,6 +982,7 @@ def task_comments(task_id: str, format: str, raw: bool) -> None:
 )
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def add_comment(
     task_id: str,
     text: str,
@@ -1053,6 +1072,7 @@ def list_comments(list_id: str, format: str, raw: bool) -> None:
 )
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def add_list_comment(
     list_id: str,
     text: str,
@@ -1092,6 +1112,7 @@ def add_list_comment(
 @click.option("--name", required=True, help="Checklist name (required).")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def create_checklist(task_id: str, name: str, format: str, raw: bool) -> None:
     """Create a new checklist on a task.
 
@@ -1130,6 +1151,7 @@ def create_checklist(task_id: str, name: str, format: str, raw: bool) -> None:
 @click.option("--assignee", type=int, help="Assignee user ID.")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def create_checklist_item(
     checklist_id: str, name: str, assignee: int | None, format: str, raw: bool
 ) -> None:
@@ -1178,6 +1200,7 @@ def create_checklist_item(
 )
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def update_checklist(
     checklist_id: str, name: str | None, position: int | None, format: str, raw: bool
 ) -> None:
@@ -1220,6 +1243,7 @@ def update_checklist(
 )
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def update_checklist_item(
     checklist_id: str,
     checklist_item_id: str,
@@ -1279,6 +1303,7 @@ def update_checklist_item(
 @click.argument("checklist_id")
 @click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
 @handle_api_errors
+@require_dangerous_mode
 def delete_checklist(checklist_id: str, yes: bool) -> None:
     """Delete a checklist.
 
@@ -1296,6 +1321,7 @@ def delete_checklist(checklist_id: str, yes: bool) -> None:
 @click.argument("checklist_item_id")
 @click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
 @handle_api_errors
+@require_dangerous_mode
 def delete_checklist_item(checklist_id: str, checklist_item_id: str, yes: bool) -> None:
     """Delete a checklist item.
 
@@ -1417,6 +1443,7 @@ def tags(space_id: str, format: str, raw: bool) -> None:
 )
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def create_tag(
     space_id: str, name: str, fg_color: str, bg_color: str, format: str, raw: bool
 ) -> None:
@@ -1456,6 +1483,7 @@ def create_tag(
 @click.argument("tag_name")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def add_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
     """Add a tag to a task.
 
@@ -1486,6 +1514,7 @@ def add_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
 @click.argument("tag_name")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def remove_tag(task_id: str, tag_name: str, format: str, raw: bool) -> None:
     """Remove a tag from a task.
 
@@ -1544,6 +1573,7 @@ def running_time_entry(team_id: str, format: str, raw: bool) -> None:
 @click.option("--billable", is_flag=True, help="Mark the time entry as billable.")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def start_time_entry(
     team_id: str,
     description: str | None,
@@ -1577,6 +1607,7 @@ def start_time_entry(
 @click.argument("team_id")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def stop_time_entry(team_id: str, format: str, raw: bool) -> None:
     """Stop the currently running time entry.
 
@@ -1697,6 +1728,7 @@ def time_entries(
 @click.option("--billable", is_flag=True, help="Mark the time entry as billable.")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def create_time_entry(
     team_id: str,
     start: int,
@@ -1743,6 +1775,7 @@ def create_time_entry(
 @click.option("--task-id", help="Task ID to associate with the time entry.")
 @click.option("--billable", is_flag=True, help="Mark the time entry as billable.")
 @common_output_options
+@require_dangerous_mode
 def update_time_entry(
     team_id: str,
     timer_id: str,
@@ -1789,6 +1822,7 @@ def update_time_entry(
 @click.argument("timer_id")
 @click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
 @handle_api_errors
+@require_dangerous_mode
 def delete_time_entry(team_id: str, timer_id: str, yes: bool) -> None:
     """Delete a time entry.
 
@@ -1822,6 +1856,7 @@ def delete_time_entry(team_id: str, timer_id: str, yes: bool) -> None:
 @click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def add_dependency(
     task_id: str,
     depends_on: str | None,
@@ -1899,6 +1934,7 @@ def add_dependency(
 @click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def delete_dependency(
     task_id: str,
     depends_on: str | None,
@@ -1971,6 +2007,7 @@ def delete_dependency(
 @click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def add_link(
     task_id: str,
     links_to: str | None,
@@ -2033,6 +2070,7 @@ def add_link(
 @click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def delete_link(
     task_id: str,
     links_to: str | None,
@@ -2096,6 +2134,7 @@ def delete_link(
 @click.option("--team-id", help="Workspace ID (required when using --custom-task-ids).")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def create_attachment(
     task_id: str,
     file_path: str,
@@ -2340,6 +2379,7 @@ def webhooks(team_id: str, format: str, raw: bool) -> None:
 )
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def create_webhook(
     team_id: str,
     endpoint: str,
@@ -2394,6 +2434,7 @@ def create_webhook(
 @click.option("--status", help="The webhook status (e.g., active).")
 @common_output_options
 @handle_api_errors
+@require_dangerous_mode
 def update_webhook_cli(
     webhook_id: str,
     endpoint: str | None,
@@ -2448,6 +2489,7 @@ def update_webhook_cli(
 @click.argument("webhook_id")
 @click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
 @handle_api_errors
+@require_dangerous_mode
 def delete_webhook(webhook_id: str, yes: bool) -> None:
     """Delete a webhook.
 

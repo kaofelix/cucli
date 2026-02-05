@@ -12,7 +12,7 @@ class TestTaskAttachmentsCLI:
         """Test that create-attachment command requires --file option."""
         result = runner.invoke(
             cli,
-            ["create-attachment", "86c7mc19h"],
+            ["--dangerous-mode", "create-attachment", "86c7mc19h"],
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code != 0
@@ -25,6 +25,7 @@ class TestTaskAttachmentsCLI:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-attachment",
                 "86c7mc19h",
                 "--file",
@@ -47,7 +48,13 @@ class TestTaskAttachmentsCLI:
 
         result = runner.invoke(
             cli,
-            ["create-attachment", "86c7mc19h", "--file", str(test_file)],
+            [
+                "--dangerous-mode",
+                "create-attachment",
+                "86c7mc19h",
+                "--file",
+                str(test_file),
+            ],
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code == 0
@@ -68,6 +75,7 @@ class TestTaskAttachmentsCLI:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-attachment",
                 "86c7mc19h",
                 "--file",
@@ -92,7 +100,14 @@ class TestTaskAttachmentsCLI:
 
         result = runner.invoke(
             cli,
-            ["create-attachment", "86c7mc19h", "--file", str(test_file), "--raw"],
+            [
+                "--dangerous-mode",
+                "create-attachment",
+                "86c7mc19h",
+                "--file",
+                str(test_file),
+                "--raw",
+            ],
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code == 0

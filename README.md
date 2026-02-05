@@ -40,6 +40,35 @@ All commands support different output formats:
 - `--custom-task-ids --team-id <id>` - Use custom task IDs instead of numeric IDs
 - `--help` - Show help for any command
 
+### Dangerous Mode
+
+By default, cucli operates in **read-only mode** for safety. Commands that modify data (create, update, delete) require explicit opt-in via dangerous mode:
+
+```bash
+# Enable via flag (per-command)
+cucli --dangerous-mode delete-task 123
+cucli --dangerous-mode create-task 456 --name "New Task"
+
+# Enable via environment variable (session-wide)
+export CUCLI_DANGEROUS_MODE=1
+cucli delete-task 123
+cucli create-task 456 --name "New Task"
+```
+
+**Commands requiring dangerous mode:**
+- All `create-*` commands (create-task, create-list, create-folder, etc.)
+- All `update-*` commands (update-task, update-list, update-folder, etc.)
+- All `delete-*` commands (delete-task, delete-list, delete-folder, etc.)
+- All `add-*` commands (add-comment, add-tag, add-dependency, etc.)
+- All `remove-*` commands (remove-tag)
+- Time tracking: `start-time-entry`, `stop-time-entry`
+
+**Read-only commands** (no dangerous mode required):
+- `workspaces`, `spaces`, `folders`, `lists`, `tasks`, `task`
+- `task-comments`, `list-comments`, `task-members`, `list-members`
+- `running-time-entry`, `time-entries`, `goals`, `goal`
+- `tags`, `webhooks`, `views`
+
 ## Commands
 
 ### Workspaces & Spaces

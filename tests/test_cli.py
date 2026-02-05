@@ -540,7 +540,14 @@ class TestCreateTaskCommand:
         """Test create-task command with minimal options."""
         list_id = "901520401736"
         result = runner.invoke(
-            cli, ["create-task", list_id, "--name", "Test Task from CLI"]
+            cli,
+            [
+                "--dangerous-mode",
+                "create-task",
+                list_id,
+                "--name",
+                "Test Task from CLI",
+            ],
         )
 
         assert result.exit_code == 0
@@ -555,6 +562,7 @@ class TestCreateTaskCommand:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-task",
                 list_id,
                 "--name",
@@ -576,6 +584,7 @@ class TestCreateTaskCommand:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-task",
                 list_id,
                 "--name",
@@ -596,6 +605,7 @@ class TestCreateTaskCommand:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-task",
                 list_id,
                 "--name",
@@ -616,6 +626,7 @@ class TestCreateTaskCommand:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-task",
                 list_id,
                 "--name",
@@ -636,6 +647,7 @@ class TestCreateTaskCommand:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-task",
                 list_id,
                 "--name",
@@ -655,7 +667,14 @@ class TestCreateTaskCommand:
         list_id = "901520401736"
         result = runner.invoke(
             cli,
-            ["create-task", list_id, "--name", "Test Task Raw", "--raw"],
+            [
+                "--dangerous-mode",
+                "create-task",
+                list_id,
+                "--name",
+                "Test Task Raw",
+                "--raw",
+            ],
         )
 
         assert result.exit_code == 0
@@ -668,7 +687,9 @@ class TestCreateTaskCommand:
     def test_create_task_invalid_list(self, runner, mock_api_key_env):
         """Test create-task command with invalid list ID."""
         list_id = "99999999"
-        result = runner.invoke(cli, ["create-task", list_id, "--name", "Test Task"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "create-task", list_id, "--name", "Test Task"]
+        )
 
         assert result.exit_code != 0
         assert "Error" in result.output or "HTTP Error" in result.output
@@ -676,14 +697,14 @@ class TestCreateTaskCommand:
     def test_create_task_missing_name(self, runner, mock_api_key_env):
         """Test create-task command fails without required name."""
         list_id = "901520401736"
-        result = runner.invoke(cli, ["create-task", list_id])
+        result = runner.invoke(cli, ["--dangerous-mode", "create-task", list_id])
 
         assert result.exit_code != 0
         assert "name" in result.output.lower() or "missing" in result.output.lower()
 
     def test_create_task_help(self, runner):
         """Test create-task command help."""
-        result = runner.invoke(cli, ["create-task", "--help"])
+        result = runner.invoke(cli, ["--dangerous-mode", "create-task", "--help"])
         assert result.exit_code == 0
         assert "--name" in result.output
         assert "--description" in result.output
@@ -705,13 +726,15 @@ class TestUpdateTaskCommand:
         # First create a task
         list_id = "901520401736"
         create_result = runner.invoke(
-            cli, ["create-task", list_id, "--name", "Task to Update"]
+            cli,
+            ["--dangerous-mode", "create-task", list_id, "--name", "Task to Update"],
         )
         task_id = json.loads(create_result.output)["id"]
 
         # Update the task
         result = runner.invoke(
-            cli, ["update-task", task_id, "--name", "Updated Task Name"]
+            cli,
+            ["--dangerous-mode", "update-task", task_id, "--name", "Updated Task Name"],
         )
 
         assert result.exit_code == 0
@@ -723,12 +746,15 @@ class TestUpdateTaskCommand:
         """Test update-task command with status change."""
         list_id = "901520401736"
         create_result = runner.invoke(
-            cli, ["create-task", list_id, "--name", "Task for Status"]
+            cli,
+            ["--dangerous-mode", "create-task", list_id, "--name", "Task for Status"],
         )
         task_id = json.loads(create_result.output)["id"]
 
         # Update status
-        result = runner.invoke(cli, ["update-task", task_id, "--status", "to do"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "update-task", task_id, "--status", "to do"]
+        )
 
         assert result.exit_code == 0
         output = json.loads(result.output)
@@ -739,12 +765,15 @@ class TestUpdateTaskCommand:
         """Test update-task command with priority change."""
         list_id = "901520401736"
         create_result = runner.invoke(
-            cli, ["create-task", list_id, "--name", "Task for Priority"]
+            cli,
+            ["--dangerous-mode", "create-task", list_id, "--name", "Task for Priority"],
         )
         task_id = json.loads(create_result.output)["id"]
 
         # Update priority
-        result = runner.invoke(cli, ["update-task", task_id, "--priority", "1"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "update-task", task_id, "--priority", "1"]
+        )
 
         assert result.exit_code == 0
         output = json.loads(result.output)
@@ -755,12 +784,13 @@ class TestUpdateTaskCommand:
         """Test update-task command with raw output."""
         list_id = "901520401736"
         create_result = runner.invoke(
-            cli, ["create-task", list_id, "--name", "Task for Raw"]
+            cli, ["--dangerous-mode", "create-task", list_id, "--name", "Task for Raw"]
         )
         task_id = json.loads(create_result.output)["id"]
 
         result = runner.invoke(
-            cli, ["update-task", task_id, "--name", "Updated", "--raw"]
+            cli,
+            ["--dangerous-mode", "update-task", task_id, "--name", "Updated", "--raw"],
         )
 
         assert result.exit_code == 0
@@ -772,14 +802,16 @@ class TestUpdateTaskCommand:
     def test_update_task_not_found(self, runner, mock_api_key_env):
         """Test update-task command with invalid task ID."""
         task_id = "00000000"
-        result = runner.invoke(cli, ["update-task", task_id, "--name", "New Name"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "update-task", task_id, "--name", "New Name"]
+        )
 
         assert result.exit_code != 0
         assert "Error" in result.output or "HTTP Error" in result.output
 
     def test_update_task_help(self, runner):
         """Test update-task command help."""
-        result = runner.invoke(cli, ["update-task", "--help"])
+        result = runner.invoke(cli, ["--dangerous-mode", "update-task", "--help"])
         assert result.exit_code == 0
         assert "--name" in result.output
         assert "--status" in result.output
@@ -800,12 +832,15 @@ class TestDeleteTaskCommand:
         # First create a task
         list_id = "901520401736"
         create_result = runner.invoke(
-            cli, ["create-task", list_id, "--name", "Task to Delete"]
+            cli,
+            ["--dangerous-mode", "create-task", list_id, "--name", "Task to Delete"],
         )
         task_id = json.loads(create_result.output)["id"]
 
         # Delete the task
-        result = runner.invoke(cli, ["delete-task", task_id, "--yes"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "delete-task", task_id, "--yes"]
+        )
 
         assert result.exit_code == 0
 
@@ -813,14 +848,16 @@ class TestDeleteTaskCommand:
     def test_delete_task_not_found(self, runner, mock_api_key_env):
         """Test delete-task command with invalid task ID."""
         task_id = "00000000"
-        result = runner.invoke(cli, ["delete-task", task_id, "--yes"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "delete-task", task_id, "--yes"]
+        )
 
         assert result.exit_code != 0
         assert "Error" in result.output or "HTTP Error" in result.output
 
     def test_delete_task_help(self, runner):
         """Test delete-task command help."""
-        result = runner.invoke(cli, ["delete-task", "--help"])
+        result = runner.invoke(cli, ["--dangerous-mode", "delete-task", "--help"])
         assert result.exit_code == 0
 
 
@@ -900,7 +937,9 @@ class TestAddCommentCommand:
     def test_add_comment_json_output(self, runner, mock_api_key_env):
         """Test add-comment command with JSON output (default)."""
         task_id = "86c7mc19h"
-        result = runner.invoke(cli, ["add-comment", task_id, "--text", "Test comment"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "add-comment", task_id, "--text", "Test comment"]
+        )
 
         assert result.exit_code == 0
         output = json.loads(result.output)
@@ -913,7 +952,16 @@ class TestAddCommentCommand:
         """Test add-comment command with table output."""
         task_id = "86c7mc19h"
         result = runner.invoke(
-            cli, ["add-comment", task_id, "--text", "Test comment", "--format", "table"]
+            cli,
+            [
+                "--dangerous-mode",
+                "add-comment",
+                task_id,
+                "--text",
+                "Test comment",
+                "--format",
+                "table",
+            ],
         )
 
         assert result.exit_code == 0
@@ -924,7 +972,16 @@ class TestAddCommentCommand:
         """Test add-comment command with assignee."""
         task_id = "86c7mc19h"
         result = runner.invoke(
-            cli, ["add-comment", task_id, "--text", "Test comment", "--assignee", "183"]
+            cli,
+            [
+                "--dangerous-mode",
+                "add-comment",
+                task_id,
+                "--text",
+                "Test comment",
+                "--assignee",
+                "183",
+            ],
         )
 
         assert result.exit_code == 0
@@ -934,7 +991,15 @@ class TestAddCommentCommand:
         """Test add-comment command with no-notify flag."""
         task_id = "86c7mc19h"
         result = runner.invoke(
-            cli, ["add-comment", task_id, "--text", "Test comment", "--no-notify"]
+            cli,
+            [
+                "--dangerous-mode",
+                "add-comment",
+                task_id,
+                "--text",
+                "Test comment",
+                "--no-notify",
+            ],
         )
 
         assert result.exit_code == 0
@@ -943,14 +1008,16 @@ class TestAddCommentCommand:
     def test_add_comment_not_found(self, runner, mock_api_key_env):
         """Test add-comment command with invalid task ID."""
         task_id = "00000000"
-        result = runner.invoke(cli, ["add-comment", task_id, "--text", "Test"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "add-comment", task_id, "--text", "Test"]
+        )
 
         assert result.exit_code != 0
         assert "Error" in result.output or "HTTP Error" in result.output
 
     def test_add_comment_help(self, runner):
         """Test add-comment command help."""
-        result = runner.invoke(cli, ["add-comment", "--help"])
+        result = runner.invoke(cli, ["--dangerous-mode", "add-comment", "--help"])
         assert result.exit_code == 0
 
 
@@ -967,7 +1034,14 @@ class TestCreateFolderCommand:
         """Test create-folder command with minimal options."""
         space_id = "90159451300"
         result = runner.invoke(
-            cli, ["create-folder", space_id, "--name", "Test Folder from CLI"]
+            cli,
+            [
+                "--dangerous-mode",
+                "create-folder",
+                space_id,
+                "--name",
+                "Test Folder from CLI",
+            ],
         )
 
         assert result.exit_code == 0
@@ -982,6 +1056,7 @@ class TestCreateFolderCommand:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-folder",
                 space_id,
                 "--name",
@@ -1000,7 +1075,15 @@ class TestCreateFolderCommand:
         """Test create-folder command with raw output."""
         space_id = "90159451300"
         result = runner.invoke(
-            cli, ["create-folder", space_id, "--name", "Test Folder Raw", "--raw"]
+            cli,
+            [
+                "--dangerous-mode",
+                "create-folder",
+                space_id,
+                "--name",
+                "Test Folder Raw",
+                "--raw",
+            ],
         )
 
         assert result.exit_code == 0
@@ -1014,7 +1097,8 @@ class TestCreateFolderCommand:
         """Test create-folder command with invalid space ID."""
         space_id = "99999999"
         result = runner.invoke(
-            cli, ["create-folder", space_id, "--name", "Test Folder"]
+            cli,
+            ["--dangerous-mode", "create-folder", space_id, "--name", "Test Folder"],
         )
 
         assert result.exit_code != 0
@@ -1023,14 +1107,14 @@ class TestCreateFolderCommand:
     def test_create_folder_missing_name(self, runner, mock_api_key_env):
         """Test create-folder command fails without required name."""
         space_id = "90159451300"
-        result = runner.invoke(cli, ["create-folder", space_id])
+        result = runner.invoke(cli, ["--dangerous-mode", "create-folder", space_id])
 
         assert result.exit_code != 0
         assert "name" in result.output.lower() or "missing" in result.output.lower()
 
     def test_create_folder_help(self, runner):
         """Test create-folder command help."""
-        result = runner.invoke(cli, ["create-folder", "--help"])
+        result = runner.invoke(cli, ["--dangerous-mode", "create-folder", "--help"])
         assert result.exit_code == 0
         assert "--name" in result.output
 
@@ -1048,7 +1132,14 @@ class TestCreateListCommand:
         """Test create-list command with minimal options."""
         folder_id = "901513787576"
         result = runner.invoke(
-            cli, ["create-list", folder_id, "--name", "Test List from CLI"]
+            cli,
+            [
+                "--dangerous-mode",
+                "create-list",
+                folder_id,
+                "--name",
+                "Test List from CLI",
+            ],
         )
 
         assert result.exit_code == 0
@@ -1063,6 +1154,7 @@ class TestCreateListCommand:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-list",
                 folder_id,
                 "--name",
@@ -1084,6 +1176,7 @@ class TestCreateListCommand:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-list",
                 folder_id,
                 "--name",
@@ -1109,6 +1202,7 @@ class TestCreateListCommand:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-list",
                 folder_id,
                 "--name",
@@ -1127,7 +1221,15 @@ class TestCreateListCommand:
         """Test create-list command with raw output."""
         folder_id = "901513787576"
         result = runner.invoke(
-            cli, ["create-list", folder_id, "--name", "Test List Raw", "--raw"]
+            cli,
+            [
+                "--dangerous-mode",
+                "create-list",
+                folder_id,
+                "--name",
+                "Test List Raw",
+                "--raw",
+            ],
         )
 
         assert result.exit_code == 0
@@ -1140,7 +1242,9 @@ class TestCreateListCommand:
     def test_create_list_invalid_folder(self, runner, mock_api_key_env):
         """Test create-list command with invalid folder ID."""
         folder_id = "99999999"
-        result = runner.invoke(cli, ["create-list", folder_id, "--name", "Test List"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "create-list", folder_id, "--name", "Test List"]
+        )
 
         assert result.exit_code != 0
         assert "Error" in result.output or "HTTP Error" in result.output
@@ -1148,14 +1252,14 @@ class TestCreateListCommand:
     def test_create_list_missing_name(self, runner, mock_api_key_env):
         """Test create-list command fails without required name."""
         folder_id = "901513787576"
-        result = runner.invoke(cli, ["create-list", folder_id])
+        result = runner.invoke(cli, ["--dangerous-mode", "create-list", folder_id])
 
         assert result.exit_code != 0
         assert "name" in result.output.lower() or "missing" in result.output.lower()
 
     def test_create_list_help(self, runner):
         """Test create-list command help."""
-        result = runner.invoke(cli, ["create-list", "--help"])
+        result = runner.invoke(cli, ["--dangerous-mode", "create-list", "--help"])
         assert result.exit_code == 0
         assert "--name" in result.output
 
@@ -1173,7 +1277,14 @@ class TestChecklistCommands:
         """Test create-checklist command with JSON output (default)."""
         task_id = "86c7mc19h"
         result = runner.invoke(
-            cli, ["create-checklist", task_id, "--name", "Test Checklist"]
+            cli,
+            [
+                "--dangerous-mode",
+                "create-checklist",
+                task_id,
+                "--name",
+                "Test Checklist",
+            ],
         )
 
         assert result.exit_code == 0
@@ -1193,6 +1304,7 @@ class TestChecklistCommands:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-checklist",
                 task_id,
                 "--name",
@@ -1213,7 +1325,15 @@ class TestChecklistCommands:
         """Test create-checklist command with raw JSON output."""
         task_id = "86c7mc19h"
         result = runner.invoke(
-            cli, ["create-checklist", task_id, "--name", "Test Checklist", "--raw"]
+            cli,
+            [
+                "--dangerous-mode",
+                "create-checklist",
+                task_id,
+                "--name",
+                "Test Checklist",
+                "--raw",
+            ],
         )
 
         assert result.exit_code == 0
@@ -1226,7 +1346,14 @@ class TestChecklistCommands:
         """Test create-checklist-item command with JSON output (default)."""
         checklist_id = "143aaa01-22fe-4b98-ab9b-96794a1c5901"
         result = runner.invoke(
-            cli, ["create-checklist-item", checklist_id, "--name", "Test Item"]
+            cli,
+            [
+                "--dangerous-mode",
+                "create-checklist-item",
+                checklist_id,
+                "--name",
+                "Test Item",
+            ],
         )
 
         assert result.exit_code == 0
@@ -1244,6 +1371,7 @@ class TestChecklistCommands:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-checklist-item",
                 checklist_id,
                 "--name",
@@ -1262,7 +1390,14 @@ class TestChecklistCommands:
         """Test update-checklist command."""
         checklist_id = "143aaa01-22fe-4b98-ab9b-96794a1c5901"
         result = runner.invoke(
-            cli, ["update-checklist", checklist_id, "--name", "Updated Name"]
+            cli,
+            [
+                "--dangerous-mode",
+                "update-checklist",
+                checklist_id,
+                "--name",
+                "Updated Name",
+            ],
         )
 
         assert result.exit_code == 0
@@ -1275,6 +1410,7 @@ class TestChecklistCommands:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "update-checklist-item",
                 checklist_id,
                 checklist_item_id,
@@ -1291,7 +1427,9 @@ class TestChecklistCommands:
     def test_delete_checklist(self, runner, mock_api_key_env):
         """Test delete-checklist command."""
         checklist_id = "143aaa01-22fe-4b98-ab9b-96794a1c5901"
-        result = runner.invoke(cli, ["delete-checklist", checklist_id, "--yes"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "delete-checklist", checklist_id, "--yes"]
+        )
 
         assert result.exit_code == 0
         assert "deleted successfully" in result.output
@@ -1302,7 +1440,14 @@ class TestChecklistCommands:
         checklist_id = "143aaa01-22fe-4b98-ab9b-96794a1c5901"
         checklist_item_id = "9a6fdb6b-83c2-48e5-9dd2-4b1749dbe966"
         result = runner.invoke(
-            cli, ["delete-checklist-item", checklist_id, checklist_item_id, "--yes"]
+            cli,
+            [
+                "--dangerous-mode",
+                "delete-checklist-item",
+                checklist_id,
+                checklist_item_id,
+                "--yes",
+            ],
         )
 
         assert result.exit_code == 0
@@ -1311,7 +1456,7 @@ class TestChecklistCommands:
     def test_create_checklist_missing_name(self, runner, mock_api_key_env):
         """Test create-checklist command fails without required name."""
         task_id = "86c7mc19h"
-        result = runner.invoke(cli, ["create-checklist", task_id])
+        result = runner.invoke(cli, ["--dangerous-mode", "create-checklist", task_id])
 
         assert result.exit_code != 0
         assert "name" in result.output.lower() or "missing" in result.output.lower()
@@ -1503,7 +1648,14 @@ class TestTimeTrackingCommands:
     def test_start_time_entry(self, runner, mock_api_key_env, team_id):
         """Test start-time-entry command."""
         result = runner.invoke(
-            cli, ["start-time-entry", team_id, "--description", "Test time entry"]
+            cli,
+            [
+                "--dangerous-mode",
+                "start-time-entry",
+                team_id,
+                "--description",
+                "Test time entry",
+            ],
         )
 
         assert result.exit_code == 0
@@ -1521,7 +1673,9 @@ class TestTimeTrackingCommands:
     def test_start_time_entry_with_task(self, runner, mock_api_key_env, team_id):
         """Test start-time-entry command with task."""
         task_id = "86c7mc19h"
-        result = runner.invoke(cli, ["start-time-entry", team_id, "--task-id", task_id])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "start-time-entry", team_id, "--task-id", task_id]
+        )
 
         assert result.exit_code == 0
         output = json.loads(result.output)
@@ -1539,6 +1693,7 @@ class TestTimeTrackingCommands:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "start-time-entry",
                 team_id,
                 "--description",
@@ -1555,7 +1710,7 @@ class TestTimeTrackingCommands:
     @pytest.mark.vcr
     def test_stop_time_entry(self, runner, mock_api_key_env, team_id):
         """Test stop-time-entry command."""
-        result = runner.invoke(cli, ["stop-time-entry", team_id])
+        result = runner.invoke(cli, ["--dangerous-mode", "stop-time-entry", team_id])
 
         assert result.exit_code == 0
         output = json.loads(result.output)
@@ -1574,7 +1729,9 @@ class TestTimeTrackingCommands:
     )
     def test_stop_time_entry_table(self, runner, mock_api_key_env, team_id):
         """Test stop-time-entry command with table format."""
-        result = runner.invoke(cli, ["stop-time-entry", team_id, "--format", "table"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "stop-time-entry", team_id, "--format", "table"]
+        )
 
         assert result.exit_code == 0
         assert "ID:" in result.output or "stopped" in result.output.lower()
@@ -1660,6 +1817,7 @@ class TestTimeTrackingCommands:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-time-entry",
                 team_id,
                 "--start",
@@ -1688,6 +1846,7 @@ class TestTimeTrackingCommands:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-time-entry",
                 team_id,
                 "--start",
@@ -1716,6 +1875,7 @@ class TestTimeTrackingCommands:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-time-entry",
                 team_id,
                 "--start",
@@ -1740,6 +1900,7 @@ class TestTimeTrackingCommands:
         create_result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-time-entry",
                 team_id,
                 "--start",
@@ -1757,6 +1918,7 @@ class TestTimeTrackingCommands:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "update-time-entry",
                 team_id,
                 timer_id,
@@ -1783,6 +1945,7 @@ class TestTimeTrackingCommands:
         create_result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-time-entry",
                 team_id,
                 "--start",
@@ -1798,6 +1961,7 @@ class TestTimeTrackingCommands:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "update-time-entry",
                 team_id,
                 timer_id,
@@ -1823,6 +1987,7 @@ class TestTimeTrackingCommands:
         create_result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-time-entry",
                 team_id,
                 "--start",
@@ -1837,7 +2002,9 @@ class TestTimeTrackingCommands:
         timer_id = json.loads(create_result.output)["id"]
 
         # Delete the time entry
-        result = runner.invoke(cli, ["delete-time-entry", team_id, timer_id, "--yes"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "delete-time-entry", team_id, timer_id, "--yes"]
+        )
 
         assert result.exit_code == 0
         assert "deleted" in result.output.lower()
@@ -1856,6 +2023,7 @@ class TestTimeTrackingCommands:
         create_result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "create-time-entry",
                 team_id,
                 "--start",
@@ -1868,14 +2036,16 @@ class TestTimeTrackingCommands:
         timer_id = json.loads(create_result.output)["id"]
 
         # Try to delete without --yes flag (should prompt)
-        result = runner.invoke(cli, ["delete-time-entry", team_id, timer_id], input="y")
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "delete-time-entry", team_id, timer_id], input="y"
+        )
 
         assert result.exit_code == 0
         assert "deleted" in result.output.lower()
 
     def test_start_time_entry_missing_team_id(self, runner):
         """Test start-time-entry command fails without team_id."""
-        result = runner.invoke(cli, ["start-time-entry"])
+        result = runner.invoke(cli, ["--dangerous-mode", "start-time-entry"])
 
         assert result.exit_code != 0
         assert "Missing argument" in result.output or "team_id" in result.output.lower()
@@ -1884,7 +2054,8 @@ class TestTimeTrackingCommands:
         """Test create-time-entry command fails without start time."""
         team_id = "90152245421"
         result = runner.invoke(
-            cli, ["create-time-entry", team_id, "--duration", "3600000"]
+            cli,
+            ["--dangerous-mode", "create-time-entry", team_id, "--duration", "3600000"],
         )
 
         assert result.exit_code != 0
@@ -1894,7 +2065,14 @@ class TestTimeTrackingCommands:
         """Test create-time-entry command fails without duration."""
         team_id = "90152245421"
         result = runner.invoke(
-            cli, ["create-time-entry", team_id, "--start", "1737925200000"]
+            cli,
+            [
+                "--dangerous-mode",
+                "create-time-entry",
+                team_id,
+                "--start",
+                "1737925200000",
+            ],
         )
 
         assert result.exit_code != 0

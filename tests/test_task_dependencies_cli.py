@@ -19,7 +19,7 @@ class TestTaskDependenciesCLI:
 
     def test_add_dependency_requires_option(self, runner):
         """Test that add-dependency requires either --depends-on or --dependency-of."""
-        result = runner.invoke(cli, ["add-dependency", "86c7ujp8z"])
+        result = runner.invoke(cli, ["--dangerous-mode", "add-dependency", "86c7ujp8z"])
         assert result.exit_code != 0
         assert (
             "Either --depends-on or --dependency-of must be specified" in result.output
@@ -30,6 +30,7 @@ class TestTaskDependenciesCLI:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "add-dependency",
                 "86c7ujp8z",
                 "--depends-on",
@@ -44,7 +45,14 @@ class TestTaskDependenciesCLI:
     def test_add_dependency_depends_on_json(self, runner, task_id, dependent_task_id):
         """Test adding a dependency with --depends-on in JSON format."""
         result = runner.invoke(
-            cli, ["add-dependency", task_id, "--depends-on", dependent_task_id]
+            cli,
+            [
+                "--dangerous-mode",
+                "add-dependency",
+                task_id,
+                "--depends-on",
+                dependent_task_id,
+            ],
         )
         assert result.exit_code == 0
         assert task_id in result.output
@@ -58,6 +66,7 @@ class TestTaskDependenciesCLI:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "add-dependency",
                 task_id,
                 "--dependency-of",
@@ -72,7 +81,9 @@ class TestTaskDependenciesCLI:
 
     def test_delete_dependency_requires_option(self, runner):
         """Test that delete-dependency requires either --depends-on or --dependency-of."""
-        result = runner.invoke(cli, ["delete-dependency", "86c7ujp8z"])
+        result = runner.invoke(
+            cli, ["--dangerous-mode", "delete-dependency", "86c7ujp8z"]
+        )
         assert result.exit_code != 0
         assert (
             "Either --depends-on or --dependency-of must be specified" in result.output
@@ -83,6 +94,7 @@ class TestTaskDependenciesCLI:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "delete-dependency",
                 "86c7ujp8z",
                 "--depends-on",
@@ -99,7 +111,14 @@ class TestTaskDependenciesCLI:
     ):
         """Test deleting a dependency with --depends-on in JSON format."""
         result = runner.invoke(
-            cli, ["delete-dependency", task_id, "--depends-on", dependent_task_id]
+            cli,
+            [
+                "--dangerous-mode",
+                "delete-dependency",
+                task_id,
+                "--depends-on",
+                dependent_task_id,
+            ],
         )
         assert result.exit_code == 0
         assert task_id in result.output
@@ -113,6 +132,7 @@ class TestTaskDependenciesCLI:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "delete-dependency",
                 task_id,
                 "--dependency-of",

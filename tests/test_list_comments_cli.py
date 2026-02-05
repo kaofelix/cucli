@@ -38,7 +38,14 @@ def test_list_comments_raw(runner):
 def test_add_list_comment(runner):
     """Test adding a comment to a list."""
     result = runner.invoke(
-        cli, ["add-list-comment", "901520401736", "--text", "Test list comment"]
+        cli,
+        [
+            "--dangerous-mode",
+            "add-list-comment",
+            "901520401736",
+            "--text",
+            "Test list comment",
+        ],
     )
 
     assert result.exit_code == 0
@@ -52,6 +59,7 @@ def test_add_list_comment_with_notify_false(runner):
     result = runner.invoke(
         cli,
         [
+            "--dangerous-mode",
             "add-list-comment",
             "901520401736",
             "--text",
@@ -71,6 +79,7 @@ def test_add_list_comment_with_assignee(runner):
     result = runner.invoke(
         cli,
         [
+            "--dangerous-mode",
             "add-list-comment",
             "901520401736",
             "--text",
@@ -91,6 +100,7 @@ def test_add_list_comment_table_format(runner):
     result = runner.invoke(
         cli,
         [
+            "--dangerous-mode",
             "add-list-comment",
             "901520401736",
             "--text",
@@ -110,7 +120,14 @@ def test_add_list_comment_raw(runner):
     """Test adding a comment to a list with raw output."""
     result = runner.invoke(
         cli,
-        ["add-list-comment", "901520401736", "--text", "Test list comment", "--raw"],
+        [
+            "--dangerous-mode",
+            "add-list-comment",
+            "901520401736",
+            "--text",
+            "Test list comment",
+            "--raw",
+        ],
     )
 
     assert result.exit_code == 0
@@ -122,7 +139,9 @@ def test_add_list_comment_raw(runner):
 @pytest.mark.vcr()
 def test_add_list_comment_missing_text(runner, mock_api_key_env):
     """Test adding a comment to a list without text raises error."""
-    result = runner.invoke(cli, ["add-list-comment", "901520401736"])
+    result = runner.invoke(
+        cli, ["--dangerous-mode", "add-list-comment", "901520401736"]
+    )
 
     assert result.exit_code == 2
     assert "--text" in result.output or "Missing option" in result.output

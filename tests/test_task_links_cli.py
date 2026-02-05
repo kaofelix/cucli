@@ -12,7 +12,7 @@ class TestTaskLinksCLI:
         """Test that add-link command requires --links-to option."""
         result = runner.invoke(
             cli,
-            ["add-link", "86c7mc19h"],
+            ["--dangerous-mode", "add-link", "86c7mc19h"],
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code != 0
@@ -23,7 +23,7 @@ class TestTaskLinksCLI:
         # This is just to verify the command exists and handles missing required params
         result = runner.invoke(
             cli,
-            ["add-link", "86c7mc19h"],
+            ["--dangerous-mode", "add-link", "86c7mc19h"],
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         # Should fail because --links-to is required
@@ -33,7 +33,7 @@ class TestTaskLinksCLI:
         """Test that delete-link command requires --links-to option."""
         result = runner.invoke(
             cli,
-            ["delete-link", "86c7mc19h"],
+            ["--dangerous-mode", "delete-link", "86c7mc19h"],
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code != 0
@@ -43,7 +43,14 @@ class TestTaskLinksCLI:
         """Test that add-link command requires --team-id when using --custom-task-ids."""
         result = runner.invoke(
             cli,
-            ["add-link", "86c7mc19h", "--links-to", "86c7ujp8z", "--custom-task-ids"],
+            [
+                "--dangerous-mode",
+                "add-link",
+                "86c7mc19h",
+                "--links-to",
+                "86c7ujp8z",
+                "--custom-task-ids",
+            ],
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code != 0
@@ -56,6 +63,7 @@ class TestTaskLinksCLI:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "delete-link",
                 "86c7mc19h",
                 "--links-to",
@@ -74,7 +82,7 @@ class TestTaskLinksCLI:
         """Test adding a task link with JSON output format."""
         result = runner.invoke(
             cli,
-            ["add-link", "86c7mc19h", "--links-to", "86c7ujp8z"],
+            ["--dangerous-mode", "add-link", "86c7mc19h", "--links-to", "86c7ujp8z"],
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code == 0
@@ -91,7 +99,15 @@ class TestTaskLinksCLI:
         """Test adding a task link with table output format."""
         result = runner.invoke(
             cli,
-            ["add-link", "86c7mc19h", "--links-to", "86c7ujp8z", "--format", "table"],
+            [
+                "--dangerous-mode",
+                "add-link",
+                "86c7mc19h",
+                "--links-to",
+                "86c7ujp8z",
+                "--format",
+                "table",
+            ],
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code == 0
@@ -104,7 +120,7 @@ class TestTaskLinksCLI:
         """Test deleting a task link with JSON output format."""
         result = runner.invoke(
             cli,
-            ["delete-link", "86c7mc19h", "--links-to", "86c7ujp8z"],
+            ["--dangerous-mode", "delete-link", "86c7mc19h", "--links-to", "86c7ujp8z"],
             env={"CLICKUP_API_KEY": mock_api_key_env},
         )
         assert result.exit_code == 0
@@ -122,6 +138,7 @@ class TestTaskLinksCLI:
         result = runner.invoke(
             cli,
             [
+                "--dangerous-mode",
                 "delete-link",
                 "86c7mc19h",
                 "--links-to",
